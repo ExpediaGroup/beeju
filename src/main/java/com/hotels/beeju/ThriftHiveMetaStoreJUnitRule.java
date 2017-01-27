@@ -37,9 +37,8 @@ import org.slf4j.LoggerFactory;
 /**
  * A JUnit Rule that creates a Hive Metastore Thrift service backed by a Hive Metastore using an HSQLDB in-memory
  * database.
- * <p/>
+ * <p>
  * A fresh database instance will be created for each test method.
- * <p/>
  */
 public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreJUnitRule.class);
