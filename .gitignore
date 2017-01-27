@@ -1,0 +1,50 @@
+# Eclipse
+.classpath
+.project
+.metadata
+.settings/
+
+# Checkstyle and findbugs eclipse plugins
+*/.checkstyle
+*/.fbExcludeFilterFile
+
+# Intellij
+.idea/
+*.iml
+*.iws
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Python
+*.py[cod]
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+sdist
+develop-eggs
+.installed.cfg
+lib
+lib64
+MANIFEST
+
+# *Nix text editor backup files
+*~
+# Emacs backup files
+.\#*
+\#*
+
+derby.log
