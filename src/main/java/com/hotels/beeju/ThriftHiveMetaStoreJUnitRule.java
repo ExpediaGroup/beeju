@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
  * database.
  * <p>
  * A fresh database instance will be created for each test method.
+ * </p>
  */
 public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreJUnitRule.class);
@@ -64,18 +65,18 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
+  protected void beforeTest() throws Throwable {
     thriftPort = -1;
     startThrift();
-    super.before();
+    super.beforeTest();
   }
 
   private void startThrift() throws Exception {
     final Lock startLock = new ReentrantLock();
     final Condition startCondition = startLock.newCondition();
     final AtomicBoolean startedServing = new AtomicBoolean();
-    try (ServerSocket s = new ServerSocket(0)) {
-      thriftPort = s.getLocalPort();
+    try (ServerSocket socket = new ServerSocket(0)) {
+      thriftPort = socket.getLocalPort();
     }
     conf.setVar(ConfVars.METASTOREURIS, getThriftConnectionUri());
     final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
@@ -121,9 +122,9 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   }
 
   @Override
-  protected void after() {
+  protected void afterTest() {
     thriftServer.shutdown();
-    super.after();
+    super.afterTest();
   }
 
 }

@@ -31,8 +31,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.hotels.beeju.HiveMetaStoreJUnitRule;
-
 public class HiveMetaStoreJUnitRuleTest {
 
   public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule();
