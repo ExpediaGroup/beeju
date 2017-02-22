@@ -35,8 +35,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.hotels.beeju.ThriftHiveMetaStoreJUnitRule;
-
 public class ThriftHiveMetaStoreJUnitRuleTest {
 
   public @Rule ThriftHiveMetaStoreJUnitRule hiveDefaultName = new ThriftHiveMetaStoreJUnitRule();
