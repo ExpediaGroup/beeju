@@ -28,7 +28,6 @@ import org.junit.Rule;
  * <p>
  * A fresh database instance will be created for each test method.
  * </p>
- * <p>
  * To allow querying of the memory database, add the following to your {@code @Before} method. This will open a Swing
  * SQL query window for the duration of the test. Remember to add a break point to your test.
  *
@@ -49,7 +48,6 @@ import org.junit.Rule;
  *
  * }
  * </pre>
- * </p>
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
