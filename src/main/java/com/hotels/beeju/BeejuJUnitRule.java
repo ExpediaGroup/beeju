@@ -20,12 +20,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.util.UUID;
 
+import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.thrift.TException;
-import org.hsqldb.jdbc.JDBCDriver;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
@@ -36,8 +36,9 @@ import com.google.common.annotations.VisibleForTesting;
  */
 abstract class BeejuJUnitRule extends ExternalResource {
 
-  public static final String HSQLDB_USER = "user";
-  public static final String HSQLDB_PASSWORD = "password";
+  // "user" conflicts with USER db and the metastore_db can't be created.
+  public static final String METASTORE_DB_USER = "db_user";
+  public static final String METASTORE_DB_PASSWORD = "db_password";
 
   @VisibleForTesting
   final TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -50,16 +51,18 @@ abstract class BeejuJUnitRule extends ExternalResource {
   public BeejuJUnitRule(String databaseName) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
-    driverClassName = JDBCDriver.class.getName();
+
+    driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
-    connectionURL = "jdbc:hsqldb:mem:" + UUID.randomUUID();
+    connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
     conf.setVar(ConfVars.METASTORECONNECTURLKEY, connectionURL);
     conf.setVar(ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(ConfVars.METASTORE_CONNECTION_USER_NAME, HSQLDB_USER);
-    conf.setVar(ConfVars.METASTOREPWD, HSQLDB_PASSWORD);
+    conf.setVar(ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
+    conf.setVar(ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
     conf.setBoolVar(ConfVars.HMSHANDLERFORCERELOADCONF, true);
     // Hive 2.x compatibility
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
+    conf.setBoolean("hive.metastore.schema.verification", false);
   }
 
   /**
