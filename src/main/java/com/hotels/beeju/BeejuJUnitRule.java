@@ -18,6 +18,7 @@ package com.hotels.beeju;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -63,6 +64,13 @@ abstract class BeejuJUnitRule extends ExternalResource {
     // Hive 2.x compatibility
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("hive.metastore.schema.verification", false);
+    try {
+      // overriding default derby log path to go to tmp
+      String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
+      System.setProperty("derby.stream.error.file", derbyLog);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
