@@ -4,7 +4,7 @@
 # Start using
 You can obtain BeeJU from Maven Central : 
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.hotels/beeju/badge.svg?subject=com.hotels:beeju)](https://maven-badges.herokuapp.com/maven-central/com.hotels/beeju) ![GitHub license](https://img.shields.io/github/license/HotelsDotCom/beeju.svg)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.hotels/beeju/badge.svg?subject=com.hotels:beeju)](https://maven-badges.herokuapp.com/maven-central/com.hotels/beeju) [![Build Status](https://travis-ci.org/HotelsDotCom/beeju.svg?branch=master)](https://travis-ci.org/HotelsDotCom/beeju) [![Coverage Status](https://coveralls.io/repos/github/HotelsDotCom/beeju/badge.svg?branch=master)](https://coveralls.io/github/HotelsDotCom/beeju) ![GitHub license](https://img.shields.io/github/license/HotelsDotCom/beeju.svg)
 
 # Overview
 BeeJU provides [JUnit rules](http://junit.org/junit4/javadoc/4.12/org/junit/Rule.html) that can be used to write test code that tests [Hive](https://hive.apache.org/). A JUnit rule is a means to provide resources in a test and automatically tear them down when the life cycle of a test ends.
