@@ -1,0 +1,16 @@
+language: java
+jdk:
+  - openjdk7
+os:
+  - linux
+cache:
+  directories:
+    - ~/.m2/repository
+before_deploy:
+  - travis/before-deploy.sh
+deploy:
+  provider: script
+  script: travis/deploy.sh
+  skip_cleanup: true
+after_deploy:
+  - travis/after-deploy.sh
