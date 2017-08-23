@@ -9,14 +9,19 @@ cache:
 install:
   - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P travis
 script:
-  - mvn test -B -P travis -Dmaven-surefire-plugin.arguments='-Xmx512m -XX:MaxPermSize=256m'
-after_success:
   - mvn clean test cobertura:cobertura coveralls:report -B -P travis -DrepoToken=${COVERALLS_REPO_TOKEN} -Dmaven-surefire-plugin.arguments='-Xmx512m -XX:MaxPermSize=256m'
 before_deploy:
   - travis/before-deploy.sh
 deploy:
-  provider: script
-  script: travis/deploy.sh
-  skip_cleanup: true
+  - provider: script
+    script: travis/deploy.sh
+    skip_cleanup: true
+    on:
+      branch: master
+  - provider: script
+    script: travis/deploy.sh
+    skip_cleanup: true
+    on:
+      tags: true
 after_deploy:
   - travis/after-deploy.sh

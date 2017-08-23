@@ -1,7 +1,13 @@
 #!/usr/bin/env bash
 
-if [ "$TRAVIS_BRANCH" = 'master' ] && [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
+set -e
+
+if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   if [ ! -z "$TRAVIS_TAG" ]; then
-    mvn clean deploy --settings travis/mvn-settings.xml -B -U -P travis,oss-release "$@"
+    echo "Deploying release"
+    mvn clean deploy --settings travis/mvn-settings.xml -B -U -P travis,oss-release "$@" -DskipTests=true -X -e
+  else
+    echo "Deploying snapshot"
+    mvn clean deploy --settings travis/mvn-settings.xml -B -U -P travis "$@" -DskipTests=true
   fi
 fi
