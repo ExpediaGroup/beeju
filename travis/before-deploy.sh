@@ -8,6 +8,4 @@ if [ "$TRAVIS_PULL_REQUEST" == 'false' ]; then
   mkdir -p $GPG_DIR
   echo $GPG_PUBLIC_KEYS | base64 --decode >> ${GPG_DIR}/pubring.gpg
   echo $GPG_SECRET_KEYS | base64 --decode >> ${GPG_DIR}/secring.gpg
-  gpg2 --no-default-keyring --keyring ${GPG_DIR}/pubring.gpg --list-keys
-  gpg2 --no-default-keyring --keyring ${GPG_DIR}/secring.gpg --list-secret-keys
 fi
