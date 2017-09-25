@@ -1,4 +1,4 @@
-## Unreleased
+## [1.1.3] - 25-09-2017
 ### Changed 
 * Depend on latest parent with test.argument build parameter
 
