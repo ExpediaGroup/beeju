@@ -17,6 +17,7 @@ package com.hotels.beeju;
 
 import java.net.ServerSocket;
 import java.net.URI;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +61,17 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    * @param databaseName Database name.
    */
   public ThriftHiveMetaStoreJUnitRule(String databaseName) {
-    super(databaseName);
+    this(databaseName, null);
+  }
+
+  /**
+   * Create a Thrift Hive Metastore service with a pre-created database using the provided name and configuration.
+   *
+   * @param databaseName Database name.
+   * @param configuration Hive configuration properties.
+   */
+  public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
+    super(databaseName, configuration);
     thriftServer = Executors.newSingleThreadExecutor();
   }
 

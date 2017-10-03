@@ -21,7 +21,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -79,6 +81,14 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     assertThat(databases.size(), is(2));
     assertThat(databases.get(0), is("default"));
     assertThat(databases.get(1), is(databaseName));
+  }
+
+  @Test
+  public void customProperties() {
+    Map<String, String> conf = new HashMap<>();
+    conf.put("my.custom.key", "my.custom.value");
+    HiveConf hiveConf = new ThriftHiveMetaStoreJUnitRule("db", conf).conf();
+    assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test(expected = AlreadyExistsException.class)

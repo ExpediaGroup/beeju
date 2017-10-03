@@ -16,6 +16,7 @@
 package com.hotels.beeju;
 
 import java.net.ServerSocket;
+import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -56,7 +57,17 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
    * @param databaseName Database name.
    */
   public HiveServer2JUnitRule(String databaseName) {
-    super(databaseName);
+    this(databaseName, null);
+  }
+
+  /**
+   * Create a HiveServer2 service with a pre-created database using the provided name and configuration.
+   *
+   * @param databaseName Database name.
+   * @param configuration Hive configuration properties.
+   */
+  public HiveServer2JUnitRule(String databaseName, Map<String, String> configuration) {
+    super(databaseName, configuration);
   }
 
   @Override

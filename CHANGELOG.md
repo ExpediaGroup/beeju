@@ -1,16 +1,24 @@
-## [1.1.3] - 25-09-2017
-### Changed 
-* Depend on latest parent with test.arguments build parameter
+## [1.2.0] - 2017-10-03
+### Changed
+* Upgrade to Hive-2.3.0.
+* Upgrade parent POM to 2.0.3.
+### Added
+* The rules now accept Hive configuration properties at construction time.
 
-## [1.1.0] - 18-08-2017
-* Upgrade to Hive-2.1.1, required a switch from HsqlDB to Derby (Hive no longer seems to support HsqlDB)
+## [1.1.3] - 2017-09-25
+### Changed
+* Depend on latest parent with test.arguments build parameter.
+
+## [1.1.0] - 2017-08-18
+### Changed
+* Upgrade to Hive-2.1.1, required a switch from HsqlDB to Derby (Hive no longer seems to support HsqlDB).
 
 ## [1.0.2]
-### Changed 
-* Upgrade parent POM to 1.1.1
+### Changed
+* Upgrade parent POM to 1.1.1.
 
 ## [1.0.1]
-### Addded 
+### Added
 * Addition of `HiveServer2JUnitRule` rule to test against Hive Metastore using the JDBC API.
 
 ## [1.0.0]

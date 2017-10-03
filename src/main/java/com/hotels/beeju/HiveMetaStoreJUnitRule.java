@@ -15,6 +15,7 @@
  */
 package com.hotels.beeju;
 
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -66,7 +67,17 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
    * @param databaseName Database name.
    */
   public HiveMetaStoreJUnitRule(String databaseName) {
-    super(databaseName);
+    this(databaseName, null);
+  }
+
+  /**
+   * Create a Hive Metastore with a pre-created database using the provided name and configuration.
+   *
+   * @param databaseName Database name.
+   * @param configuration Hive configuration properties.
+   */
+  public HiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
+    super(databaseName, configuration);
   }
 
   @Override
