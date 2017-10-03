@@ -25,8 +25,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.FieldSchema;
@@ -48,6 +51,20 @@ public class HiveServer2JUnitRuleTest {
   @Before
   public void init() throws Exception {
     Class.forName(server.driverClassName());
+  }
+
+  @Test
+  public void defaultDatabaseName() {
+    String defaultDbName = new HiveServer2JUnitRule().databaseName();
+    assertThat(defaultDbName, is("test_database"));
+  }
+
+  @Test
+  public void customProperties() {
+    Map<String, String> conf = new HashMap<>();
+    conf.put("my.custom.key", "my.custom.value");
+    HiveConf hiveConf = new HiveServer2JUnitRule(DATABASE, conf).conf();
+    assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test

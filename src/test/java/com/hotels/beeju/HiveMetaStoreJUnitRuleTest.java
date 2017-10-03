@@ -21,7 +21,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
@@ -63,6 +66,14 @@ public class HiveMetaStoreJUnitRuleTest {
     assertThat(database.getName(), is(databaseName));
     File databaseFolder = new File(hive.temporaryFolder.getRoot(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
+  }
+
+  @Test
+  public void customProperties() {
+    Map<String, String> conf = new HashMap<>();
+    conf.put("my.custom.key", "my.custom.value");
+    HiveConf hiveConf = new HiveMetaStoreJUnitRule("db", conf).conf();
+    assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test(expected = AlreadyExistsException.class)

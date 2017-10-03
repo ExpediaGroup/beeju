@@ -19,6 +19,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -49,9 +51,15 @@ abstract class BeejuJUnitRule extends ExternalResource {
   private final String driverClassName;
   private File metastoreLocation;
 
-  public BeejuJUnitRule(String databaseName) {
+  public BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
+
+    if (configuration != null && !configuration.isEmpty()) {
+      for (Entry<String, String> entry : configuration.entrySet()) {
+        conf.set(entry.getKey(), entry.getValue());
+      }
+    }
 
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
