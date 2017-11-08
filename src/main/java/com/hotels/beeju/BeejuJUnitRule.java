@@ -73,7 +73,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("hive.metastore.schema.verification", false);
     // override default port as some of our test environments claim it is in use.
-    conf.setIntVar(ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
+    conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
     try {
       // overriding default derby log path to go to tmp
       String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
