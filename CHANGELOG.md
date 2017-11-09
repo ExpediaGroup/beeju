@@ -1,3 +1,7 @@
+## [1.2.1] - 2017-11-09
+### Changed
+* Change `ConfVars` added in Hive 2.x to their equivalent string.
+
 ## [1.2.0] - 2017-10-03
 ### Changed
 * Upgrade to Hive-2.3.0.
