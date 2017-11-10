@@ -9,13 +9,13 @@
   </parent>
 
   <artifactId>beeju</artifactId>
-  <version>1.2.1-SNAPSHOT</version>
+  <version>1.2.1</version>
 
   <scm>
     <connection>scm:git:git@github.com:HotelsDotCom/beeju.git</connection>
     <developerConnection>scm:git:git@github.com:HotelsDotCom/beeju.git</developerConnection>
     <url>https://github.com/HotelsDotCom/beeju</url>
-    <tag>HEAD</tag>
+    <tag>beeju-1.2.1</tag>
   </scm>
 
   <properties>
