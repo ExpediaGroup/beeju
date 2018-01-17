@@ -22,7 +22,7 @@ Example usage: Class under test creates a table via the Hive Metastore Thrift AP
     public ThriftHiveMetaStoreJUnitRule hive = new ThriftHiveMetaStoreJUnitRule("foo_db");
     
     @Test
-    public void example() {
+    public void example() throws Exception {
       ClassUnderTest classUnderTest = new ClassUnderTest(hive.getThriftConnectionUri());
       classUnderTest.createTable("foo_db", "bar_table");	
       
@@ -38,7 +38,7 @@ Example usage: Class under test creates a partition using an injected Hive Metas
     public HiveMetaStoreJUnitRule hive = new HiveMetaStoreJUnitRule("foo_db");
     
     @Test
-    public void example() {
+    public void example() throws Exception {
       HiveMetaStoreClient client = hive.client();
       ClassUnderTest classUnderTest = new ClassUnderTest(client);	
       Table table = new Table();
@@ -48,7 +48,7 @@ Example usage: Class under test creates a partition using an injected Hive Metas
       
       classUnderTest.createPartition(client, table);
       
-      assertEquals(1, client.listPartitions("foo_db", "bar_table", 100));
+      assertEquals(1, client.listPartitions("foo_db", "bar_table", (short) 100));
     }
 
 ## HiveServer2JUnitRule
