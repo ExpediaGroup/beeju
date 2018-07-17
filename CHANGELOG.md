@@ -1,3 +1,7 @@
+## TBD
+### Changed
+* Upgrade hotels-oss-parent to 2.2.0.
+
 ## [1.2.1] - 2017-11-09
 ### Changed
 * Change `ConfVars` added in Hive 2.x to their equivalent string.
