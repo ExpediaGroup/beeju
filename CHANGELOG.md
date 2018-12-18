@@ -1,4 +1,4 @@
-## TBD
+## [1.3.0] - 2018-12-18
 ### Changed
 * `log4j-slf4j-impl` transitive dependency excluded. See [#17](https://github.com/HotelsDotCom/beeju/issues/17).
 * Hive version upgraded to 2.3.4 (was 2.3.0) and transitive dependencies on HBase which in turn depended on JDK tools 1.7 excluded. See [#19](https://github.com/HotelsDotCom/beeju/issues/19).
