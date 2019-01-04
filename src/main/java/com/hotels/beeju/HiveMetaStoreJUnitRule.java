@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2018 Expedia Inc.
+ * Copyright (C) 2015-2019 Expedia Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,20 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
+  private static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
+
+    private final HiveConf hiveConf;
+
+    public CallableHiveClient(HiveConf hiveConf) {
+      this.hiveConf = hiveConf;
+    }
+
+    @Override
+    public HiveMetaStoreClient call() throws Exception {
+      return new HiveMetaStoreClient(hiveConf);
+    }
+  }
+
   private HiveMetaStoreClient client;
 
   /**
@@ -85,12 +99,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
     final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
-      client = singleThreadExecutor.submit(new Callable<HiveMetaStoreClient>() {
-        @Override
-        public HiveMetaStoreClient call() throws Exception {
-          return new HiveMetaStoreClient(hiveConf);
-        }
-      }).get();
+      client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();
     } finally {
       singleThreadExecutor.shutdown();
     }
