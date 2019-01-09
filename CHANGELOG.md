@@ -1,3 +1,8 @@
+# [TBD]
+### Changed
+* Refactored project to remove checkstyle and findbugs warnings, which does not impact functionality.
+* Upgraded `hotels-oss-parent` to 2.3.5 (was 2.3.3).
+
 ## [1.3.0] - 2018-12-18
 ### Changed
 * `log4j-slf4j-impl` transitive dependency excluded. See [#17](https://github.com/HotelsDotCom/beeju/issues/17).

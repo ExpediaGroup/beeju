@@ -2,7 +2,8 @@
  * Copyright (C) 2015-2017 The Apache Software Foundation and Expedia Inc.
  * This code is based on Hive's HiveMetaStore:
  *
- * https://github.com/apache/hive/blob/release-2.1.0-rc3/ql/src/java/org/apache/hadoop/hive/ql/security/authorization/plugin/sqlstd/SQLStdHiveAuthorizerFactory.java
+ * https://github.com/apache/hive/blob/release-2.1.0-rc3/ql/src/java/org/apache/hadoop/hive/ql/
+ * security/authorization/plugin/sqlstd/SQLStdHiveAuthorizerFactory.java
  *
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
