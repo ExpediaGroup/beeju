@@ -5,7 +5,7 @@
   <parent>
     <groupId>com.hotels</groupId>
     <artifactId>hotels-oss-parent</artifactId>
-    <version>2.3.5</version>
+    <version>4.0.1</version>
   </parent>
 
   <artifactId>beeju</artifactId>
@@ -21,6 +21,7 @@
   <properties>
     <hadoop.version>2.7.2</hadoop.version>
     <hive.version>2.3.4</hive.version>
+    <jdk.version>1.7</jdk.version>
     <junit.version>4.11</junit.version>
   </properties>
 
