@@ -16,7 +16,6 @@
 package com.hotels.beeju;
 
 import java.net.ServerSocket;
-import java.net.URI;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

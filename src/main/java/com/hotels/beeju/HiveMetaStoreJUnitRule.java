@@ -22,7 +22,6 @@ import java.util.concurrent.Executors;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.junit.Rule;
 
 /**
  * A JUnit {@link Rule} that creates a Hive Metastore backed by an HSQLDB in-memory database.
@@ -38,19 +37,34 @@ import org.junit.Rule;
  *
  * &#064;Override
  * protected void before() throws Throwable {
- *   org.hsqldb.util.DatabaseManagerSwing.main(new String[] {
- *       &quot;--url&quot;,
- *       hive.connectionURL(),
- *       &quot;--user&quot;,
- *       HiveMetaStoreJUnitRule.HSQLDB_USER,
- *       &quot;--password&quot;,
- *       HiveMetaStoreJUnitRule.HSQLDB_PASSWORD,
- *       &quot;--noexit&quot; });
+ *   org.hsqldb.util.DatabaseManagerSwing
+ *       .main(new String[] {
+ *           &quot;--url&quot;,
+ *           hive.connectionURL(),
+ *           &quot;--user&quot;,
+ *           HiveMetaStoreJUnitRule.HSQLDB_USER,
+ *           &quot;--password&quot;,
+ *           HiveMetaStoreJUnitRule.HSQLDB_PASSWORD,
+ *           &quot;--noexit&quot; });
  *
  * }
  * </pre>
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
+
+  private static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
+
+    private final HiveConf hiveConf;
+
+    public CallableHiveClient(HiveConf hiveConf) {
+      this.hiveConf = hiveConf;
+    }
+
+    @Override
+    public HiveMetaStoreClient call() throws Exception {
+      return new HiveMetaStoreClient(hiveConf);
+    }
+  }
 
   private HiveMetaStoreClient client;
 
@@ -85,12 +99,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
     final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
-      client = singleThreadExecutor.submit(new Callable<HiveMetaStoreClient>() {
-        @Override
-        public HiveMetaStoreClient call() throws Exception {
-          return new HiveMetaStoreClient(hiveConf);
-        }
-      }).get();
+      client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();
     } finally {
       singleThreadExecutor.shutdown();
     }
