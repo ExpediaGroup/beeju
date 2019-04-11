@@ -1,4 +1,4 @@
-## [TBD] - TBD
+## [1.3.1] - 2019-04-11
 ### Changed
 - `hotels-oss-parent` version updated to 4.0.1 (was 2.3.5).
 - Refactored project to remove checkstyle and findbugs warnings, which does not impact functionality.
