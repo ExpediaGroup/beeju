@@ -22,7 +22,7 @@
     <hadoop.version>2.7.2</hadoop.version>
     <hive.version>2.3.4</hive.version>
     <jdk.version>1.7</jdk.version>
-    <junit.version>4.11</junit.version>
+    <junit.version>5.2.0</junit.version>
   </properties>
 
   <dependencies>
@@ -92,11 +92,27 @@
       <version>${hive.version}</version>
       <scope>compile</scope>
     </dependency>
-    <dependency>
+    <!--dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
+      <version>4.11</version>
       <scope>compile</scope>
+    </dependency-->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.vintage</groupId>
+      <artifactId>junit-vintage-engine</artifactId>
+      <version>5.5.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-migrationsupport</artifactId>
+      <version>${junit.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>

@@ -29,6 +29,7 @@ import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.thrift.TException;
+import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
@@ -37,6 +38,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
  */
+@EnableRuleMigrationSupport
 abstract class BeejuJUnitRule extends ExternalResource {
 
   // "user" conflicts with USER db and the metastore_db can't be created.
