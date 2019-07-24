@@ -38,7 +38,7 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
  */
-@EnableRuleMigrationSupport
+
 abstract class BeejuJUnitRule extends ExternalResource {
 
   // "user" conflicts with USER db and the metastore_db can't be created.
