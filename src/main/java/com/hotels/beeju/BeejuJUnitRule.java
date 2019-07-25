@@ -15,74 +15,35 @@
  */
 package com.hotels.beeju;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.UUID;
 
-import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.thrift.TException;
-import org.junit.jupiter.migrationsupport.rules.EnableRuleMigrationSupport;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
 
 import com.google.common.annotations.VisibleForTesting;
 
+import com.hotels.beeju.core.BeejuCore;
+
 /**
  * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
  */
-
 abstract class BeejuJUnitRule extends ExternalResource {
-
-  // "user" conflicts with USER db and the metastore_db can't be created.
-  public static final String METASTORE_DB_USER = "db_user";
-  public static final String METASTORE_DB_PASSWORD = "db_password";
 
   @VisibleForTesting
   final TemporaryFolder temporaryFolder = new TemporaryFolder();
   protected final HiveConf conf = new HiveConf();
   private final String databaseName;
-  private final String connectionURL;
-  private final String driverClassName;
   private File metastoreLocation;
+  private BeejuCore core;
 
   public BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
-    checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
-
-    if (configuration != null && !configuration.isEmpty()) {
-      for (Entry<String, String> entry : configuration.entrySet()) {
-        conf.set(entry.getKey(), entry.getValue());
-      }
-    }
-
-    driverClassName = EmbeddedDriver.class.getName();
-    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
-    connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
-    conf.setVar(ConfVars.METASTORECONNECTURLKEY, connectionURL);
-    conf.setVar(ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
-    conf.setVar(ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
-    conf.setBoolVar(ConfVars.HMSHANDLERFORCERELOADCONF, true);
-    // Hive 2.x compatibility
-    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
-    conf.setBoolean("hive.metastore.schema.verification", false);
-    // override default port as some of our test environments claim it is in use.
-    conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
-    try {
-      // overriding default derby log path to go to tmp
-      String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
-      System.setProperty("derby.stream.error.file", derbyLog);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
+    core = new BeejuCore(conf, databaseName,configuration);
   }
 
   /**
@@ -95,7 +56,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
    */
   protected void init() throws Throwable {
     metastoreLocation = temporaryFolder.newFolder("metastore");
-    conf.setVar(ConfVars.METASTOREWAREHOUSE, metastoreLocation.getAbsolutePath());
+    conf.setVar(HiveConf.ConfVars.METASTOREWAREHOUSE, metastoreLocation.getAbsolutePath());
   }
 
   /**
@@ -134,7 +95,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
    * @return the name of the JDBC driver class used to access the database.
    */
   public String driverClassName() {
-    return driverClassName;
+    return core.driverClassName();
   }
 
   /**
@@ -156,7 +117,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
    * @return the JDBC connection URL to the HSQLDB in-memory database.
    */
   public String connectionURL() {
-    return connectionURL;
+    return core.connectionURL();
   }
 
   /**
