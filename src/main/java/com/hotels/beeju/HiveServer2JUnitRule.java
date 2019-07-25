@@ -91,15 +91,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   private void waitForHiveServer2StartUp() throws InterruptedException {
-    int retries = 0;
-    int maxRetries = 5;
-    while (hiveServer2.getServiceState() != STATE.STARTED && retries < maxRetries) {
-      Thread.sleep(1000);
-      retries++;
-    }
-    if (retries >= maxRetries) {
-      throw new RuntimeException("HiveServer2 did not start in a reasonable time");
-    }
+    core.waitForHiveServer2StartUp(hiveServer2);
   }
 
   @Override
@@ -125,20 +117,5 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
     return jdbcConnectionUrl;
   }
 
-  /**
-   * Creates a new HiveMetaStoreClient that can talk directly to the backed metastore database.
-   * <p>
-   * The invoker is responsible for closing the client.
-   * </p>
-   *
-   * @return the {@link HiveMetaStoreClient} backed by an HSQLDB in-memory database.
-   */
-  public HiveMetaStoreClient newClient() {
-    try {
-      return new HiveMetaStoreClient(core.conf());
-    } catch (MetaException e) {
-      throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
-    }
-  }
 
 }

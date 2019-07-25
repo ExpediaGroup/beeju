@@ -20,6 +20,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.hotels.beeju.core.BeejuCore;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
@@ -51,20 +52,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
  * </pre>
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
-
-  private static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
-
-    private final HiveConf hiveConf;
-
-    public CallableHiveClient(HiveConf hiveConf) {
-      this.hiveConf = hiveConf;
-    }
-
-    @Override
-    public HiveMetaStoreClient call() throws Exception {
-      return new HiveMetaStoreClient(hiveConf);
-    }
-  }
 
   private HiveMetaStoreClient client;
 
@@ -99,7 +86,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
     final HiveConf hiveConf = new HiveConf(core.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
-      client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();
+      client = singleThreadExecutor.submit(new BeejuCore.CallableHiveClient(hiveConf)).get();
     } finally {
       singleThreadExecutor.shutdown();
     }

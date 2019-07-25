@@ -73,9 +73,9 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     File databaseFolder = new File(hive.temporaryFolder.getRoot(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
-    assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
+    assertThat(hive.core.getThriftConnectionUri(), is("thrift://localhost:" + hive.core.getThriftPort()));
     HiveConf conf = new HiveConf(ThriftHiveMetaStoreJUnitRuleTest.class);
-    conf.setVar(ConfVars.METASTOREURIS, hive.getThriftConnectionUri());
+    conf.setVar(ConfVars.METASTOREURIS, hive.core.getThriftConnectionUri());
     HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
     List<String> databases = client.getAllDatabases();
     assertThat(databases.size(), is(2));
