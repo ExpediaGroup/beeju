@@ -96,7 +96,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void beforeTest() throws Throwable {
-    final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
+    final HiveConf hiveConf = new HiveConf(core.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
       client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();

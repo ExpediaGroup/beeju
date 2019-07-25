@@ -17,6 +17,9 @@ package com.hotels.beeju.core;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.thrift.TException;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,11 +34,12 @@ public class BeejuCore {
   public static final String METASTORE_DB_USER = "db_user";
   public static final String METASTORE_DB_PASSWORD = "db_password";
 
+  protected final HiveConf conf = new HiveConf();
   private final String databaseName;
   private final String connectionURL;
   private final String driverClassName;
 
-  public BeejuCore(HiveConf conf, String databaseName, Map<String, String> configuration){
+  public BeejuCore(String databaseName, Map<String, String> configuration){
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
 
@@ -65,6 +69,45 @@ public class BeejuCore {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  public void setHiveVar(HiveConf.ConfVars variable, String value){
+    conf.setVar(variable, value);
+  }
+
+  public void setHiveIntVar(HiveConf.ConfVars variable, int value){
+    conf.setIntVar(variable, value);
+  }
+
+  /**
+   * Create a new database with the specified name.
+   *
+   * @param databaseName Database name.
+   * @throws TException If an error occurs creating the database.
+   */
+  public void createDatabase(String databaseName, File tempFile, HiveConf conf) throws TException {
+    HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
+    String databaseFolder = new File(tempFile, databaseName).toURI().toString();
+    try {
+      client.createDatabase(new Database(databaseName, null, databaseFolder, null));
+    } finally {
+      client.close();
+    }
+  }
+
+  /**
+   * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
+   *         used by tests wishing to connect to the database.
+   */
+  public HiveConf conf() {
+    return new HiveConf(conf);
+  }
+
+  /**
+   * @return the name of the pre-created database.
+   */
+  public String databaseName() {
+    return databaseName;
   }
 
   /**

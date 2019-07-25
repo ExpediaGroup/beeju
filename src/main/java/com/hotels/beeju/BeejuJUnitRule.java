@@ -19,8 +19,6 @@ import java.io.File;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.thrift.TException;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
@@ -36,14 +34,11 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   @VisibleForTesting
   final TemporaryFolder temporaryFolder = new TemporaryFolder();
-  protected final HiveConf conf = new HiveConf();
-  private final String databaseName;
   private File metastoreLocation;
-  private BeejuCore core;
+  public BeejuCore core;
 
   public BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
-    this.databaseName = databaseName;
-    core = new BeejuCore(conf, databaseName,configuration);
+    core = new BeejuCore(databaseName,configuration);
   }
 
   /**
@@ -56,7 +51,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
    */
   protected void init() throws Throwable {
     metastoreLocation = temporaryFolder.newFolder("metastore");
-    conf.setVar(HiveConf.ConfVars.METASTOREWAREHOUSE, metastoreLocation.getAbsolutePath());
+    core.setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, metastoreLocation.getAbsolutePath() );
   }
 
   /**
@@ -74,7 +69,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
     temporaryFolder.create();
     init();
     beforeTest();
-    createDatabase(databaseName);
+    createDatabase(core.databaseName());
   }
 
   /**
@@ -99,18 +94,10 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   /**
-   * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   *         used by tests wishing to connect to the database.
-   */
-  public HiveConf conf() {
-    return new HiveConf(conf);
-  }
-
-  /**
    * @return the name of the pre-created database.
    */
   public String databaseName() {
-    return databaseName;
+    return core.databaseName();
   }
 
   /**
@@ -127,13 +114,8 @@ abstract class BeejuJUnitRule extends ExternalResource {
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
-    HiveMetaStoreClient client = new HiveMetaStoreClient(conf());
-    String databaseFolder = new File(temporaryFolder.getRoot(), databaseName).toURI().toString();
-    try {
-      client.createDatabase(new Database(databaseName, null, databaseFolder, null));
-    } finally {
-      client.close();
-    }
+    File tempFolder = temporaryFolder.getRoot();
+    core.createDatabase(databaseName,tempFolder, core.conf());
   }
 
 }

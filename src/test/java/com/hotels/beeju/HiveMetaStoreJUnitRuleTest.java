@@ -72,7 +72,7 @@ public class HiveMetaStoreJUnitRuleTest {
   public void customProperties() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new HiveMetaStoreJUnitRule("db", conf).conf();
+    HiveConf hiveConf = new HiveMetaStoreJUnitRule("db", conf).core.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 

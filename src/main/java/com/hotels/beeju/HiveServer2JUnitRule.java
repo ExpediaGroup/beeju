@@ -76,14 +76,14 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
     try (ServerSocket socket = new ServerSocket(0)) {
       port = socket.getLocalPort();
     }
-    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT, port);
+    core.setHiveIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT, port);
   }
 
   @Override
   protected void beforeTest() throws Throwable {
-    conf.setVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER, RelaxedSQLStdHiveAuthorizerFactory.class.getName());
+    core.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER, RelaxedSQLStdHiveAuthorizerFactory.class.getName());
     hiveServer2 = new HiveServer2();
-    hiveServer2.init(conf);
+    hiveServer2.init(core.conf());
     hiveServer2.start();
     waitForHiveServer2StartUp();
 
@@ -135,7 +135,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
    */
   public HiveMetaStoreClient newClient() {
     try {
-      return new HiveMetaStoreClient(conf());
+      return new HiveMetaStoreClient(core.conf());
     } catch (MetaException e) {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }

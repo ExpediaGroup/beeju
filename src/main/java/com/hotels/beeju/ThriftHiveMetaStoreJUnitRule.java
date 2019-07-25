@@ -88,8 +88,8 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
     try (ServerSocket socket = new ServerSocket(0)) {
       thriftPort = socket.getLocalPort();
     }
-    conf.setVar(ConfVars.METASTOREURIS, getThriftConnectionUri());
-    final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
+    core.setHiveVar(ConfVars.METASTOREURIS, getThriftConnectionUri());
+    final HiveConf hiveConf = new HiveConf(core.conf(), HiveMetaStoreClient.class);
     thriftServer.execute(new Runnable() {
       @Override
       public void run() {
