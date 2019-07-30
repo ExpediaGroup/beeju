@@ -21,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.hotels.beeju.core.BeejuCore;
+import com.hotels.beeju.core.HiveMetaStoreCore;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
@@ -53,7 +54,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
-  private HiveMetaStoreClient client;
+  private HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
   /**
    * Create a Hive Metastore with a pre-created database "test_database".
@@ -83,25 +84,19 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void beforeTest() throws Throwable {
-    final HiveConf hiveConf = new HiveConf(core.conf(), HiveMetaStoreClient.class);
-    ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-    try {
-      client = singleThreadExecutor.submit(new BeejuCore.CallableHiveClient(hiveConf)).get();
-    } finally {
-      singleThreadExecutor.shutdown();
-    }
+    hiveMetaStoreCore.before();
   }
 
   @Override
   protected void afterTest() {
-    client.close();
+    hiveMetaStoreCore.after();
   }
 
   /**
    * @return the {@link HiveMetaStoreClient} backed by an HSQLDB in-memory database.
    */
   public HiveMetaStoreClient client() {
-    return client;
+    return hiveMetaStoreCore.client();
   }
 
 }

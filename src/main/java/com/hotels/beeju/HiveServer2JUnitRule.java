@@ -15,17 +15,10 @@
  */
 package com.hotels.beeju;
 
-import java.net.ServerSocket;
 import java.util.Map;
 
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.metastore.api.MetaException;
+import com.hotels.beeju.core.HiveServer2Core;
 import org.apache.hive.jdbc.HiveDriver;
-import org.apache.hive.service.Service.STATE;
-import org.apache.hive.service.server.HiveServer2;
-
-import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
 
 /**
  * A JUnit Rule that creates a HiveServer2 service and Thrift Metastore service backed by a Hive Metastore using an
@@ -40,9 +33,7 @@ import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
  */
 public class HiveServer2JUnitRule extends BeejuJUnitRule {
 
-  private String jdbcConnectionUrl;
-  private HiveServer2 hiveServer2;
-  private int port;
+  private HiveServer2Core hiveServer2Core = new HiveServer2Core(core);
 
   /**
    * Create a HiveServer2 service with a pre-created database "test_database".
@@ -73,32 +64,17 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   @Override
   protected void init() throws Throwable {
     super.init();
-    try (ServerSocket socket = new ServerSocket(0)) {
-      port = socket.getLocalPort();
-    }
-    core.setHiveIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT, port);
+    hiveServer2Core.startServerSocket();
   }
 
   @Override
   protected void beforeTest() throws Throwable {
-    core.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER, RelaxedSQLStdHiveAuthorizerFactory.class.getName());
-    hiveServer2 = new HiveServer2();
-    hiveServer2.init(core.conf());
-    hiveServer2.start();
-    waitForHiveServer2StartUp();
-
-    jdbcConnectionUrl = "jdbc:hive2://localhost:" + port + "/" + databaseName();
-  }
-
-  private void waitForHiveServer2StartUp() throws InterruptedException {
-    core.waitForHiveServer2StartUp(hiveServer2);
+    hiveServer2Core.before();
   }
 
   @Override
   protected void afterTest() {
-    if (hiveServer2 != null) {
-      hiveServer2.stop();
-    }
+    hiveServer2Core.after();
   }
 
   /**
@@ -114,7 +90,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
    */
   @Override
   public String connectionURL() {
-    return jdbcConnectionUrl;
+    return hiveServer2Core.getJdbcConnectionUrl();
   }
 
 

@@ -45,7 +45,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class BeejuCore {
-  private static final Logger LOG = LoggerFactory.getLogger(BeejuCore.class);
 
   // "user" conflicts with USER db and the metastore_db can't be created.
   public static final String METASTORE_DB_USER = "db_user";
@@ -142,68 +141,6 @@ public class BeejuCore {
     return connectionURL;
   }
 
-  public void startThrift(ExecutorService thriftServer) throws Exception {
-    thriftPort = -1;
-    final Lock startLock = new ReentrantLock();
-    final Condition startCondition = startLock.newCondition();
-    final AtomicBoolean startedServing = new AtomicBoolean();
-    try (ServerSocket socket = new ServerSocket(0)) {
-      thriftPort = socket.getLocalPort();
-    }
-    setHiveVar(HiveConf.ConfVars.METASTOREURIS, getThriftConnectionUri());
-    final HiveConf hiveConf = new HiveConf(conf(), HiveMetaStoreClient.class);
-    thriftServer.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          HadoopThriftAuthBridge bridge = new HadoopThriftAuthBridge23();
-          HiveMetaStore.startMetaStore(thriftPort, bridge, hiveConf, startLock, startCondition, startedServing);
-        } catch (Throwable e) {
-          LOG.error("Unable to start a Thrift server for Hive Metastore", e);
-        }
-      }
-    });
-    int i = 0;
-    while (i++ < 3) {
-      startLock.lock();
-      try {
-        if (startCondition.await(1, TimeUnit.MINUTES)) {
-          break;
-        }
-      } finally {
-        startLock.unlock();
-      }
-      if (i == 3) {
-        throw new RuntimeException("Maximum number of tries reached whilst waiting for Thrift server to be ready");
-      }
-    }
-  }
-
-  /**
-   * @return The Thrift connection {@link URI} string for the Metastore service.
-   */
-  public String getThriftConnectionUri() {
-    return "thrift://localhost:" + thriftPort;
-  }
-
-  /**
-   * @return The port used for the Thrift Metastore service.
-   */
-  public int getThriftPort() {
-    return thriftPort;
-  }
-
-  public void waitForHiveServer2StartUp(HiveServer2 hiveServer2) throws InterruptedException {
-    int retries = 0;
-    int maxRetries = 5;
-    while (hiveServer2.getServiceState() != Service.STATE.STARTED && retries < maxRetries) {
-      Thread.sleep(1000);
-      retries++;
-    }
-    if (retries >= maxRetries) {
-      throw new RuntimeException("HiveServer2 did not start in a reasonable time");
-    }
-  }
 
   /**
    * Creates a new HiveMetaStoreClient that can talk directly to the backed metastore database.

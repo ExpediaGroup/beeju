@@ -73,9 +73,9 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     File databaseFolder = new File(hive.temporaryFolder.getRoot(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
-    assertThat(hive.core.getThriftConnectionUri(), is("thrift://localhost:" + hive.core.getThriftPort()));
+    assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
     HiveConf conf = new HiveConf(ThriftHiveMetaStoreJUnitRuleTest.class);
-    conf.setVar(ConfVars.METASTOREURIS, hive.core.getThriftConnectionUri());
+    conf.setVar(ConfVars.METASTOREURIS, hive.getThriftConnectionUri());
     HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
     List<String> databases = client.getAllDatabases();
     assertThat(databases.size(), is(2));
@@ -87,7 +87,7 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
   public void customProperties() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new ThriftHiveMetaStoreJUnitRule("db", conf).core.conf();
+    HiveConf hiveConf = new ThriftHiveMetaStoreJUnitRule("db", conf).conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 

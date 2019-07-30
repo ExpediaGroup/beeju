@@ -15,6 +15,8 @@
  */
 package com.hotels.beeju;
 
+import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
+
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -29,6 +31,7 @@ import java.util.concurrent.Executors;
 public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
 
   private final ExecutorService thriftServer;
+  private ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
 
   /**
    * Create a Thrift Hive Metastore service with a pre-created database "test_database".
@@ -59,7 +62,7 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
 
   @Override
   protected void beforeTest() throws Throwable {
-    core.startThrift(thriftServer);
+    thriftHiveMetaStoreCore.startThrift(thriftServer);
     super.beforeTest();
   }
 
@@ -67,6 +70,20 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   protected void afterTest() {
     thriftServer.shutdown();
     super.afterTest();
+  }
+
+  /**
+   * @return The Thrift connection {@link URI} string for the Metastore service.
+   */
+  public String getThriftConnectionUri() {
+    return thriftHiveMetaStoreCore.getThriftConnectionUri();
+  }
+
+  /**
+   * @return The port used for the Thrift Metastore service.
+   */
+  public int getThriftPort() {
+    return thriftHiveMetaStoreCore.getThriftPort();
   }
 
 }
