@@ -38,7 +38,7 @@ public class ThriftHiveMetaStoreCore {
   private final ExecutorService thriftServer;
   private BeejuCore beejuCore;
 
-  private static final Logger LOG = LoggerFactory.getLogger(BeejuCore.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreCore.class);
 
   public ThriftHiveMetaStoreCore(BeejuCore beejuCore){
     this.beejuCore = beejuCore;

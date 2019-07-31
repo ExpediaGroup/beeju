@@ -13,6 +13,32 @@ This project is currently built with and tested against Hive 2.3.0 (and minor ve
 # Usage
 The BeeJU JUnit rules provide a way to run tests that have an underlying requirement to use the Hive Metastore API but don't have the ability to mock the [Hive Metastore Client](https://hive.apache.org/javadocs/r1.2.1/api/org/apache/hadoop/hive/metastore/HiveMetaStoreClient.html). The rules spin up and tear down an in-memory Metastore which may add few seconds to the test life cycle so if you require tests to run in the sub-second range this is not for you.
 
+##Maven Dependencies
+Depend on Beeju using:
+
+    <dependency>
+        <groupId>com.hotels</groupId>
+        <artifactId>beeju</artifactId>
+        <version>....</version>
+        <scope>test</scope>
+    </dependency>
+
+###JUnit4
+For JUnit4, ensure you have the JUnit4 dependency in your POM.
+
+###JUnit5
+For JUnit5, support is available to enable you to migrate your tests that currently use Beeju rules. To use JUnit5, ensure you have:
+    
+    <dependency>
+        <groupId>org.junit.jupiter</groupId>
+        <artifactId>junit-jupiter-migrationsupport</artifactId>
+        <version>${junit.jupiter.version}</version>
+        <scope>test</scope>
+    </dependency>
+
+To any test classes using the Beeju rules, add the class annotation `@EnableRuleMigrationSupport`. No further changes are needed to move your JUnit4 tests to JUnit5.
+
+
 ## ThriftHiveMetaStoreJUnitRule
 This rule creates an in-memory Hive database and a Thrift Hive Metastore service on top of this. This can then be used to perform Hive Thrift API calls in a test. The rule exposes a Thrift URI that can be injected into the class under test and a Hive Metastore Client which can be used for data setup and assertions.
 

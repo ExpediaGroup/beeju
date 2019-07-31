@@ -51,7 +51,7 @@ public class HiveServer2Core {
     }
   }
 
-  public void waitForHiveServer2StartUp() throws InterruptedException {
+  private void waitForHiveServer2StartUp() throws InterruptedException {
     int retries = 0;
     int maxRetries = 5;
     while (hiveServer2.getServiceState() != Service.STATE.STARTED && retries < maxRetries) {
