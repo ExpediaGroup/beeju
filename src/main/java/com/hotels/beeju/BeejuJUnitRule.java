@@ -19,6 +19,7 @@ import java.io.File;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
@@ -101,7 +102,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   /**
-   * @return the JDBC connection URL to the HSQLDB in-memory database.
+   * @return @see com.hotels.beeju.core.BeejuCore#connectionURL()
    */
   public String connectionURL() {
     return core.connectionURL();
@@ -115,6 +116,10 @@ abstract class BeejuJUnitRule extends ExternalResource {
     return core.conf();
   }
 
+  public HiveMetaStoreClient newClient (){
+    return core.newClient();
+  }
+
   /**
    * Create a new database with the specified name.
    *
@@ -123,7 +128,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
    */
   public void createDatabase(String databaseName) throws TException {
     File tempFolder = temporaryFolder.getRoot();
-    core.createDatabase(databaseName,tempFolder, conf());
+    core.createDatabase(databaseName, tempFolder);
   }
 
 }

@@ -15,7 +15,6 @@
  */
 package com.hotels.beeju.core;
 
-import com.hotels.beeju.HiveServer2JUnitRule;
 import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hive.service.Service;

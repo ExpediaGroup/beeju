@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Condition;
@@ -34,15 +35,17 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ThriftHiveMetaStoreCore {
 
   private int thriftPort;
+  private final ExecutorService thriftServer;
   private BeejuCore beejuCore;
 
   private static final Logger LOG = LoggerFactory.getLogger(BeejuCore.class);
 
   public ThriftHiveMetaStoreCore(BeejuCore beejuCore){
     this.beejuCore = beejuCore;
+    this.thriftServer = Executors.newSingleThreadExecutor();
   }
 
-  public void startThrift(ExecutorService thriftServer) throws Exception {
+  public void before() throws Exception {
     thriftPort = -1;
     final Lock startLock = new ReentrantLock();
     final Condition startCondition = startLock.newCondition();
@@ -77,6 +80,10 @@ public class ThriftHiveMetaStoreCore {
         throw new RuntimeException("Maximum number of tries reached whilst waiting for Thrift server to be ready");
       }
     }
+  }
+
+  public void after(){
+    thriftServer.shutdown();
   }
 
   /**

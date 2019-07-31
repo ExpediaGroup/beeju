@@ -110,7 +110,7 @@ public class HiveServer2JUnitRuleTest {
     String databaseName = "Another_DB";
 
     server.createDatabase(databaseName);
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     Database db = client.getDatabase(databaseName);
     client.close();
 
@@ -130,7 +130,7 @@ public class HiveServer2JUnitRuleTest {
       statement.execute(dropHql);
     }
 
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     try {
       client.getDatabase(databaseName);
       fail(String.format("Database %s was not deleted", databaseName));
@@ -156,7 +156,7 @@ public class HiveServer2JUnitRuleTest {
       statement.execute(createHql);
     }
 
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     Table table = client.getTable(DATABASE, tableName);
     client.close();
     assertThat(table.getDbName(), is(DATABASE));
@@ -180,7 +180,7 @@ public class HiveServer2JUnitRuleTest {
       statement.execute(dropHql);
     }
 
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     try {
       client.getTable(DATABASE, tableName);
       fail(String.format("Table %s.%s was not deleted", DATABASE, tableName));
@@ -202,7 +202,7 @@ public class HiveServer2JUnitRuleTest {
       statement.execute(addPartitionHql);
     }
 
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     try {
       List<Partition> partitions = client.listPartitions(DATABASE, tableName, (short) -1);
       assertThat(partitions.size(), is(1));
@@ -219,7 +219,7 @@ public class HiveServer2JUnitRuleTest {
   @Test
   public void dropPartition() throws Exception {
     String tableName = "my_table";
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
 
     try {
       Table table = createPartitionedTable(DATABASE, tableName);
@@ -256,7 +256,7 @@ public class HiveServer2JUnitRuleTest {
     table.getSd().setOutputFormat("org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat");
     table.getSd().setSerdeInfo(new SerDeInfo());
     table.getSd().getSerdeInfo().setSerializationLib("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe");
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     client.createTable(table);
     client.close();
     return table;
@@ -273,7 +273,7 @@ public class HiveServer2JUnitRuleTest {
     table.getSd().setOutputFormat("org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat");
     table.getSd().setSerdeInfo(new SerDeInfo());
     table.getSd().getSerdeInfo().setSerializationLib("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe");
-    HiveMetaStoreClient client = server.core.newClient();
+    HiveMetaStoreClient client = server.newClient();
     client.createTable(table);
     client.close();
     return table;

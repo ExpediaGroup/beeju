@@ -30,7 +30,6 @@ import java.util.concurrent.Executors;
  */
 public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
 
-  private final ExecutorService thriftServer;
   private ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
 
   /**
@@ -57,18 +56,17 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    */
   public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
-    thriftServer = Executors.newSingleThreadExecutor();
   }
 
   @Override
   protected void beforeTest() throws Throwable {
-    thriftHiveMetaStoreCore.startThrift(thriftServer);
+    thriftHiveMetaStoreCore.before();
     super.beforeTest();
   }
 
   @Override
   protected void afterTest() {
-    thriftServer.shutdown();
+    thriftHiveMetaStoreCore.after();
     super.afterTest();
   }
 

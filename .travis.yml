@@ -1,8 +1,9 @@
 language: java
 jdk:
-  - openjdk8
+  - openjdk7
 os:
   - linux
+dist: trusty
 cache:
   directories:
     - ~/.m2/repository

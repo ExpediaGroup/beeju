@@ -22,7 +22,7 @@
     <hadoop.version>2.7.2</hadoop.version>
     <hive.version>2.3.4</hive.version>
     <jdk.version>1.7</jdk.version>
-    <junit.version>5.2.0</junit.version>
+    <junit.version>5.4.0</junit.version>
   </properties>
 
   <dependencies>
@@ -93,13 +93,14 @@
       <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.version}</version>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-migrationsupport</artifactId>
+      <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit.version}</version>
     </dependency>
     <!-- below removes "Failed to set setXIncludeAware(true)" warnings in log when running cobertura -->

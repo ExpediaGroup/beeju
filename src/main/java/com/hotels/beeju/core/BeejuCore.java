@@ -54,7 +54,14 @@ public class BeejuCore {
   private final String databaseName;
   private final String connectionURL;
   private final String driverClassName;
-  private int thriftPort;
+
+  public BeejuCore(){
+    this("test_database");
+  }
+
+  public BeejuCore(String databaseName){
+    this(databaseName, null);
+  }
 
   public BeejuCore(String databaseName, Map<String, String> configuration){
     checkNotNull(databaseName, "databaseName is required");
@@ -102,7 +109,7 @@ public class BeejuCore {
    * @param databaseName Database name.
    * @throws TException If an error occurs creating the database.
    */
-  public void createDatabase(String databaseName, File tempFile, HiveConf conf) throws TException {
+  public void createDatabase(String databaseName, File tempFile) throws TException {
     HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
