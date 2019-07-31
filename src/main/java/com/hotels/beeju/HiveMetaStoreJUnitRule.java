@@ -16,13 +16,8 @@
 package com.hotels.beeju;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import com.hotels.beeju.core.BeejuCore;
 import com.hotels.beeju.core.HiveMetaStoreCore;
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
 /**
