@@ -18,6 +18,7 @@ package com.hotels.beeju.core;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,11 +32,25 @@ public class HiveMetaStoreCore {
     this.beejuCore = beejuCore;
   }
 
+  public static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
+
+    private final HiveConf hiveConf;
+
+    public CallableHiveClient(HiveConf hiveConf) {
+      this.hiveConf = hiveConf;
+    }
+
+    @Override
+    public HiveMetaStoreClient call() throws Exception {
+      return new HiveMetaStoreClient(hiveConf);
+    }
+  }
+
   public void before() throws InterruptedException, ExecutionException {
     final HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
-      client = singleThreadExecutor.submit(new BeejuCore.CallableHiveClient(hiveConf)).get();
+      client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();
     } finally {
       singleThreadExecutor.shutdown();
     }

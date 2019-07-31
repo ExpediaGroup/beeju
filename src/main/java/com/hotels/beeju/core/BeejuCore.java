@@ -165,18 +165,4 @@ public class BeejuCore {
     }
   }
 
-  public static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
-
-    private final HiveConf hiveConf;
-
-    public CallableHiveClient(HiveConf hiveConf) {
-      this.hiveConf = hiveConf;
-    }
-
-    @Override
-    public HiveMetaStoreClient call() throws Exception {
-      return new HiveMetaStoreClient(hiveConf);
-    }
-  }
-
 }
