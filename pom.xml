@@ -98,11 +98,6 @@
       <version>4.12</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-engine</artifactId>
-      <version>${junit.version}</version>
-    </dependency>
     <!-- below removes "Failed to set setXIncludeAware(true)" warnings in log when running cobertura -->
     <dependency>
       <groupId>xerces</groupId>
