@@ -33,9 +33,6 @@ public class HiveMetaStoreCoreTest {
   public void clientStarted() throws ExecutionException, InterruptedException {
     hiveMetaStoreCore.before();
     assertNotNull(hiveMetaStoreCore.client());
-
-    //HiveMetaStoreCore.CallableHiveClient client = new HiveMetaStoreCore.CallableHiveClient(core.conf());
-    //assertEquals();
   }
 
   @Test(expected = NoSuchObjectException.class)

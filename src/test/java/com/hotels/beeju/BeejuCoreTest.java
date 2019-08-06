@@ -16,6 +16,7 @@
 package com.hotels.beeju;
 
 import com.hotels.beeju.core.BeejuCore;
+import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.junit.Test;
 
@@ -30,6 +31,13 @@ public class BeejuCoreTest {
 
   private BeejuCore defaultCore = new BeejuCore();
   private BeejuCore dbNameCore = new BeejuCore("test_db");
+  private BeejuCore dbNameAndConfCore = new BeejuCore("test_db_2", createConf());
+
+  public Map<String, String> createConf(){
+    Map<String, String> conf = new HashMap<>();
+    conf.put("my.custom.key", "my.custom.value");
+    return conf;
+  }
 
   @Test
   public void initialisedDefaultConstructor(){
@@ -42,23 +50,34 @@ public class BeejuCoreTest {
   }
 
   @Test
-  public void customProperties(){
-    Map<String, String> conf = new HashMap<>();
-    conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new BeejuCore("db", conf).conf();
-    assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
+  public void intialisedDbNameAndConfConstructor() {
+    assertThat(dbNameAndConfCore.databaseName(), is("test_db_2"));
   }
 
   @Test
-  public void setHiveVar(){
+  public void setHiveVar() {
     defaultCore.setHiveVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, "test");
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORECONNECTURLKEY), is("test"));
   }
 
   @Test
-  public void setHiveIntVar(){
+  public void setHiveIntVar() {
     defaultCore.setHiveIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT, 00000);
     assertThat(defaultCore.conf().getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT), is(00000));
+  }
+
+  @Test
+  public void checkConfig() {
+    assertThat(defaultCore.driverClassName(), is(EmbeddedDriver.class.getName()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORECONNECTURLKEY), is(defaultCore.connectionURL()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER), is(defaultCore.driverClassName()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is("db_password"));
+    assertThat(defaultCore.conf().getBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF), is(true));
+    assertThat(defaultCore.conf().get("datanucleus.schema.autoCreateAll"), is("true"));
+    assertThat(defaultCore.conf().get("hive.metastore.schema.verification"), is("false"));
+    assertThat(defaultCore.conf().get("hive.server2.webui.port"), is("0"));
+    assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
 
 }
