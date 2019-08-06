@@ -99,4 +99,8 @@ public class ThriftHiveMetaStoreCore {
   public int getThriftPort() {
     return thriftPort;
   }
+
+  public ExecutorService getThriftServer(){
+    return thriftServer;
+  }
 }

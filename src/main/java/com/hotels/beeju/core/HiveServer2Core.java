@@ -73,4 +73,12 @@ public class HiveServer2Core {
   public String getJdbcConnectionUrl() {
     return jdbcConnectionUrl;
   }
+
+  public int getPort() {
+    return port;
+  }
+
+  public HiveServer2 getHiveServer2(){
+    return hiveServer2;
+  }
 }
