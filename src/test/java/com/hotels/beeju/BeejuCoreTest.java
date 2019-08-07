@@ -26,14 +26,13 @@ import java.util.Map;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-
 public class BeejuCoreTest {
 
   private BeejuCore defaultCore = new BeejuCore();
   private BeejuCore dbNameCore = new BeejuCore("test_db");
   private BeejuCore dbNameAndConfCore = new BeejuCore("test_db_2", createConf());
 
-  public Map<String, String> createConf(){
+  private Map<String, String> createConf(){
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
     return conf;
@@ -52,6 +51,7 @@ public class BeejuCoreTest {
   @Test
   public void intialisedDbNameAndConfConstructor() {
     assertThat(dbNameAndConfCore.databaseName(), is("test_db_2"));
+    assertThat(dbNameAndConfCore.conf().get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test

@@ -40,6 +40,5 @@ public class HiveMetaStoreCoreTest {
     hiveMetaStoreCore.before();
     hiveMetaStoreCore.after();
     hiveMetaStoreCore.client().getDatabase(core.databaseName());
-
   }
 }
