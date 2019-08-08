@@ -15,6 +15,13 @@
  */
 package com.hotels.beeju.core;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -22,34 +29,26 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.thrift.TException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Map;
-import java.util.UUID;
-
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class BeejuCore {
 
   // "user" conflicts with USER db and the metastore_db can't be created.
-  public static final String METASTORE_DB_USER = "db_user";
-  public static final String METASTORE_DB_PASSWORD = "db_password";
+  private static final String METASTORE_DB_USER = "db_user";
+  private static final String METASTORE_DB_PASSWORD = "db_password";
 
   protected final HiveConf conf = new HiveConf();
   private final String databaseName;
   private final String connectionURL;
   private final String driverClassName;
 
-  public BeejuCore(){
+  public BeejuCore() {
     this("test_database");
   }
 
-  public BeejuCore(String databaseName){
+  public BeejuCore(String databaseName) {
     this(databaseName, null);
   }
 
-  public BeejuCore(String databaseName, Map<String, String> configuration){
+  public BeejuCore(String databaseName, Map<String, String> configuration) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
 
@@ -81,11 +80,11 @@ public class BeejuCore {
     }
   }
 
-  public void setHiveVar(HiveConf.ConfVars variable, String value){
+  public void setHiveVar(HiveConf.ConfVars variable, String value) {
     conf.setVar(variable, value);
   }
 
-  public void setHiveIntVar(HiveConf.ConfVars variable, int value){
+  public void setHiveIntVar(HiveConf.ConfVars variable, int value) {
     conf.setIntVar(variable, value);
   }
 
@@ -107,7 +106,7 @@ public class BeejuCore {
 
   /**
    * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   *         used by tests wishing to connect to the database.
+   * used by tests wishing to connect to the database.
    */
   public HiveConf conf() {
     return new HiveConf(conf);
@@ -134,7 +133,6 @@ public class BeejuCore {
     return connectionURL;
   }
 
-
   /**
    * Creates a new HiveMetaStoreClient that can talk directly to the backed metastore database.
    * <p>
@@ -150,5 +148,4 @@ public class BeejuCore {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }
   }
-
 }

@@ -15,14 +15,6 @@
  */
 package com.hotels.beeju.core;
 
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge;
-import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge23;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -32,17 +24,24 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStore;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge;
+import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge23;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class ThriftHiveMetaStoreCore {
 
-  private int thriftPort;
-  private final ExecutorService thriftServer;
-  private BeejuCore beejuCore;
-
   private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreCore.class);
+  private final ExecutorService thriftServer;
+  private int thriftPort;
+  private final BeejuCore beejuCore;
 
-  public ThriftHiveMetaStoreCore(BeejuCore beejuCore){
+  public ThriftHiveMetaStoreCore(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
-    this.thriftServer = Executors.newSingleThreadExecutor();
+    thriftServer = Executors.newSingleThreadExecutor();
   }
 
   public void before() throws Exception {
@@ -82,7 +81,7 @@ public class ThriftHiveMetaStoreCore {
     }
   }
 
-  public void after(){
+  public void after() {
     thriftServer.shutdown();
   }
 
@@ -100,7 +99,7 @@ public class ThriftHiveMetaStoreCore {
     return thriftPort;
   }
 
-  public ExecutorService getThriftServer(){
+  public ExecutorService getThriftServer() {
     return thriftServer;
   }
 }

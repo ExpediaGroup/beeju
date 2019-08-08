@@ -15,30 +15,32 @@
  */
 package com.hotels.beeju;
 
-import com.hotels.beeju.core.BeejuCore;
-import com.hotels.beeju.core.HiveServer2Core;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.junit.Test;
-
-import java.io.IOException;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.junit.Test;
+
+import com.hotels.beeju.core.BeejuCore;
+import com.hotels.beeju.core.HiveServer2Core;
+
 public class HiveServer2CoreTest {
 
-  private BeejuCore core = new BeejuCore();
-  private HiveServer2Core hiveServer2Core = new HiveServer2Core(core);
+  private final BeejuCore core = new BeejuCore();
+  private final HiveServer2Core hiveServer2Core = new HiveServer2Core(core);
 
   @Test
   public void initiateServer() throws InterruptedException {
     hiveServer2Core.before();
-    assertThat(hiveServer2Core.getJdbcConnectionUrl(), is("jdbc:hive2://localhost:" + hiveServer2Core.getPort() + "/" + core.databaseName()));
+    assertThat(hiveServer2Core.getJdbcConnectionUrl(),
+        is("jdbc:hive2://localhost:" + hiveServer2Core.getPort() + "/" + core.databaseName()));
   }
 
   @Test(expected = NullPointerException.class)
-  public void closeServer(){
+  public void closeServer() {
     hiveServer2Core.after();
     hiveServer2Core.getHiveServer2().stop();
   }

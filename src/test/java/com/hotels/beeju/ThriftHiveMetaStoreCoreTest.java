@@ -15,18 +15,21 @@
  */
 package com.hotels.beeju;
 
-import com.hotels.beeju.core.BeejuCore;
-import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
+import com.hotels.beeju.core.BeejuCore;
+import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
 public class ThriftHiveMetaStoreCoreTest {
 
-  private BeejuCore core = new BeejuCore();
-  private ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
+  private final BeejuCore core = new BeejuCore();
+  private final ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
 
   @Test
   public void initalisedThriftCore() {
@@ -36,14 +39,13 @@ public class ThriftHiveMetaStoreCoreTest {
   @Test
   public void before() throws Exception {
     thriftHiveMetaStoreCore.before();
-    assertThat(core.conf().getVar(HiveConf.ConfVars.METASTOREURIS), is(thriftHiveMetaStoreCore.getThriftConnectionUri()));
+    assertThat(core.conf().getVar(HiveConf.ConfVars.METASTOREURIS),
+        is(thriftHiveMetaStoreCore.getThriftConnectionUri()));
   }
 
   @Test
-
   public void after() {
     thriftHiveMetaStoreCore.after();
     assertTrue(thriftHiveMetaStoreCore.getThriftServer().isShutdown());
   }
-
 }

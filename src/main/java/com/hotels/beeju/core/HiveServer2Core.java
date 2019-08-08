@@ -15,13 +15,14 @@
  */
 package com.hotels.beeju.core;
 
-import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
+import java.io.IOException;
+import java.net.ServerSocket;
+
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hive.service.Service;
 import org.apache.hive.service.server.HiveServer2;
 
-import java.io.IOException;
-import java.net.ServerSocket;
+import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
 
 public class HiveServer2Core {
 
@@ -29,14 +30,15 @@ public class HiveServer2Core {
   private HiveServer2 hiveServer2;
   private int port;
 
-  private BeejuCore beejuCore;
+  private final BeejuCore beejuCore;
 
-  public HiveServer2Core(BeejuCore beejuCore){
+  public HiveServer2Core(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
   }
 
-  public void before() throws InterruptedException{
-    beejuCore.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER, RelaxedSQLStdHiveAuthorizerFactory.class.getName());
+  public void before() throws InterruptedException {
+    beejuCore.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
+        RelaxedSQLStdHiveAuthorizerFactory.class.getName());
     hiveServer2 = new HiveServer2();
     hiveServer2.init(beejuCore.conf());
     hiveServer2.start();
@@ -45,7 +47,7 @@ public class HiveServer2Core {
     jdbcConnectionUrl = "jdbc:hive2://localhost:" + port + "/" + beejuCore.databaseName();
   }
 
-  public void after(){
+  public void after() {
     if (hiveServer2 != null) {
       hiveServer2.stop();
     }
@@ -78,7 +80,7 @@ public class HiveServer2Core {
     return port;
   }
 
-  public HiveServer2 getHiveServer2(){
+  public HiveServer2 getHiveServer2() {
     return hiveServer2;
   }
 }

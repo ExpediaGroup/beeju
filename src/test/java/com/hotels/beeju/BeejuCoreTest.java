@@ -15,36 +15,37 @@
  */
 package com.hotels.beeju;
 
-import com.hotels.beeju.core.BeejuCore;
-import org.apache.derby.jdbc.EmbeddedDriver;
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.apache.derby.jdbc.EmbeddedDriver;
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.junit.Test;
+
+import com.hotels.beeju.core.BeejuCore;
 
 public class BeejuCoreTest {
 
-  private BeejuCore defaultCore = new BeejuCore();
-  private BeejuCore dbNameCore = new BeejuCore("test_db");
-  private BeejuCore dbNameAndConfCore = new BeejuCore("test_db_2", createConf());
+  private final BeejuCore defaultCore = new BeejuCore();
+  private final BeejuCore dbNameCore = new BeejuCore("test_db");
+  private final BeejuCore dbNameAndConfCore = new BeejuCore("test_db_2", createConf());
 
-  private Map<String, String> createConf(){
+  private Map<String, String> createConf() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
     return conf;
   }
 
   @Test
-  public void initialisedDefaultConstructor(){
+  public void initialisedDefaultConstructor() {
     assertThat(defaultCore.databaseName(), is("test_database"));
   }
 
   @Test
-  public void initialisedDbNameConstructor(){
+  public void initialisedDbNameConstructor() {
     assertThat(dbNameCore.databaseName(), is("test_db"));
   }
 
@@ -70,7 +71,8 @@ public class BeejuCoreTest {
   public void checkConfig() {
     assertThat(defaultCore.driverClassName(), is(EmbeddedDriver.class.getName()));
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORECONNECTURLKEY), is(defaultCore.connectionURL()));
-    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER), is(defaultCore.driverClassName()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER),
+        is(defaultCore.driverClassName()));
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is("db_password"));
     assertThat(defaultCore.conf().getBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF), is(true));
@@ -79,5 +81,4 @@ public class BeejuCoreTest {
     assertThat(defaultCore.conf().get("hive.server2.webui.port"), is("0"));
     assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
-
 }

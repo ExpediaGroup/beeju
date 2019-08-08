@@ -15,19 +15,20 @@
  */
 package com.hotels.beeju;
 
-import com.hotels.beeju.core.BeejuCore;
-import com.hotels.beeju.core.HiveMetaStoreCore;
-import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
-import org.junit.Test;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.Assert.*;
+import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
+import org.junit.Test;
+
+import com.hotels.beeju.core.BeejuCore;
+import com.hotels.beeju.core.HiveMetaStoreCore;
 
 public class HiveMetaStoreCoreTest {
 
-  private BeejuCore core = new BeejuCore();
-  private HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
+  private final BeejuCore core = new BeejuCore();
+  private final HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
   @Test
   public void clientStarted() throws ExecutionException, InterruptedException {

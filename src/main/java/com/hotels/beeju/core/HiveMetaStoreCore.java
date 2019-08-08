@@ -15,39 +15,25 @@
  */
 package com.hotels.beeju.core;
 
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+
 public class HiveMetaStoreCore {
 
   private HiveMetaStoreClient client;
-  private BeejuCore beejuCore;
+  private final BeejuCore beejuCore;
 
-  public HiveMetaStoreCore(BeejuCore beejuCore){
+  public HiveMetaStoreCore(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
   }
 
-  public static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
-
-    private final HiveConf hiveConf;
-
-    public CallableHiveClient(HiveConf hiveConf) {
-      this.hiveConf = hiveConf;
-    }
-
-    @Override
-    public HiveMetaStoreClient call() throws Exception {
-      return new HiveMetaStoreClient(hiveConf);
-    }
-  }
-
   public void before() throws InterruptedException, ExecutionException {
-    final HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
+    HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
       client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();
@@ -56,7 +42,7 @@ public class HiveMetaStoreCore {
     }
   }
 
-  public void after(){
+  public void after() {
     client.close();
   }
 
@@ -65,5 +51,18 @@ public class HiveMetaStoreCore {
    */
   public HiveMetaStoreClient client() {
     return client;
+  }
+  public static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
+
+    private final HiveConf hiveConf;
+
+    CallableHiveClient(HiveConf hiveConf) {
+      this.hiveConf = hiveConf;
+    }
+
+    @Override
+    public HiveMetaStoreClient call() throws Exception {
+      return new HiveMetaStoreClient(hiveConf);
+    }
   }
 }
