@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.core;
 
 import static org.junit.Assert.assertNotNull;
 
 import java.util.concurrent.ExecutionException;
 
-import org.apache.hadoop.hive.metastore.api.NoSuchObjectException;
 import org.junit.Test;
-
-import com.hotels.beeju.core.BeejuCore;
-import com.hotels.beeju.core.HiveMetaStoreCore;
 
 public class HiveMetaStoreCoreTest {
 
@@ -32,14 +28,7 @@ public class HiveMetaStoreCoreTest {
 
   @Test
   public void clientStarted() throws ExecutionException, InterruptedException {
-    hiveMetaStoreCore.before();
+    hiveMetaStoreCore.initialise();
     assertNotNull(hiveMetaStoreCore.client());
-  }
-
-  @Test(expected = NoSuchObjectException.class)
-  public void clientClosed() throws Exception {
-    hiveMetaStoreCore.before();
-    hiveMetaStoreCore.after();
-    hiveMetaStoreCore.client().getDatabase(core.databaseName());
   }
 }

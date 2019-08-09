@@ -36,15 +36,15 @@ public class ThriftHiveMetaStoreCore {
 
   private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreCore.class);
   private final ExecutorService thriftServer;
-  private int thriftPort;
   private final BeejuCore beejuCore;
+  private int thriftPort;
 
   public ThriftHiveMetaStoreCore(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
     thriftServer = Executors.newSingleThreadExecutor();
   }
 
-  public void before() throws Exception {
+  public void initialise() throws Exception {
     thriftPort = -1;
     final Lock startLock = new ReentrantLock();
     final Condition startCondition = startLock.newCondition();
@@ -81,7 +81,7 @@ public class ThriftHiveMetaStoreCore {
     }
   }
 
-  public void after() {
+  public void shutdown() {
     thriftServer.shutdown();
   }
 
@@ -99,7 +99,7 @@ public class ThriftHiveMetaStoreCore {
     return thriftPort;
   }
 
-  public ExecutorService getThriftServer() {
-    return thriftServer;
+  public String getDatabaseName(){
+    return beejuCore.databaseName();
   }
 }

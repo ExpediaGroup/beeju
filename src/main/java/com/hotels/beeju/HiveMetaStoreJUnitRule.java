@@ -79,12 +79,12 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void beforeTest() throws Throwable {
-    hiveMetaStoreCore.before();
+    hiveMetaStoreCore.initialise();
   }
 
   @Override
   protected void afterTest() {
-    hiveMetaStoreCore.after();
+    hiveMetaStoreCore.shutdown();
   }
 
   /**

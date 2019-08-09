@@ -32,7 +32,7 @@ public class HiveMetaStoreCore {
     this.beejuCore = beejuCore;
   }
 
-  public void before() throws InterruptedException, ExecutionException {
+  public void initialise() throws InterruptedException, ExecutionException {
     HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
@@ -42,7 +42,7 @@ public class HiveMetaStoreCore {
     }
   }
 
-  public void after() {
+  public void shutdown() {
     client.close();
   }
 

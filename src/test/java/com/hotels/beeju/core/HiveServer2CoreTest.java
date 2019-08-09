@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.core;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
@@ -22,10 +22,8 @@ import static org.junit.Assert.assertThat;
 import java.io.IOException;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hive.service.Service;
 import org.junit.Test;
-
-import com.hotels.beeju.core.BeejuCore;
-import com.hotels.beeju.core.HiveServer2Core;
 
 public class HiveServer2CoreTest {
 
@@ -34,15 +32,18 @@ public class HiveServer2CoreTest {
 
   @Test
   public void initiateServer() throws InterruptedException {
-    hiveServer2Core.before();
+    hiveServer2Core.initialise();
     assertThat(hiveServer2Core.getJdbcConnectionUrl(),
         is("jdbc:hive2://localhost:" + hiveServer2Core.getPort() + "/" + core.databaseName()));
+    assertThat(hiveServer2Core.getHiveServer2().getServiceState(), is(Service.STATE.STARTED));
   }
 
-  @Test(expected = NullPointerException.class)
-  public void closeServer() {
-    hiveServer2Core.after();
-    hiveServer2Core.getHiveServer2().stop();
+  @Test
+  public void closeServer() throws InterruptedException {
+    hiveServer2Core.initialise();
+    hiveServer2Core.shutdown();
+
+    assertThat(hiveServer2Core.getHiveServer2().getServiceState(), is(Service.STATE.STOPPED));
   }
 
   @Test

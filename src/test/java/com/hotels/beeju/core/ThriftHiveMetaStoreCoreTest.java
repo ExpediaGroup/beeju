@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.core;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+
+import java.util.List;
 
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.junit.Test;
-
-import com.hotels.beeju.core.BeejuCore;
-import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
 public class ThriftHiveMetaStoreCoreTest {
 
@@ -32,20 +30,17 @@ public class ThriftHiveMetaStoreCoreTest {
   private final ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
 
   @Test
-  public void initalisedThriftCore() {
-    assertNotNull(thriftHiveMetaStoreCore.getThriftServer());
-  }
-
-  @Test
   public void before() throws Exception {
-    thriftHiveMetaStoreCore.before();
+    thriftHiveMetaStoreCore.initialise();
     assertThat(core.conf().getVar(HiveConf.ConfVars.METASTOREURIS),
         is(thriftHiveMetaStoreCore.getThriftConnectionUri()));
+
+    HiveConf conf = new HiveConf(this.getClass());
+    conf.setVar(HiveConf.ConfVars.METASTOREURIS, thriftHiveMetaStoreCore.getThriftConnectionUri());
+    HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
+    List<String> databases = client.getAllDatabases();
+    assertThat(databases.size(), is(1));
+    assertThat(databases.get(0), is("default"));
   }
 
-  @Test
-  public void after() {
-    thriftHiveMetaStoreCore.after();
-    assertTrue(thriftHiveMetaStoreCore.getThriftServer().isShutdown());
-  }
 }

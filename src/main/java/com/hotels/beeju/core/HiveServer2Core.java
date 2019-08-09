@@ -36,7 +36,7 @@ public class HiveServer2Core {
     this.beejuCore = beejuCore;
   }
 
-  public void before() throws InterruptedException {
+  public void initialise() throws InterruptedException {
     beejuCore.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         RelaxedSQLStdHiveAuthorizerFactory.class.getName());
     hiveServer2 = new HiveServer2();
@@ -47,7 +47,7 @@ public class HiveServer2Core {
     jdbcConnectionUrl = "jdbc:hive2://localhost:" + port + "/" + beejuCore.databaseName();
   }
 
-  public void after() {
+  public void shutdown() {
     if (hiveServer2 != null) {
       hiveServer2.stop();
     }
