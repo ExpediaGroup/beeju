@@ -69,14 +69,14 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   }
 
   /**
-   * @return The Thrift connection {@link URI} string for the Metastore service.
+   * @return {@link com.hotels.beeju.core.ThriftHiveMetaStoreCore#getThriftConnectionUri()}.
    */
   public String getThriftConnectionUri() {
     return thriftHiveMetaStoreCore.getThriftConnectionUri();
   }
 
   /**
-   * @return The port used for the Thrift Metastore service.
+   * @return {@link com.hotels.beeju.core.ThriftHiveMetaStoreCore#getThriftPort()}
    */
   public int getThriftPort() {
     return thriftHiveMetaStoreCore.getThriftPort();

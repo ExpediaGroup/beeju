@@ -88,34 +88,36 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   /**
-   * @return the name of the JDBC driver class used to access the database.
+   * @return {@link com.hotels.beeju.core.BeejuCore#driverClassName()}.
    */
   public String driverClassName() {
     return core.driverClassName();
   }
 
   /**
-   * @return the name of the pre-created database.
+   * @return {@link com.hotels.beeju.core.BeejuCore#databaseName()}.
    */
   public String databaseName() {
     return core.databaseName();
   }
 
   /**
-   * @return @see com.hotels.beeju.core.BeejuCore#connectionURL()
+   * @return {@link com.hotels.beeju.core.BeejuCore#connectionURL()}.
    */
   public String connectionURL() {
     return core.connectionURL();
   }
 
   /**
-   * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   *         used by tests wishing to connect to the database.
+   * @return {@link com.hotels.beeju.core.BeejuCore#conf()}.
    */
   public HiveConf conf() {
     return core.conf();
   }
 
+  /**
+   * @return {@link com.hotels.beeju.core.BeejuCore#newClient()}.
+   */
   public HiveMetaStoreClient newClient (){
     return core.newClient();
   }

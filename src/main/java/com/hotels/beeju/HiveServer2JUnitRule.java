@@ -86,7 +86,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   /**
-   * @return the JDBC connection URL to the HiveServer2 service.
+   * @return {@link com.hotels.beeju.core.HiveServer2Core#getJdbcConnectionUrl()}.
    */
   @Override
   public String connectionURL() {

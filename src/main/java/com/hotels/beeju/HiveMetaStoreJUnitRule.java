@@ -88,7 +88,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   /**
-   * @return the {@link HiveMetaStoreClient} backed by an HSQLDB in-memory database.
+   * @return the {@link com.hotels.beeju.core.HiveMetaStoreCore#client()}.
    */
   public HiveMetaStoreClient client() {
     return hiveMetaStoreCore.client();
