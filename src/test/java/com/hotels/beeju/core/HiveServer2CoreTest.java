@@ -39,7 +39,8 @@ public class HiveServer2CoreTest {
   }
 
   @Test
-  public void closeServer() throws InterruptedException {
+  public void closeServer() throws InterruptedException, IOException {
+    hiveServer2Core.startServerSocket();
     hiveServer2Core.initialise();
     hiveServer2Core.shutdown();
 
