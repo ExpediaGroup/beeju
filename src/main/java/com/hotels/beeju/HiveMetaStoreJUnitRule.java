@@ -16,11 +16,8 @@
 package com.hotels.beeju;
 
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import org.apache.hadoop.hive.conf.HiveConf;
+import com.hotels.beeju.core.HiveMetaStoreCore;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
 /**
@@ -52,21 +49,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
-  private static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
-
-    private final HiveConf hiveConf;
-
-    public CallableHiveClient(HiveConf hiveConf) {
-      this.hiveConf = hiveConf;
-    }
-
-    @Override
-    public HiveMetaStoreClient call() throws Exception {
-      return new HiveMetaStoreClient(hiveConf);
-    }
-  }
-
-  private HiveMetaStoreClient client;
+  private HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
   /**
    * Create a Hive Metastore with a pre-created database "test_database".
@@ -96,25 +79,19 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void beforeTest() throws Throwable {
-    final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
-    ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
-    try {
-      client = singleThreadExecutor.submit(new CallableHiveClient(hiveConf)).get();
-    } finally {
-      singleThreadExecutor.shutdown();
-    }
+    hiveMetaStoreCore.initialise();
   }
 
   @Override
   protected void afterTest() {
-    client.close();
+    hiveMetaStoreCore.shutdown();
   }
 
   /**
-   * @return the {@link HiveMetaStoreClient} backed by an HSQLDB in-memory database.
+   * @return the {@link com.hotels.beeju.core.HiveMetaStoreCore#client()}.
    */
   public HiveMetaStoreClient client() {
-    return client;
+    return hiveMetaStoreCore.client();
   }
 
 }

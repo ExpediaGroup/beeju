@@ -15,24 +15,9 @@
  */
 package com.hotels.beeju;
 
-import java.net.ServerSocket;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
-import org.apache.hadoop.hive.conf.HiveConf;
-import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
-import org.apache.hadoop.hive.metastore.HiveMetaStore;
-import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge;
-import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge23;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
 
 /**
  * A JUnit Rule that creates a Hive Metastore Thrift service backed by a Hive Metastore using an HSQLDB in-memory
@@ -42,10 +27,8 @@ import org.slf4j.LoggerFactory;
  * </p>
  */
 public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
-  private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreJUnitRule.class);
 
-  private final ExecutorService thriftServer;
-  private int thriftPort;
+  private ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
 
   /**
    * Create a Thrift Hive Metastore service with a pre-created database "test_database".
@@ -71,70 +54,32 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    */
   public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
-    thriftServer = Executors.newSingleThreadExecutor();
   }
 
   @Override
   protected void beforeTest() throws Throwable {
-    thriftPort = -1;
-    startThrift();
+    thriftHiveMetaStoreCore.initialise();
     super.beforeTest();
-  }
-
-  private void startThrift() throws Exception {
-    final Lock startLock = new ReentrantLock();
-    final Condition startCondition = startLock.newCondition();
-    final AtomicBoolean startedServing = new AtomicBoolean();
-    try (ServerSocket socket = new ServerSocket(0)) {
-      thriftPort = socket.getLocalPort();
-    }
-    conf.setVar(ConfVars.METASTOREURIS, getThriftConnectionUri());
-    final HiveConf hiveConf = new HiveConf(conf, HiveMetaStoreClient.class);
-    thriftServer.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          HadoopThriftAuthBridge bridge = new HadoopThriftAuthBridge23();
-          HiveMetaStore.startMetaStore(thriftPort, bridge, hiveConf, startLock, startCondition, startedServing);
-        } catch (Throwable e) {
-          LOG.error("Unable to start a Thrift server for Hive Metastore", e);
-        }
-      }
-    });
-    int i = 0;
-    while (i++ < 3) {
-      startLock.lock();
-      try {
-        if (startCondition.await(1, TimeUnit.MINUTES)) {
-          break;
-        }
-      } finally {
-        startLock.unlock();
-      }
-      if (i == 3) {
-        throw new RuntimeException("Maximum number of tries reached whilst waiting for Thrift server to be ready");
-      }
-    }
-  }
-
-  /**
-   * @return The Thrift connection {@link URI} string for the Metastore service.
-   */
-  public String getThriftConnectionUri() {
-    return "thrift://localhost:" + thriftPort;
-  }
-
-  /**
-   * @return The port used for the Thrift Metastore service.
-   */
-  public int getThriftPort() {
-    return thriftPort;
   }
 
   @Override
   protected void afterTest() {
-    thriftServer.shutdown();
+    thriftHiveMetaStoreCore.shutdown();
     super.afterTest();
+  }
+
+  /**
+   * @return {@link com.hotels.beeju.core.ThriftHiveMetaStoreCore#getThriftConnectionUri()}.
+   */
+  public String getThriftConnectionUri() {
+    return thriftHiveMetaStoreCore.getThriftConnectionUri();
+  }
+
+  /**
+   * @return {@link com.hotels.beeju.core.ThriftHiveMetaStoreCore#getThriftPort()}
+   */
+  public int getThriftPort() {
+    return thriftHiveMetaStoreCore.getThriftPort();
   }
 
 }

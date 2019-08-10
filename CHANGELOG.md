@@ -1,3 +1,7 @@
+## [2.0.0] - TBD
+### Added
+- Support for JUnit5 using `migration-support` dependency. NOTE - the transitive dependency for JUnit from Beeju has been removed so you must depend on it in your own POM. 
+
 ## [1.3.2] - 2019-07-10
 ### Changed
 - Release process now uses HTTPS (was SSH) from build slaves to GitHub, no changes to code or functionality.
