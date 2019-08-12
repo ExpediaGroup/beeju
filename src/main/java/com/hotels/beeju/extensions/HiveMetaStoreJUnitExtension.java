@@ -24,18 +24,59 @@ import org.junit.jupiter.api.extension.BeforeEachCallback;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
+/**
+ * A JUnit {@link Extension} that creates a Hive Metastore backed by an HSQLDB in-memory database.
+ * <p>
+ * A fresh database instance will be created for each test method.
+ * </p>
+ * To allow querying of the memory database, add the following to your {@code @BeforeEach} method. This will open a Swing
+ * SQL query window for the duration of the test. Remember to add a break point to your test.
+ *
+ * <pre>
+ * &#064;Rule
+ * public HiveMetaStoreJUnitRule hive = new HiveMetaStoreJUnitRule();
+ *
+ * &#064;Override
+ * protected void before() throws Throwable {
+ *   org.hsqldb.util.DatabaseManagerSwing
+ *       .main(new String[] {
+ *           &quot;--url&quot;,
+ *           hive.connectionURL(),
+ *           &quot;--user&quot;,
+ *           HiveMetaStoreJUnitRule.HSQLDB_USER,
+ *           &quot;--password&quot;,
+ *           HiveMetaStoreJUnitRule.HSQLDB_PASSWORD,
+ *           &quot;--noexit&quot; });
+ *
+ * }
+ * </pre>
+ */
 public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
 
-  private HiveMetaStoreCore hiveMetaStoreCore;
+  private final HiveMetaStoreCore hiveMetaStoreCore;
 
+  /**
+   * Create a Hive Metastore with a pre-created database "test_database".
+   */
   HiveMetaStoreJUnitExtension() {
     this("test_database");
   }
 
-  HiveMetaStoreJUnitExtension(String databaseName){
+  /**
+   * Create a Hive Metastore with a pre-created database using the provided name.
+   *
+   * @param databaseName Database name.
+   */
+  HiveMetaStoreJUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
+  /**
+   * Create a Hive Metastore with a pre-created database using the provided name and configuration.
+   *
+   * @param databaseName Database name.
+   * @param configuration Hive configuration properties.
+   */
   HiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
     hiveMetaStoreCore = new HiveMetaStoreCore(core);

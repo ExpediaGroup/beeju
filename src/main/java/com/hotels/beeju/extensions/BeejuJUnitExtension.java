@@ -25,20 +25,22 @@ import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hotels.beeju.core.BeejuCore;
 
-/**
- * Might not need to use this
- */
 abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
 
+  private static final Logger LOG = LoggerFactory.getLogger(BeejuJUnitExtension.class);
   public BeejuCore core;
   private Path tempDirectory;
 
   public BeejuJUnitExtension(String databaseName, Map<String, String> configuration) {
-    core = new BeejuCore(databaseName,configuration);
+    core = new BeejuCore(databaseName, configuration);
   }
 
   /**
@@ -65,12 +67,12 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
   protected abstract void beforeTest() throws Throwable;
 
   @Override
-  public void beforeEach(ExtensionContext context) throws TException{
+  public void beforeEach(ExtensionContext context) throws TException {
     try {
       init();
       beforeTest();
     } catch (Throwable throwable) {
-      throwable.printStackTrace();
+      LOG.error("Unable to initialise BeejuJUnit extension", throwable);
     }
     core.createDatabase(core.databaseName(), tempDirectory.toFile());
   }
@@ -116,7 +118,7 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
 
   /**
    * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   *         used by tests wishing to connect to the database.
+   * used by tests wishing to connect to the database.
    */
   public HiveConf conf() {
     return core.conf();
@@ -133,11 +135,11 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
     core.createDatabase(databaseName, tempFolder);
   }
 
-  public HiveMetaStoreClient newClient (){
+  public HiveMetaStoreClient newClient() {
     return core.newClient();
   }
 
-  public File getTempDirectory(){
+  public File getTempDirectory() {
     return tempDirectory.toFile();
   }
 }

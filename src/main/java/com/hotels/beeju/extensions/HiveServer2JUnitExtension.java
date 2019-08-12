@@ -23,7 +23,7 @@ import com.hotels.beeju.core.HiveServer2Core;
 
 public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
 
-  private HiveServer2Core hiveServer2Core;
+  private final HiveServer2Core hiveServer2Core;
 
   /**
    * Create a HiveServer2 service with a pre-created database "test_database".
