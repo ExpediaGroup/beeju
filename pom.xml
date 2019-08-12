@@ -21,7 +21,8 @@
   <properties>
     <hadoop.version>2.7.2</hadoop.version>
     <hive.version>2.3.4</hive.version>
-    <jdk.version>1.7</jdk.version>
+    <jdk.version>1.8</jdk.version>
+    <junit.jupiter.version>5.5.1</junit.jupiter.version>
   </properties>
 
   <dependencies>
@@ -97,6 +98,12 @@
       <version>4.12</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.jupiter.version}</version>
+    </dependency>
+
     <!-- below removes "Failed to set setXIncludeAware(true)" warnings in log when running cobertura -->
     <dependency>
       <groupId>xerces</groupId>
