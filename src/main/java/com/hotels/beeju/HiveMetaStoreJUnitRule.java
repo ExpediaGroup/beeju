@@ -24,28 +24,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
  * A JUnit {@link Rule} that creates a Hive Metastore backed by an HSQLDB in-memory database.
  * <p>
  * A fresh database instance will be created for each test method.
- * </p>
- * To allow querying of the memory database, add the following to your {@code @Before} method. This will open a Swing
- * SQL query window for the duration of the test. Remember to add a break point to your test.
- *
- * <pre>
- * &#064;Rule
- * public HiveMetaStoreJUnitRule hive = new HiveMetaStoreJUnitRule();
- *
- * &#064;Override
- * protected void before() throws Throwable {
- *   org.hsqldb.util.DatabaseManagerSwing
- *       .main(new String[] {
- *           &quot;--url&quot;,
- *           hive.connectionURL(),
- *           &quot;--user&quot;,
- *           HiveMetaStoreJUnitRule.HSQLDB_USER,
- *           &quot;--password&quot;,
- *           HiveMetaStoreJUnitRule.HSQLDB_PASSWORD,
- *           &quot;--noexit&quot; });
- *
- * }
- * </pre>
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 

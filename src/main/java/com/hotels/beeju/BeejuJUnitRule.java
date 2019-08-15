@@ -15,14 +15,13 @@
  */
 package com.hotels.beeju;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
 import org.junit.rules.ExternalResource;
-import org.junit.rules.TemporaryFolder;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -34,25 +33,17 @@ import com.hotels.beeju.core.BeejuCore;
 abstract class BeejuJUnitRule extends ExternalResource {
 
   @VisibleForTesting
-  final TemporaryFolder temporaryFolder = new TemporaryFolder();
-  private File metastoreLocation;
   public BeejuCore core;
 
   public BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
-    core = new BeejuCore(databaseName,configuration);
+    core = new BeejuCore(databaseName, configuration);
   }
 
   /**
-   * Initialise the warehouse path.
-   * <p>
-   * This method can be overridden to provide additional initialisations.
-   * </p>
-   *
-   * @throws Throwable If the initialisation fails.
+   * {@link com.hotels.beeju.core.BeejuCore#init()}.
    */
-  protected void init() throws Throwable {
-    metastoreLocation = temporaryFolder.newFolder("metastore");
-    core.setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, metastoreLocation.getAbsolutePath());
+  protected void init() throws Exception {
+    core.init();
   }
 
   /**
@@ -67,7 +58,6 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
-    temporaryFolder.create();
     init();
     beforeTest();
     createDatabase(databaseName());
@@ -84,7 +74,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
   @Override
   protected void after() {
     afterTest();
-    temporaryFolder.delete();
+    core.deleteTempDir();
   }
 
   /**
@@ -118,8 +108,12 @@ abstract class BeejuJUnitRule extends ExternalResource {
   /**
    * @return {@link com.hotels.beeju.core.BeejuCore#newClient()}.
    */
-  public HiveMetaStoreClient newClient (){
+  public HiveMetaStoreClient newClient() {
     return core.newClient();
+  }
+
+  public Path tempDir() {
+    return core.tempDir();
   }
 
   /**
@@ -129,8 +123,6 @@ abstract class BeejuJUnitRule extends ExternalResource {
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
-    File tempFolder = temporaryFolder.getRoot();
-    core.createDatabase(databaseName, tempFolder);
+    core.createDatabase(databaseName);
   }
-
 }

@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
 /**
- * A JUnit Extension that creates a Hive Metastore Thrift service backed by a Hive Metastore using an HSQLDB in-memory
+ * A JUnit Extension that creates a Hive Metastore Thrift service backed by a Hive Metastore using an in-memory
  * database.
  * <p>
  * A fresh database instance will be created for each test method.
@@ -32,7 +32,7 @@ import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtension {
 
   private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreJUnitExtension.class);
-  private ThriftHiveMetaStoreCore thriftHiveMetaStoreCore;
+  private final ThriftHiveMetaStoreCore thriftHiveMetaStoreCore;
 
   /**
    * Create a Thrift Hive Metastore service with a pre-created database "test_database".
@@ -46,7 +46,7 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
    *
    * @param databaseName Database name.
    */
-  public ThriftHiveMetaStoreJUnitExtension(String databaseName){
+  public ThriftHiveMetaStoreJUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
@@ -56,19 +56,15 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
    * @param databaseName Database name.
    * @param configuration Hive configuration properties.
    */
-  public ThriftHiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration){
-    super(databaseName,configuration);
+  public ThriftHiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
+    super(databaseName, configuration);
     thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
   }
 
   @Override
-  public void beforeTest() {
-    try {
-      thriftHiveMetaStoreCore.initialise();
-      super.beforeTest();
-    } catch (Exception e) {
-      LOG.error("Unable to initialise ThriftHiveMetaStore extension", e);
-    }
+  public void beforeTest() throws Exception{
+    thriftHiveMetaStoreCore.initialise();
+    super.beforeTest();
   }
 
   @Override

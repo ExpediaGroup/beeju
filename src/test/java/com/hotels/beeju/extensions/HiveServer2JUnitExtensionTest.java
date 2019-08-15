@@ -50,6 +50,7 @@ public class HiveServer2JUnitExtensionTest {
 
   @Test
   public void defaultDatabaseName() {
+    HiveServer2JUnitExtension server = new HiveServer2JUnitExtension(DATABASE, null);
     String defaultDbName = new HiveServer2JUnitExtension().databaseName();
     assertThat(defaultDbName, is("test_database"));
   }

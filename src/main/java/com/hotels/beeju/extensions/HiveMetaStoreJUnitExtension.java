@@ -16,11 +16,8 @@
 package com.hotels.beeju.extensions;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.junit.jupiter.api.extension.AfterEachCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
@@ -28,30 +25,8 @@ import com.hotels.beeju.core.HiveMetaStoreCore;
  * A JUnit {@link Extension} that creates a Hive Metastore backed by an HSQLDB in-memory database.
  * <p>
  * A fresh database instance will be created for each test method.
- * </p>
- * To allow querying of the memory database, add the following to your {@code @BeforeEach} method. This will open a Swing
- * SQL query window for the duration of the test. Remember to add a break point to your test.
- *
- * <pre>
- * &#064;Rule
- * public HiveMetaStoreJUnitRule hive = new HiveMetaStoreJUnitRule();
- *
- * &#064;Override
- * protected void before() throws Throwable {
- *   org.hsqldb.util.DatabaseManagerSwing
- *       .main(new String[] {
- *           &quot;--url&quot;,
- *           hive.connectionURL(),
- *           &quot;--user&quot;,
- *           HiveMetaStoreJUnitRule.HSQLDB_USER,
- *           &quot;--password&quot;,
- *           HiveMetaStoreJUnitRule.HSQLDB_PASSWORD,
- *           &quot;--noexit&quot; });
- *
- * }
- * </pre>
  */
-public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
+public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
 
   private final HiveMetaStoreCore hiveMetaStoreCore;
 
@@ -83,7 +58,7 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension implements 
   }
 
   @Override
-  public void beforeTest() throws InterruptedException, ExecutionException {
+  public void beforeTest() throws Exception {
     hiveMetaStoreCore.initialise();
   }
 
@@ -93,7 +68,7 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension implements 
   }
 
   /**
-   * @return the {@link HiveMetaStoreClient} backed by an HSQLDB in-memory database.
+   * @return {@link com.hotels.beeju.core.HiveMetaStoreCore#client()}.
    */
   public HiveMetaStoreClient client() {
     return hiveMetaStoreCore.client();

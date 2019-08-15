@@ -98,7 +98,7 @@ public class HiveServer2JUnitRuleTest {
         .append("OUTPUTFORMAT \n")
         .append("  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'\n")
         .append("LOCATION\n")
-        .append("  'file:" + server.temporaryFolder.getRoot() + "/" + DATABASE + "/my_table'\n")
+        .append("  'file:" + server.tempDir() + "/" + DATABASE + "/my_table'\n")
         .append("TBLPROPERTIES (\n")
         .append("  'transient_lastDdlTime'='" + table.getParameters().get("transient_lastDdlTime") + "')\n")
         .toString();
@@ -116,7 +116,7 @@ public class HiveServer2JUnitRuleTest {
 
     assertThat(db, is(notNullValue()));
     assertThat(db.getName(), is(databaseName.toLowerCase()));
-    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", server.temporaryFolder.getRoot(), databaseName)));
+    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", server.tempDir(), databaseName)));
   }
 
   @Test
@@ -210,7 +210,7 @@ public class HiveServer2JUnitRuleTest {
       assertThat(partitions.get(0).getTableName(), is(tableName));
       assertThat(partitions.get(0).getValues(), is(Arrays.asList("1")));
       assertThat(partitions.get(0).getSd().getLocation(),
-          is(String.format("file:%s/%s/%s/partcol=1", server.temporaryFolder.getRoot(), DATABASE, tableName)));
+          is(String.format("file:%s/%s/%s/partcol=1", server.tempDir(), DATABASE, tableName)));
     } finally {
       client.close();
     }
@@ -230,7 +230,7 @@ public class HiveServer2JUnitRuleTest {
       partition.setValues(Arrays.asList("1"));
       partition.setSd(new StorageDescriptor(table.getSd()));
       partition.getSd().setLocation(
-          String.format("file:%s/%s/%s/partcol=1", server.temporaryFolder.getRoot(), DATABASE, tableName));
+          String.format("file:%s/%s/%s/partcol=1", server.tempDir(), DATABASE, tableName));
       client.add_partition(partition);
 
       try (Connection connection = DriverManager.getConnection(server.connectionURL());

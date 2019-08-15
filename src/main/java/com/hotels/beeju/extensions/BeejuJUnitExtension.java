@@ -16,28 +16,20 @@
 package com.hotels.beeju.extensions;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.hotels.beeju.core.BeejuCore;
 
 abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
 
-  private static final Logger LOG = LoggerFactory.getLogger(BeejuJUnitExtension.class);
   public BeejuCore core;
-  private Path tempDirectory;
 
   public BeejuJUnitExtension(String databaseName, Map<String, String> configuration) {
     core = new BeejuCore(databaseName, configuration);
@@ -48,33 +40,26 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
    * <p>
    * This method can be overridden to provide additional initialisations.
    * </p>
-   *
-   * @throws Throwable If the initialisation fails.
    */
-  protected void init() throws Throwable {
-    tempDirectory = Files.createTempDirectory("root");
-    core.setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDirectory.toString());
+  protected void init() throws Exception {
+    core.init();
   }
 
   /**
-   * Implement this method to prepare the rule for a new test.
+   * Implement this method to prepare the extension for a new test.
    * <p>
-   * This is called after the rule is initialised.
+   * This is called after the extension is initialised.
    * </p>
    *
-   * @throws Throwable If the rule cannot be prepared for a new test.
+   * @throws Exception If the extension cannot be prepared for a new test.
    */
-  protected abstract void beforeTest() throws Throwable;
+  protected abstract void beforeTest() throws Exception;
 
   @Override
-  public void beforeEach(ExtensionContext context) throws TException {
-    try {
-      init();
-      beforeTest();
-    } catch (Throwable throwable) {
-      LOG.error("Unable to initialise BeejuJUnit extension", throwable);
-    }
-    core.createDatabase(core.databaseName(), tempDirectory.toFile());
+  public void beforeEach(ExtensionContext context) throws Exception {
+    init();
+    beforeTest();
+    createDatabase(databaseName());
   }
 
   /**
@@ -83,27 +68,23 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
    * This method is called before the warehouse directory is deleted.
    * </p>
    */
-  protected abstract void afterTest();
+  protected abstract void afterTest() throws Exception;
 
   @Override
-  public void afterEach(ExtensionContext context) {
+  public void afterEach(ExtensionContext context) throws Exception {
     afterTest();
-    try {
-      FileUtils.deleteDirectory(tempDirectory.toFile());
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+    core.deleteTempDir();
   }
 
   /**
-   * @return the name of the JDBC driver class used to access the database.
+   * @return {@link com.hotels.beeju.core.BeejuCore#driverClassName()}.
    */
   public String driverClassName() {
     return core.driverClassName();
   }
 
   /**
-   * @return the name of the pre-created database.
+   * @return {@link com.hotels.beeju.core.BeejuCore#databaseName()}.
    */
   public String databaseName() {
     return core.databaseName();
@@ -117,29 +98,33 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
   }
 
   /**
-   * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   * used by tests wishing to connect to the database.
+   * @return {@link com.hotels.beeju.core.BeejuCore#conf()}.
    */
   public HiveConf conf() {
     return core.conf();
   }
 
   /**
-   * Create a new database with the specified name.
+   * @return {@link com.hotels.beeju.core.BeejuCore#newClient()}.
+   */
+  public HiveMetaStoreClient newClient() {
+    return core.newClient();
+  }
+
+  /**
+   * See {@link com.hotels.beeju.core.BeejuCore#createDatabase(String)}
    *
    * @param databaseName Database name.
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
-    File tempFolder = tempDirectory.toFile();
-    core.createDatabase(databaseName, tempFolder);
+    core.createDatabase(databaseName);
   }
 
-  public HiveMetaStoreClient newClient() {
-    return core.newClient();
-  }
-
+  /**
+   * @return Root temporary directory as a file.
+   */
   public File getTempDirectory() {
-    return tempDirectory.toFile();
+    return core.tempDir().toFile();
   }
 }

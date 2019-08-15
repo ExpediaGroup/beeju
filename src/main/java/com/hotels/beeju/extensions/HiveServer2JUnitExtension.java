@@ -53,18 +53,18 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
   }
 
   @Override
-  protected void init() throws Throwable {
+  protected void init() throws Exception {
     super.init();
     hiveServer2Core.startServerSocket();
   }
 
   @Override
-  public void beforeTest() throws InterruptedException {
+  protected void beforeTest() throws InterruptedException {
     hiveServer2Core.initialise();
   }
 
   @Override
-  public void afterTest() {
+  protected void afterTest() {
     hiveServer2Core.shutdown();
   }
 

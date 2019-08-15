@@ -62,7 +62,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void init() throws Throwable {
+  protected void init() throws Exception {
     super.init();
     hiveServer2Core.startServerSocket();
   }

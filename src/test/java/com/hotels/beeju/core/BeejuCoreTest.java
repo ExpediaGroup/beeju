@@ -16,6 +16,7 @@
 package com.hotels.beeju.core;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.HashMap;
@@ -23,6 +24,8 @@ import java.util.Map;
 
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.apache.hadoop.hive.metastore.api.Database;
 import org.junit.Test;
 
 public class BeejuCoreTest {
@@ -79,4 +82,18 @@ public class BeejuCoreTest {
     assertThat(defaultCore.conf().get("hive.server2.webui.port"), is("0"));
     assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
+
+//  @Test
+//  public void createDatabase() throws Exception {
+//    String databaseName = "Another_DB";
+//
+//    defaultCore.createDatabase(databaseName);
+//    HiveMetaStoreClient client = defaultCore.newClient();
+//    Database db = client.getDatabase(databaseName);
+//    client.close();
+//
+//    assertThat(db, is(notNullValue()));
+//    assertThat(db.getName(), is(databaseName.toLowerCase()));
+//    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", temporaryFolder, databaseName)));
+//  }
 }
