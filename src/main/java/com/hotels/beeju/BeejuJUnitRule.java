@@ -15,7 +15,7 @@
  */
 package com.hotels.beeju;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -40,10 +40,10 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   /**
-   * {@link com.hotels.beeju.core.BeejuCore#init()}.
+   * This method can be overridden to provide additional initialisations.
+   * </p>
    */
   protected void init() throws Exception {
-    core.init();
   }
 
   /**
@@ -112,8 +112,11 @@ abstract class BeejuJUnitRule extends ExternalResource {
     return core.newClient();
   }
 
-  public Path tempDir() {
-    return core.tempDir();
+  /**
+   * @return Root of temporary directory
+   */
+  public File tempDir() {
+    return core.tempDir().toFile();
   }
 
   /**

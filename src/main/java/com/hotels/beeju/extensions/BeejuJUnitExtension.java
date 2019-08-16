@@ -36,13 +36,11 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
   }
 
   /**
-   * Initialise the warehouse path.
-   * <p>
    * This method can be overridden to provide additional initialisations.
    * </p>
    */
   protected void init() throws Exception {
-    core.init();
+
   }
 
   /**

@@ -38,8 +38,6 @@ import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hotels.beeju.extensions.BeejuJUnitExtension;
-
 public class BeejuCore {
 
   private static final Logger LOG = LoggerFactory.getLogger(BeejuCore.class);
@@ -89,6 +87,9 @@ public class BeejuCore {
       // overriding default derby log path to go to tmp
       String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
       System.setProperty("derby.stream.error.file", derbyLog);
+
+      //Creating temporary folder
+      init();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -161,11 +162,11 @@ public class BeejuCore {
     return connectionURL;
   }
 
-  public Path tempDir(){
+  public Path tempDir() {
     return tempDir;
   }
 
-  public void deleteTempDir(){
+  public void deleteTempDir() {
     try {
       Files.walkFileTree(tempDir, new SimpleFileVisitor<Path>() {
         @Override

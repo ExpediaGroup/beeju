@@ -17,8 +17,9 @@ package com.hotels.beeju;
 
 import java.util.Map;
 
-import com.hotels.beeju.core.HiveMetaStoreCore;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+
+import com.hotels.beeju.core.HiveMetaStoreCore;
 
 /**
  * A JUnit {@link Rule} that creates a Hive Metastore backed by an HSQLDB in-memory database.
@@ -27,7 +28,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
-  private HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
+  private final HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
   /**
    * Create a Hive Metastore with a pre-created database "test_database".
@@ -71,5 +72,4 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   public HiveMetaStoreClient client() {
     return hiveMetaStoreCore.client();
   }
-
 }

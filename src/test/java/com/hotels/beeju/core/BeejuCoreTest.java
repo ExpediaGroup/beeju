@@ -83,17 +83,17 @@ public class BeejuCoreTest {
     assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
 
-//  @Test
-//  public void createDatabase() throws Exception {
-//    String databaseName = "Another_DB";
-//
-//    defaultCore.createDatabase(databaseName);
-//    HiveMetaStoreClient client = defaultCore.newClient();
-//    Database db = client.getDatabase(databaseName);
-//    client.close();
-//
-//    assertThat(db, is(notNullValue()));
-//    assertThat(db.getName(), is(databaseName.toLowerCase()));
-//    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", temporaryFolder, databaseName)));
-//  }
+  @Test
+  public void createDatabase() throws Exception {
+    String databaseName = "Another_DB";
+
+    defaultCore.createDatabase(databaseName);
+    HiveMetaStoreClient client = defaultCore.newClient();
+    Database db = client.getDatabase(databaseName);
+    client.close();
+
+    assertThat(db, is(notNullValue()));
+    assertThat(db.getName(), is(databaseName.toLowerCase()));
+    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", defaultCore.tempDir(), databaseName)));
+  }
 }
