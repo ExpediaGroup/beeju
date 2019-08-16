@@ -43,7 +43,7 @@ public class HiveMetaStoreJUnitRuleTest {
 
   @Before
   public void before() {
-    tempRoot = hiveDefaultName.tempDir().toFile();
+    tempRoot = hiveDefaultName.tempDir();
     assertTrue(tempRoot.exists());
   }
 
@@ -63,7 +63,7 @@ public class HiveMetaStoreJUnitRuleTest {
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.tempDir().toFile(), databaseName);
+    File databaseFolder = new File(hive.tempDir(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
   }
 

@@ -48,9 +48,9 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
 
   @Before
   public void before() {
-    defaultTempRoot = hiveDefaultName.tempDir().toFile();
+    defaultTempRoot = hiveDefaultName.tempDir();
     assertTrue(defaultTempRoot.exists());
-    customTempRoot = hiveCustomName.tempDir().toFile();
+    customTempRoot = hiveCustomName.tempDir();
     assertTrue(customTempRoot.exists());
   }
 
@@ -70,7 +70,7 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.tempDir().toFile(), databaseName);
+    File databaseFolder = new File(hive.tempDir(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
     assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
