@@ -20,7 +20,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -40,32 +40,14 @@ import com.hotels.beeju.ThriftHiveMetaStoreJUnitRuleTest;
 
 public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback {
 
+  private static File defaultTempRoot;
+  private static File customTempRoot;
+
   @RegisterExtension
   ThriftHiveMetaStoreJUnitExtension hiveDefaultName = new ThriftHiveMetaStoreJUnitExtension();
 
   @RegisterExtension
   ThriftHiveMetaStoreJUnitExtension hiveCustomName = new ThriftHiveMetaStoreJUnitExtension("my_test_database");
-
-  private static File defaultTempRoot;
-  private static File customTempRoot;
-
-  @Override
-  public void beforeEach(ExtensionContext context){
-    defaultTempRoot = hiveDefaultName.getTempDirectory();
-    assertTrue(defaultTempRoot.exists());
-    customTempRoot = hiveCustomName.getTempDirectory();
-    assertTrue(customTempRoot.exists());
-  }
-
-  @Test
-  public void hiveDefaultName() throws Exception {
-    assertRuleInitialised(hiveDefaultName);
-  }
-
-  @Test
-  public void hiveCustomName() throws Exception {
-    assertRuleInitialised(hiveCustomName);
-  }
 
   private static void assertRuleInitialised(ThriftHiveMetaStoreJUnitExtension hive) throws Exception {
     String databaseName = hive.databaseName();
@@ -86,32 +68,46 @@ public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback
     assertThat(databases.get(1), is(databaseName));
   }
 
+  @Override
+  public void beforeEach(ExtensionContext context) {
+    defaultTempRoot = hiveDefaultName.getTempDirectory();
+    assertTrue(defaultTempRoot.exists());
+    customTempRoot = hiveCustomName.getTempDirectory();
+    assertTrue(customTempRoot.exists());
+  }
+
+  @Test
+  public void hiveDefaultName() throws Exception {
+    assertRuleInitialised(hiveDefaultName);
+  }
+
+  @Test
+  public void hiveCustomName() throws Exception {
+    assertRuleInitialised(hiveCustomName);
+  }
+
   @Test
   public void customProperties() {
-    Map<String, String> conf = new HashMap<>();
-    conf.put("my.custom.key", "my.custom.value");
+    Map<String, String> conf = Collections.singletonMap("my.custom.key", "my.custom.value");
     HiveConf hiveConf = new ThriftHiveMetaStoreJUnitRule("db", conf).conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test
   public void createExistingDatabase() {
-    Assertions.assertThrows(AlreadyExistsException.class, () -> {
+    Assertions.assertThrows(AlreadyExistsException.class, ()
+        -> {
       hiveDefaultName.createDatabase(hiveDefaultName.databaseName());
     });
   }
 
   @Test
   public void createDatabaseNullName() {
-    Assertions.assertThrows(NullPointerException.class, () -> {
-      hiveDefaultName.createDatabase(null);
-    });
+    Assertions.assertThrows(NullPointerException.class, () -> { hiveDefaultName.createDatabase(null); });
   }
 
   @Test
   public void createDatabaseInvalidName() {
-    Assertions.assertThrows(InvalidObjectException.class, () -> {
-      hiveDefaultName.createDatabase("");
-    });
+    Assertions.assertThrows(InvalidObjectException.class, () -> { hiveDefaultName.createDatabase(""); });
   }
 }

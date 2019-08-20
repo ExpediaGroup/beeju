@@ -17,8 +17,7 @@ package com.hotels.beeju.extensions;
 
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
@@ -31,7 +30,6 @@ import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
  */
 public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtension {
 
-  private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreJUnitExtension.class);
   private final ThriftHiveMetaStoreCore thriftHiveMetaStoreCore;
 
   /**
@@ -62,15 +60,15 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
   }
 
   @Override
-  public void beforeTest() throws Exception{
+  public void beforeEach(ExtensionContext context) throws Exception{
     thriftHiveMetaStoreCore.initialise();
-    super.beforeTest();
+    super.beforeEach(context);
   }
 
   @Override
-  public void afterTest() {
+  public void afterEach(ExtensionContext context) throws Exception {
     thriftHiveMetaStoreCore.shutdown();
-    super.afterTest();
+    super.afterEach(context);
   }
 
   /**

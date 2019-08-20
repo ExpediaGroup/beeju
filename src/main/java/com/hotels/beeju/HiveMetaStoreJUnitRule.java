@@ -22,7 +22,7 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
 /**
- * A JUnit {@link Rule} that creates a Hive Metastore backed by an HSQLDB in-memory database.
+ * A JUnit {@link org.junit.Rule} that creates a Hive Metastore backed by an in-memory database.
  * <p>
  * A fresh database instance will be created for each test method.
  */
@@ -57,13 +57,15 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void beforeTest() throws Throwable {
+  protected void before() throws Throwable {
+    super.before();
     hiveMetaStoreCore.initialise();
   }
 
   @Override
-  protected void afterTest() {
+  protected void after() {
     hiveMetaStoreCore.shutdown();
+    super.after();
   }
 
   /**

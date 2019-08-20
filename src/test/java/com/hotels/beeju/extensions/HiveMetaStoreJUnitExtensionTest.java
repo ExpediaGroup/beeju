@@ -79,8 +79,6 @@ public class HiveMetaStoreJUnitExtensionTest {
 
   @Test
   public void createDatabaseNullName() {
-    Assertions.assertThrows(NullPointerException.class, () -> {
-      hiveDefaultName.createDatabase(null);
-    });
+    Assertions.assertThrows(NullPointerException.class, () -> { hiveDefaultName.createDatabase(null); });
   }
 }

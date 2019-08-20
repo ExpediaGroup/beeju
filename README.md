@@ -46,7 +46,7 @@ To any test classes using the Beeju rules, add the class annotation `@EnableRule
 ## ThriftHiveMetaStoreJUnitRule and Extension
 This rule creates an in-memory Hive database and a Thrift Hive Metastore service on top of this. This can then be used to perform Hive Thrift API calls in a test. The rule exposes a Thrift URI that can be injected into the class under test and a Hive Metastore Client which can be used for data setup and assertions.
 
-Example @Rule usage: Class under test creates a table via the Hive Metastore Thrift API. 
+Example `@Rule` usage: Class under test creates a table via the Hive Metastore Thrift API. 
 
     @Rule
     public ThriftHiveMetaStoreJUnitRule hive = new ThriftHiveMetaStoreJUnitRule("foo_db");
@@ -67,7 +67,7 @@ To use the extension instead, replace `@Rule` with:
 ## HiveMetaStoreJUnitRule and Extension
 This rule creates an in-memory Hive database without a Thrift Hive Metastore service. This can then be used to perform Hive API calls directly (i.e. without going via Hive's Metastore Thrift service) in a test.
 
-Example @ Rule usage: Class under test creates a partition using an injected Hive Metastore Client. 
+Example `@Rule` usage: Class under test creates a partition using an injected Hive Metastore Client. 
 
     @Rule
     public HiveMetaStoreJUnitRule hive = new HiveMetaStoreJUnitRule("foo_db");
@@ -94,7 +94,7 @@ To use the extension instead, replace `@Rule` with:
 ## HiveServer2JUnitRule and Extension
 This rule creates an in-memory Hive database, a Thrift Hive Metastore service on top of this and a HiveServer2 service. This can then be used to perform Hive JDBC calls in a test. The rule exposes a JDBC URI that can be injected into the class under test and a Hive Metastore Client which can be used for data setup and assertions.
 
-Example usage: Class under test drops a table via Hive JDBC.
+Example `@Rule` usage: Class under test drops a table via Hive JDBC.
 
     @Rule
     public HiveServer2JUnitRule hive = new HiveServer2JUnitRule("foo_db");

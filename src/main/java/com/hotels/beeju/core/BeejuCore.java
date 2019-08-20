@@ -29,6 +29,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -89,7 +90,7 @@ public class BeejuCore {
       System.setProperty("derby.stream.error.file", derbyLog);
 
       //Creating temporary folder
-      init();
+      createWarehousePath();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
@@ -97,22 +98,19 @@ public class BeejuCore {
 
   /**
    * Initialise the warehouse path.
-   * <p>
-   * This method can be overridden to provide additional initialisations.
-   * </p>
    *
-   * @throws Throwable If the initialisation fails.
+   * @throws IOException If the initialisation fails.
    */
-  public void init() throws IOException {
-    tempDir = Files.createTempDirectory("root");
+  private void createWarehousePath() throws IOException {
+    tempDir = Files.createTempDirectory("beeju_test");
     setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDir.toString());
   }
 
-  public void setHiveVar(HiveConf.ConfVars variable, String value) {
+  protected void setHiveVar(HiveConf.ConfVars variable, String value) {
     conf.setVar(variable, value);
   }
 
-  public void setHiveIntVar(HiveConf.ConfVars variable, int value) {
+  protected void setHiveIntVar(HiveConf.ConfVars variable, int value) {
     conf.setIntVar(variable, value);
   }
 
@@ -166,27 +164,16 @@ public class BeejuCore {
     return tempDir;
   }
 
-  public void deleteTempDir() {
-    try {
-      Files.walkFileTree(tempDir, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          LOG.info("delete file: " + file.toString());
-          Files.delete(file);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-          Files.delete(dir);
-          LOG.info("delete dir: " + dir.toString());
-          return FileVisitResult.CONTINUE;
-        }
-      });
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
+  /**
+   * Delete temporary files used during test
+   */
+  private void deleteTempDir() throws IOException {
+    FileUtils.deleteDirectory(tempDir.toFile());
     assertFalse(tempDir.toFile().exists());
+  }
+
+  public void cleanUp() throws IOException {
+    deleteTempDir();
   }
 
   /**

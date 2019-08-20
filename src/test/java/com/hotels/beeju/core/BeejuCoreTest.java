@@ -17,8 +17,11 @@ package com.hotels.beeju.core;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +57,18 @@ public class BeejuCoreTest {
   public void intialisedDbNameAndConfConstructor() {
     assertThat(dbNameAndConfCore.databaseName(), is("test_db_2"));
     assertThat(dbNameAndConfCore.conf().get("my.custom.key"), is("my.custom.value"));
+  }
+
+  @Test
+  public void createDirectory(){
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREWAREHOUSE), is(defaultCore.tempDir().toString()));
+  }
+
+  @Test
+  public void deleteDirectory() throws IOException {
+    BeejuCore testCore = new BeejuCore();
+    testCore.cleanUp();
+    assertFalse(Files.exists(testCore.tempDir()));
   }
 
   @Test

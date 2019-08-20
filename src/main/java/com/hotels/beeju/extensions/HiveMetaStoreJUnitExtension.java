@@ -18,11 +18,12 @@ package com.hotels.beeju.extensions;
 import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
 /**
- * A JUnit {@link Extension} that creates a Hive Metastore backed by an HSQLDB in-memory database.
+ * A JUnit Extension that creates a Hive Metastore backed by an in-memory database.
  * <p>
  * A fresh database instance will be created for each test method.
  */
@@ -58,13 +59,15 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
   }
 
   @Override
-  public void beforeTest() throws Exception {
+  public void beforeEach(ExtensionContext context) throws Exception {
+    super.beforeEach(context);
     hiveMetaStoreCore.initialise();
   }
 
   @Override
-  public void afterTest() {
+  public void afterEach(ExtensionContext context) throws Exception {
     hiveMetaStoreCore.shutdown();
+    super.afterEach(context);
   }
 
   /**

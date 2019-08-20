@@ -18,7 +18,7 @@ package com.hotels.beeju.extensions;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -34,7 +34,6 @@ public class HiveServer2JUnitExtensionTest {
 
   @Test
   public void defaultDatabaseName() {
-    HiveServer2JUnitExtension server = new HiveServer2JUnitExtension(DATABASE, null);
     String defaultDbName = new HiveServer2JUnitExtension().databaseName();
     assertThat(defaultDbName, is("test_database"));
   }
@@ -46,8 +45,7 @@ public class HiveServer2JUnitExtensionTest {
 
   @Test
   public void customProperties() {
-    Map<String, String> conf = new HashMap<>();
-    conf.put("my.custom.key", "my.custom.value");
+    Map<String, String> conf = Collections.singletonMap("my.custom.key", "my.custom.value");
     HiveConf hiveConf = new HiveServer2JUnitExtension(DATABASE, conf).conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }

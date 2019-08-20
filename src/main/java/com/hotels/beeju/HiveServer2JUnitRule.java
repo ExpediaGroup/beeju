@@ -68,13 +68,15 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void beforeTest() throws Throwable {
+  protected void before() throws Throwable {
+    super.before();
     hiveServer2Core.initialise();
   }
 
   @Override
-  protected void afterTest() {
+  protected void after() {
     hiveServer2Core.shutdown();
+    super.after();
   }
 
   /**

@@ -18,6 +18,7 @@ package com.hotels.beeju.extensions;
 import java.util.Map;
 
 import org.apache.hive.jdbc.HiveDriver;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.HiveServer2Core;
 
@@ -58,13 +59,15 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
   }
 
   @Override
-  protected void beforeTest() throws InterruptedException {
+  public void beforeEach(ExtensionContext context) throws Exception {
+    super.beforeEach(context);
     hiveServer2Core.initialise();
   }
 
   @Override
-  protected void afterTest() {
+  public void afterEach(ExtensionContext context) throws Exception {
     hiveServer2Core.shutdown();
+    super.afterEach(context);
   }
 
   /**

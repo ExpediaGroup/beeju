@@ -57,15 +57,15 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   }
 
   @Override
-  protected void beforeTest() throws Throwable {
+  protected void before() throws Throwable {
     thriftHiveMetaStoreCore.initialise();
-    super.beforeTest();
+    super.before();
   }
 
   @Override
-  protected void afterTest() {
+  protected void after() {
     thriftHiveMetaStoreCore.shutdown();
-    super.afterTest();
+    super.after();
   }
 
   /**

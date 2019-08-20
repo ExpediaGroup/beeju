@@ -16,6 +16,7 @@
 package com.hotels.beeju;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -32,8 +33,7 @@ import com.hotels.beeju.core.BeejuCore;
  */
 abstract class BeejuJUnitRule extends ExternalResource {
 
-  @VisibleForTesting
-  public BeejuCore core;
+  protected BeejuCore core;
 
   public BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
     core = new BeejuCore(databaseName, configuration);
@@ -46,35 +46,19 @@ abstract class BeejuJUnitRule extends ExternalResource {
   protected void init() throws Exception {
   }
 
-  /**
-   * Implement this method to prepare the rule for a new test.
-   * <p>
-   * This is called after the rule is initialised.
-   * </p>
-   *
-   * @throws Throwable If the rule cannot be prepared for a new test.
-   */
-  protected abstract void beforeTest() throws Throwable;
-
   @Override
   protected void before() throws Throwable {
     init();
-    beforeTest();
     createDatabase(databaseName());
   }
 
-  /**
-   * Implement method to release any resources used by the rule.
-   * <p>
-   * This method is called before the warehouse directory is deleted.
-   * </p>
-   */
-  protected abstract void afterTest();
-
   @Override
   protected void after() {
-    afterTest();
-    core.deleteTempDir();
+    try {
+      core.cleanUp();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**

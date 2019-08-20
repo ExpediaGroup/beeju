@@ -128,6 +128,7 @@ public class HiveServer2CoreTest {
     assertThat(table.getSd().getOutputFormat(), is("org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"));
     assertThat(table.getSd().getSerdeInfo().getSerializationLib(),
         is("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"));
+    server.shutdown();
   }
 
   @Test
@@ -162,6 +163,7 @@ public class HiveServer2CoreTest {
         .append("  'transient_lastDdlTime'='" + table.getParameters().get("transient_lastDdlTime") + "')\n")
         .toString();
     assertThat(showCreateTable.toString(), is(expectedShowCreateTable));
+    server.shutdown();
   }
 
   @Test
@@ -185,6 +187,7 @@ public class HiveServer2CoreTest {
     } finally {
       client.close();
     }
+    server.shutdown();
   }
 
   @Test
@@ -211,6 +214,7 @@ public class HiveServer2CoreTest {
     } finally {
       client.close();
     }
+    server.shutdown();
   }
 
   @Test
@@ -233,8 +237,8 @@ public class HiveServer2CoreTest {
 
       try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
           Statement statement = connection.createStatement()) {
-        String addPartitionHql = String.format("ALTER TABLE %s.%s DROP PARTITION (partcol=1)", DATABASE, tableName);
-        statement.execute(addPartitionHql);
+        String dropPartitionHql = String.format("ALTER TABLE %s.%s DROP PARTITION (partcol=1)", DATABASE, tableName);
+        statement.execute(dropPartitionHql);
       }
 
       List<Partition> partitions = client.listPartitions(DATABASE, tableName, (short) -1);
@@ -242,6 +246,7 @@ public class HiveServer2CoreTest {
     } finally {
       client.close();
     }
+    server.shutdown();
   }
 
   private HiveServer2Core setupServer() throws Exception {

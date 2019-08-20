@@ -43,35 +43,15 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
 
   }
 
-  /**
-   * Implement this method to prepare the extension for a new test.
-   * <p>
-   * This is called after the extension is initialised.
-   * </p>
-   *
-   * @throws Exception If the extension cannot be prepared for a new test.
-   */
-  protected abstract void beforeTest() throws Exception;
-
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     init();
-    beforeTest();
     createDatabase(databaseName());
   }
 
-  /**
-   * Implement method to release any resources used by the rule.
-   * <p>
-   * This method is called before the warehouse directory is deleted.
-   * </p>
-   */
-  protected abstract void afterTest() throws Exception;
-
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
-    afterTest();
-    core.deleteTempDir();
+    core.cleanUp();
   }
 
   /**
@@ -89,7 +69,7 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
   }
 
   /**
-   * @return @see com.hotels.beeju.core.BeejuCore#connectionURL()
+   * @return {@link com.hotels.beeju.core.BeejuCore#connectionURL()}
    */
   public String connectionURL() {
     return core.connectionURL();
