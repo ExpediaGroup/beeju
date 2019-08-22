@@ -96,18 +96,16 @@ public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback
   @Test
   public void createExistingDatabase() {
     Assertions.assertThrows(AlreadyExistsException.class, ()
-        -> {
-      hiveDefaultName.createDatabase(hiveDefaultName.databaseName());
-    });
+        -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
   }
 
   @Test
   public void createDatabaseNullName() {
-    Assertions.assertThrows(NullPointerException.class, () -> { hiveDefaultName.createDatabase(null); });
+    Assertions.assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
   }
 
   @Test
   public void createDatabaseInvalidName() {
-    Assertions.assertThrows(InvalidObjectException.class, () -> { hiveDefaultName.createDatabase(""); });
+    Assertions.assertThrows(InvalidObjectException.class, () -> hiveDefaultName.createDatabase(""));
   }
 }

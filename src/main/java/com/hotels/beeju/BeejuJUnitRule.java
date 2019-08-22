@@ -24,8 +24,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
 import org.junit.rules.ExternalResource;
 
-import com.google.common.annotations.VisibleForTesting;
-
 import com.hotels.beeju.core.BeejuCore;
 
 /**
@@ -35,7 +33,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   protected BeejuCore core;
 
-  public BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
+  BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
     core = new BeejuCore(databaseName, configuration);
   }
 
@@ -99,7 +97,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
   /**
    * @return Root of temporary directory
    */
-  public File tempDir() {
+  File tempDir() {
     return core.tempDir().toFile();
   }
 
@@ -109,7 +107,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
    * @param databaseName Database name.
    * @throws TException If an error occurs creating the database.
    */
-  public void createDatabase(String databaseName) throws TException {
+  void createDatabase(String databaseName) throws TException {
     core.createDatabase(databaseName);
   }
 }

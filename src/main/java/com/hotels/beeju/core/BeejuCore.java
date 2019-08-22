@@ -21,11 +21,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Map;
 import java.util.UUID;
 
@@ -36,12 +33,8 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.thrift.TException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BeejuCore {
-
-  private static final Logger LOG = LoggerFactory.getLogger(BeejuCore.class);
 
   // "user" conflicts with USER db and the metastore_db can't be created.
   private static final String METASTORE_DB_USER = "db_user";
@@ -106,11 +99,11 @@ public class BeejuCore {
     setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDir.toString());
   }
 
-  protected void setHiveVar(HiveConf.ConfVars variable, String value) {
+  void setHiveVar(HiveConf.ConfVars variable, String value) {
     conf.setVar(variable, value);
   }
 
-  protected void setHiveIntVar(HiveConf.ConfVars variable, int value) {
+  void setHiveIntVar(HiveConf.ConfVars variable, int value) {
     conf.setIntVar(variable, value);
   }
 
