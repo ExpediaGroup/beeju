@@ -72,7 +72,8 @@ public class HiveMetaStoreJUnitExtensionTest {
 
   @Test
   public void createExistingDatabase() {
-    Assertions.assertThrows(AlreadyExistsException.class, () -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
+    Assertions.assertThrows(AlreadyExistsException.class,
+        () -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
   }
 
   @Test
