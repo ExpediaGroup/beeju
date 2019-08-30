@@ -1,4 +1,11 @@
-## [2.0.0] - TBD
+## [3.0.0] - TBD
+### Changed
+- JDK version upgrade to 1.8 (was 1.7).
+
+### Added
+- JUnit5 extension class equivalents for all Beeju Rules. 
+
+## [2.0.0] - 2019-08-30
 ### Added
 - Support for JUnit5 using `migration-support` dependency. NOTE - the transitive dependency for JUnit from Beeju has been removed so you must depend on it in your own POM. 
 
