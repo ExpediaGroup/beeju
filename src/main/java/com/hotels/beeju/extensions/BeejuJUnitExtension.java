@@ -35,17 +35,8 @@ abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
     core = new BeejuCore(databaseName, configuration);
   }
 
-  /**
-   * This method can be overridden to provide additional initialisations.
-   * </p>
-   */
-  protected void init() throws Exception {
-
-  }
-
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    init();
     createDatabase(databaseName());
   }
 

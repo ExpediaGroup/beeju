@@ -54,12 +54,8 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
   }
 
   @Override
-  protected void init() throws Exception {
-    hiveServer2Core.startServerSocket();
-  }
-
-  @Override
   public void beforeEach(ExtensionContext context) throws Exception {
+    hiveServer2Core.startServerSocket();
     super.beforeEach(context);
     hiveServer2Core.initialise();
   }

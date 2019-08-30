@@ -17,7 +17,7 @@ package com.hotels.beeju.extensions;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.util.Collections;
@@ -29,19 +29,14 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
-import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.hotels.beeju.ThriftHiveMetaStoreJUnitRule;
 import com.hotels.beeju.ThriftHiveMetaStoreJUnitRuleTest;
 
-public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback {
-
-  private static File defaultTempRoot;
-  private static File customTempRoot;
+public class ThriftHiveMetaStoreJUnitExtensionTest{
 
   @RegisterExtension
   ThriftHiveMetaStoreJUnitExtension hiveDefaultName = new ThriftHiveMetaStoreJUnitExtension();
@@ -49,7 +44,7 @@ public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback
   @RegisterExtension
   ThriftHiveMetaStoreJUnitExtension hiveCustomName = new ThriftHiveMetaStoreJUnitExtension("my_test_database");
 
-  private static void assertRuleInitialised(ThriftHiveMetaStoreJUnitExtension hive) throws Exception {
+  private void assertRuleInitialised(ThriftHiveMetaStoreJUnitExtension hive) throws Exception {
     String databaseName = hive.databaseName();
 
     Database database = hive.client().getDatabase(databaseName);
@@ -66,14 +61,6 @@ public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback
     assertThat(databases.size(), is(2));
     assertThat(databases.get(0), is("default"));
     assertThat(databases.get(1), is(databaseName));
-  }
-
-  @Override
-  public void beforeEach(ExtensionContext context) {
-    defaultTempRoot = hiveDefaultName.getTempDirectory();
-    assertTrue(defaultTempRoot.exists());
-    customTempRoot = hiveCustomName.getTempDirectory();
-    assertTrue(customTempRoot.exists());
   }
 
   @Test
@@ -95,17 +82,17 @@ public class ThriftHiveMetaStoreJUnitExtensionTest implements BeforeEachCallback
 
   @Test
   public void createExistingDatabase() {
-    Assertions.assertThrows(AlreadyExistsException.class, ()
+    assertThrows(AlreadyExistsException.class, ()
         -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
   }
 
   @Test
   public void createDatabaseNullName() {
-    Assertions.assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
+    assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
   }
 
   @Test
   public void createDatabaseInvalidName() {
-    Assertions.assertThrows(InvalidObjectException.class, () -> hiveDefaultName.createDatabase(""));
+    assertThrows(InvalidObjectException.class, () -> hiveDefaultName.createDatabase(""));
   }
 }

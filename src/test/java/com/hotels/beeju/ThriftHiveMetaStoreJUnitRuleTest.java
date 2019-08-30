@@ -64,7 +64,7 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     assertRuleInitialised(hiveCustomName);
   }
 
-  private static void assertRuleInitialised(ThriftHiveMetaStoreJUnitRule hive) throws Exception {
+  private void assertRuleInitialised(ThriftHiveMetaStoreJUnitRule hive) throws Exception {
     String databaseName = hive.databaseName();
 
     Database database = hive.client().getDatabase(databaseName);

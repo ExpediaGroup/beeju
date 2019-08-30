@@ -37,22 +37,13 @@ import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hive.service.Service;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 public class HiveServer2CoreTest {
 
   private static final String DATABASE = "my_test_db";
   private final BeejuCore core = new BeejuCore(DATABASE);
   private final HiveServer2Core hiveServer2Core = new HiveServer2Core(core);
-
-  public TemporaryFolder temporaryFolder;
-
-  @Before
-  public void setup() {
-    temporaryFolder = new TemporaryFolder();
-  }
 
   @Test
   public void initiateServer() throws InterruptedException {

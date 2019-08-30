@@ -26,6 +26,7 @@ import com.hotels.beeju.core.HiveMetaStoreCore;
  * A JUnit Extension that creates a Hive Metastore backed by an in-memory database.
  * <p>
  * A fresh database instance will be created for each test method.
+ * </p>
  */
 public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
 

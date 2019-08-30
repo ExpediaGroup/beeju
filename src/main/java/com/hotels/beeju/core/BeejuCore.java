@@ -162,7 +162,6 @@ public class BeejuCore {
    */
   private void deleteTempDir() throws IOException {
     FileUtils.deleteDirectory(tempDir.toFile());
-    assertFalse(tempDir.toFile().exists());
   }
 
   public void cleanUp() throws IOException {

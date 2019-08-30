@@ -17,6 +17,7 @@ package com.hotels.beeju.extensions;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
 import java.util.HashMap;
@@ -24,7 +25,6 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
@@ -72,12 +72,12 @@ public class HiveMetaStoreJUnitExtensionTest {
 
   @Test
   public void createExistingDatabase() {
-    Assertions.assertThrows(AlreadyExistsException.class,
+    assertThrows(AlreadyExistsException.class,
         () -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
   }
 
   @Test
   public void createDatabaseNullName() {
-    Assertions.assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
+    assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
   }
 }

@@ -17,6 +17,7 @@ package com.hotels.beeju;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -55,7 +56,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
     try {
       core.cleanUp();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new UncheckedIOException(e);
     }
   }
 
