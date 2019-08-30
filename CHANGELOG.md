@@ -1,6 +1,8 @@
 ## [2.0.0] - 2019-08-30
 ### Added
-- Support for JUnit5 using `migration-support` dependency. NOTE - the transitive dependency for JUnit4 from Beeju has been removed so you must depend on it in your own POM. 
+- Support for JUnit5 using `migration-support` dependency. NOTE - the transitive dependency for JUnit4 from Beeju has been removed so you must depend on it in your own POM.
+### Changed
+- Excluded `org.pentaho.pentaho-aggdesigner-algorithm` dependency as it's not available in Maven Central. 
 
 ## [1.3.2] - 2019-07-10
 ### Changed
