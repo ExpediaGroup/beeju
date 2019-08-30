@@ -15,8 +15,6 @@
  */
 package com.hotels.beeju.core;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;

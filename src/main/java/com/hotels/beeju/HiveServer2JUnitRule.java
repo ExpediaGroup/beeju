@@ -62,13 +62,8 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void init() throws Exception {
-    super.init();
-    hiveServer2Core.startServerSocket();
-  }
-
-  @Override
   protected void before() throws Throwable {
+    hiveServer2Core.startServerSocket();
     super.before();
     hiveServer2Core.initialise();
   }

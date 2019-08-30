@@ -38,16 +38,8 @@ abstract class BeejuJUnitRule extends ExternalResource {
     core = new BeejuCore(databaseName, configuration);
   }
 
-  /**
-   * This method can be overridden to provide additional initialisations.
-   * </p>
-   */
-  protected void init() throws Exception {
-  }
-
   @Override
   protected void before() throws Throwable {
-    init();
     createDatabase(databaseName());
   }
 

@@ -27,9 +27,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.BeejuCore;
 
-abstract public class BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
+public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
 
-  public BeejuCore core;
+  protected BeejuCore core;
 
   public BeejuJUnitExtension(String databaseName, Map<String, String> configuration) {
     core = new BeejuCore(databaseName, configuration);

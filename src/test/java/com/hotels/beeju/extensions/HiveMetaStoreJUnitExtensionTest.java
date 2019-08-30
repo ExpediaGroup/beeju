@@ -40,7 +40,7 @@ public class HiveMetaStoreJUnitExtensionTest {
   HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_test_database",
       customConfProperties());
 
-  private static void assertRuleInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
+  private void assertRuleInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
     String databaseName = hive.databaseName();
     Database database = hive.client().getDatabase(databaseName);
 

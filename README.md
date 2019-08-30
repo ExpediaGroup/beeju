@@ -8,14 +8,14 @@ You can obtain BeeJU from Maven Central:
 
 # Overview
 BeeJU provides [JUnit5 Extensions](https://junit.org/junit5/docs/current/user-guide/#extensions) that can be used to write test code that tests [Hive](https://hive.apache.org/). The JUnit lifecycle extension points are a means to provide resources in a test and automatically tear them down when the life cycle of a test ends.
-This project is currently built with and tested against Hive 2.3.0 (and minor versions back to Hive 1.2.1) but is most likely compatible with older and newer versions of Hive. The available JUnit extensions are explained in more detail below.  
+This project is currently built with and tested against Hive 2.3.x (and minor versions back to Hive 1.2.1) but is most likely compatible with older and newer versions of Hive. The available JUnit extensions are explained in more detail below.  
 
-Beeju also provides [JUnit4 Rules](http://junit.org/junit4/javadoc/4.12/org/junit/Rule.html) that can be used in the same manner as the JUnit5 extensions. Examples of how to use both options can be found below.
+BeeJU also provides [JUnit4 Rules](http://junit.org/junit4/javadoc/4.12/org/junit/Rule.html) that can be used in the same manner as the JUnit5 extensions. Examples of how to use both options can be found below.
 # Usage
-The BeeJU JUnit rules and extensions provide a way to run tests that have an underlying requirement to use the Hive Metastore API but don't have the ability to mock the [Hive Metastore Client](https://hive.apache.org/javadocs/r1.2.1/api/org/apache/hadoop/hive/metastore/HiveMetaStoreClient.html). The rules and extensions spin up and tear down an in-memory Metastore which may add a few seconds to the test life cycle so if you require tests to run in the sub-second range this is not for you. 
+The BeeJU JUnit rules and extensions provide a way to run tests that have an underlying requirement to use the Hive Metastore API but don't have the ability to mock the [Hive Metastore Client](https://hive.apache.org/javadocs/r2.3.6/api/index.html). The rules and extensions spin up and tear down an in-memory Metastore which may add a few seconds to the test life cycle so if you require tests to run in the sub-second range this is not for you. 
 
 ## Maven Dependencies
-Depend on Beeju using:
+Depend on BeeJU using:
 
 ```xml
     <dependency>
@@ -173,7 +173,7 @@ Example `@Rule` usage: Class under test drops a table via Hive JDBC.
     }
 
 ## JUnit5 Rule Migration
-Support is available to enable you to migrate your JUnit4 tests that currently use BeeJU rules without changing them to use extensions. To use JUnit5, ensure you have:
+Support is available to enable you to migrate your JUnit4 tests that currently use BeeJU rules without changing them to use extensions. To use JUnit5, ensure you have the following dependency in your POM:
     
 ```xml
     <dependency>
@@ -184,7 +184,7 @@ Support is available to enable you to migrate your JUnit4 tests that currently u
     </dependency>
 ```
 
-To any test classes using the BeeJU rules, add the class annotation `@EnableRuleMigrationSupport`. No further changes are needed to move your JUnit4 tests to JUnit5.
+For any test classes using the BeeJU rules, add the class annotation `@EnableRuleMigrationSupport`. No further changes are needed to move your JUnit4 tests to JUnit5.
 
 # Credits
 
