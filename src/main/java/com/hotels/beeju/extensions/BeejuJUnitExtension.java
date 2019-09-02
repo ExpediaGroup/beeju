@@ -27,6 +27,9 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.BeejuCore;
 
+/**
+ * Base class for BeeJU JUnit Extensions that require a Hive Metastore database configuration pre-set.
+ */
 public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
 
   protected BeejuCore core;

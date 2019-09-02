@@ -49,7 +49,7 @@ This extension creates an in-memory Hive database without a Thrift Hive Metastor
 Example usage: Class under test creates a partition using an injected Hive Metastore Client. 
 
     @RegisterExtension
-    public HiveMetaStoreJUnitRule hive = new HiveMetaStoreJUnitRule("foo_db");
+    public HiveMetaStoreJUnitExtension hive = new HiveMetaStoreJUnitExtension("foo_db");
     
     @Test
     public void example() throws Exception {
@@ -65,7 +65,7 @@ Example usage: Class under test creates a partition using an injected Hive Metas
       assertEquals(1, client.listPartitions("foo_db", "bar_table", (short) 100));
     }
 
-### HiveServer2JUnitRule and Extension
+### HiveServer2JUnitExtension
 This extension creates an in-memory Hive database, a Thrift Hive Metastore service on top of this and a HiveServer2 service. This can then be used to perform Hive JDBC calls in a test. The extension exposes a JDBC URI that can be injected into the class under test and a Hive Metastore Client which can be used for data setup and assertions.
 
 Example usage: Class under test drops a table via Hive JDBC.
@@ -99,7 +99,7 @@ Example usage: Class under test drops a table via Hive JDBC.
     }
 
 ## JUnit4
-For JUnit4, ensure you have the JUnit4 dependency in your POM, as BeeJU no longer supplies it as a transitive dependency.
+For JUnit4, ensure you have the [JUnit4](https://github.com/junit-team/junit4) dependency in your POM, as BeeJU no longer supplies it as a transitive dependency.
 
 ### ThriftHiveMetaStoreJUnitRule
 This rule creates an in-memory Hive database and a Thrift Hive Metastore service on top of this. This can then be used to perform Hive Thrift API calls in a test. The rule exposes a Thrift URI that can be injected into the class under test and a Hive Metastore Client which can be used for data setup and assertions.
