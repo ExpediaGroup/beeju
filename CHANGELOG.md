@@ -5,9 +5,10 @@
 ### Added
 - JUnit5 extension class equivalents for all BeeJU Rules. 
 
-## [2.0.0] - 2019-08-30
+## [2.0.0] - 2019-09-02
 ### Added
 - Support for JUnit5 using `migration-support` dependency. NOTE - the transitive dependency for JUnit4 from Beeju has been removed so you must depend on it in your own POM.
+
 ### Changed
 - Excluded `org.pentaho.pentaho-aggdesigner-algorithm` dependency as it's not available in Maven Central.
 - `hotels-oss-parent` version updated to 4.1.0 (was 4.0.1). 
