@@ -19,9 +19,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -39,6 +42,7 @@ public class BeejuCore {
   private final String databaseName;
   private final String connectionURL;
   private final String driverClassName;
+  private Path tempDir;
 
   public BeejuCore() {
     this("test_database");
@@ -75,16 +79,29 @@ public class BeejuCore {
       // overriding default derby log path to go to tmp
       String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
       System.setProperty("derby.stream.error.file", derbyLog);
+
+      //Creating temporary folder
+      createWarehousePath();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
   }
 
-  public void setHiveVar(HiveConf.ConfVars variable, String value) {
+  /**
+   * Initialise the warehouse path.
+   *
+   * @throws IOException If the initialisation fails.
+   */
+  private void createWarehousePath() throws IOException {
+    tempDir = Files.createTempDirectory("beeju_test");
+    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDir.toString());
+  }
+
+  void setHiveVar(HiveConf.ConfVars variable, String value) {
     conf.setVar(variable, value);
   }
 
-  public void setHiveIntVar(HiveConf.ConfVars variable, int value) {
+  void setHiveIntVar(HiveConf.ConfVars variable, int value) {
     conf.setIntVar(variable, value);
   }
 
@@ -94,7 +111,8 @@ public class BeejuCore {
    * @param databaseName Database name.
    * @throws TException If an error occurs creating the database.
    */
-  public void createDatabase(String databaseName, File tempFile) throws TException {
+  public void createDatabase(String databaseName) throws TException {
+    File tempFile = tempDir.toFile();
     HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
@@ -133,6 +151,21 @@ public class BeejuCore {
     return connectionURL;
   }
 
+  public Path tempDir() {
+    return tempDir;
+  }
+
+  /**
+   * Delete temporary files used during test
+   */
+  private void deleteTempDir() throws IOException {
+    FileUtils.deleteDirectory(tempDir.toFile());
+  }
+
+  public void cleanUp() throws IOException {
+    deleteTempDir();
+  }
+
   /**
    * Creates a new HiveMetaStoreClient that can talk directly to the backed metastore database.
    * <p>
@@ -143,7 +176,7 @@ public class BeejuCore {
    */
   public HiveMetaStoreClient newClient() {
     try {
-      return new HiveMetaStoreClient(conf());
+      return new HiveMetaStoreClient(conf);
     } catch (MetaException e) {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }

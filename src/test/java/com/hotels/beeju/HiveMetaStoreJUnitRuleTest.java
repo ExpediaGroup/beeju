@@ -36,15 +36,14 @@ import org.junit.Test;
 
 public class HiveMetaStoreJUnitRuleTest {
 
+  private static File tempRoot;
   public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule();
-
   public @Rule HiveMetaStoreJUnitRule hiveCustomName = new HiveMetaStoreJUnitRule("my_test_database");
 
-  private static File tempRoot;
 
   @Before
   public void before() {
-    tempRoot = hiveDefaultName.temporaryFolder.getRoot();
+    tempRoot = hiveDefaultName.tempDir();
     assertTrue(tempRoot.exists());
   }
 
@@ -64,7 +63,7 @@ public class HiveMetaStoreJUnitRuleTest {
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.temporaryFolder.getRoot(), databaseName);
+    File databaseFolder = new File(hive.tempDir(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
   }
 
@@ -95,5 +94,4 @@ public class HiveMetaStoreJUnitRuleTest {
   public static void afterClass() {
     assertFalse(tempRoot.exists());
   }
-
 }

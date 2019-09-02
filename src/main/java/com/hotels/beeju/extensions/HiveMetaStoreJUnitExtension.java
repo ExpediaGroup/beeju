@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.extensions;
 
 import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
 /**
- * A JUnit {@link org.junit.Rule} that creates a Hive Metastore backed by an in-memory database.
+ * A JUnit Extension that creates a Hive Metastore backed by an in-memory database.
  * <p>
  * A fresh database instance will be created for each test method.
+ * </p>
  */
-public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
+public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
 
-  private final HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
+  private final HiveMetaStoreCore hiveMetaStoreCore;
 
   /**
    * Create a Hive Metastore with a pre-created database "test_database".
    */
-  public HiveMetaStoreJUnitRule() {
+  HiveMetaStoreJUnitExtension() {
     this("test_database");
   }
 
@@ -42,7 +44,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
    *
    * @param databaseName Database name.
    */
-  public HiveMetaStoreJUnitRule(String databaseName) {
+  HiveMetaStoreJUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
@@ -52,24 +54,25 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
    * @param databaseName Database name.
    * @param configuration Hive configuration properties.
    */
-  public HiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
+  HiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
+    hiveMetaStoreCore = new HiveMetaStoreCore(core);
   }
 
   @Override
-  protected void before() throws Throwable {
-    super.before();
+  public void beforeEach(ExtensionContext context) throws Exception {
+    super.beforeEach(context);
     hiveMetaStoreCore.initialise();
   }
 
   @Override
-  protected void after() {
+  public void afterEach(ExtensionContext context) throws Exception {
     hiveMetaStoreCore.shutdown();
-    super.after();
+    super.afterEach(context);
   }
 
   /**
-   * @return the {@link com.hotels.beeju.core.HiveMetaStoreCore#client()}.
+   * @return {@link com.hotels.beeju.core.HiveMetaStoreCore#client()}.
    */
   public HiveMetaStoreClient client() {
     return hiveMetaStoreCore.client();

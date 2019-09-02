@@ -13,43 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.extensions;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
-import org.junit.rules.ExternalResource;
+import org.junit.jupiter.api.extension.AfterEachCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 import com.hotels.beeju.core.BeejuCore;
 
 /**
- * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
+ * Base class for BeeJU JUnit Extensions that require a Hive Metastore database configuration pre-set.
  */
-abstract class BeejuJUnitRule extends ExternalResource {
+public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEachCallback {
 
   protected BeejuCore core;
 
-  BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
+  public BeejuJUnitExtension(String databaseName, Map<String, String> configuration) {
     core = new BeejuCore(databaseName, configuration);
   }
 
   @Override
-  protected void before() throws Throwable {
+  public void beforeEach(ExtensionContext context) throws Exception {
     createDatabase(databaseName());
   }
 
   @Override
-  protected void after() {
-    try {
-      core.cleanUp();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+  public void afterEach(ExtensionContext context) throws Exception {
+    core.cleanUp();
   }
 
   /**
@@ -67,7 +63,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   /**
-   * @return {@link com.hotels.beeju.core.BeejuCore#connectionURL()}.
+   * @return {@link com.hotels.beeju.core.BeejuCore#connectionURL()}
    */
   public String connectionURL() {
     return core.connectionURL();
@@ -88,19 +84,19 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   /**
-   * @return Root of temporary directory
-   */
-  File tempDir() {
-    return core.tempDir().toFile();
-  }
-
-  /**
-   * Create a new database with the specified name.
+   * See {@link com.hotels.beeju.core.BeejuCore#createDatabase(String)}
    *
    * @param databaseName Database name.
    * @throws TException If an error occurs creating the database.
    */
-  void createDatabase(String databaseName) throws TException {
+  public void createDatabase(String databaseName) throws TException {
     core.createDatabase(databaseName);
+  }
+
+  /**
+   * @return Root temporary directory as a file.
+   */
+  public File getTempDirectory() {
+    return core.tempDir().toFile();
   }
 }

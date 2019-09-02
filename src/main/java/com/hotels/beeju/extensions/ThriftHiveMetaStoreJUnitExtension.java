@@ -13,27 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
-
-import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
+package com.hotels.beeju.extensions;
 
 import java.util.Map;
 
+import org.junit.jupiter.api.extension.ExtensionContext;
+
+import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
+
 /**
- * A JUnit Rule that creates a Hive Metastore Thrift service backed by a Hive Metastore using an HSQLDB in-memory
+ * A JUnit Extension that creates a Hive Metastore Thrift service backed by a Hive Metastore using an in-memory
  * database.
  * <p>
  * A fresh database instance will be created for each test method.
  * </p>
  */
-public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
+public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtension {
 
-  private ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
+  private final ThriftHiveMetaStoreCore thriftHiveMetaStoreCore;
 
   /**
    * Create a Thrift Hive Metastore service with a pre-created database "test_database".
    */
-  public ThriftHiveMetaStoreJUnitRule() {
+  public ThriftHiveMetaStoreJUnitExtension() {
     this("test_database");
   }
 
@@ -42,7 +44,7 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    *
    * @param databaseName Database name.
    */
-  public ThriftHiveMetaStoreJUnitRule(String databaseName) {
+  public ThriftHiveMetaStoreJUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
@@ -52,20 +54,21 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    * @param databaseName Database name.
    * @param configuration Hive configuration properties.
    */
-  public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
+  public ThriftHiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
+    thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
   }
 
   @Override
-  protected void before() throws Throwable {
+  public void beforeEach(ExtensionContext context) throws Exception{
     thriftHiveMetaStoreCore.initialise();
-    super.before();
+    super.beforeEach(context);
   }
 
   @Override
-  protected void after() {
+  public void afterEach(ExtensionContext context) throws Exception {
     thriftHiveMetaStoreCore.shutdown();
-    super.after();
+    super.afterEach(context);
   }
 
   /**
@@ -81,5 +84,4 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   public int getThriftPort() {
     return thriftHiveMetaStoreCore.getThriftPort();
   }
-
 }

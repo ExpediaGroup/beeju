@@ -13,32 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.extensions;
 
 import java.util.Map;
 
-import com.hotels.beeju.core.HiveServer2Core;
 import org.apache.hive.jdbc.HiveDriver;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
-/**
- * A JUnit Rule that creates a HiveServer2 service and Thrift Metastore service backed by a Hive Metastore using an
- * HSQLDB in-memory database.
- * <p>
- * A fresh database instance will be created for each test method.
- * </p>
- * <p>
- * Note that this class is meant to be used for DDL operations only. Any attempt to run DML operations may result in
- * errors.
- * </p>
- */
-public class HiveServer2JUnitRule extends BeejuJUnitRule {
+import com.hotels.beeju.core.HiveServer2Core;
 
-  private HiveServer2Core hiveServer2Core = new HiveServer2Core(core);
+public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
+
+  private final HiveServer2Core hiveServer2Core;
 
   /**
    * Create a HiveServer2 service with a pre-created database "test_database".
    */
-  public HiveServer2JUnitRule() {
+  HiveServer2JUnitExtension() {
     this("test_database");
   }
 
@@ -47,7 +38,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
    *
    * @param databaseName Database name.
    */
-  public HiveServer2JUnitRule(String databaseName) {
+  HiveServer2JUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
@@ -57,21 +48,22 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
    * @param databaseName Database name.
    * @param configuration Hive configuration properties.
    */
-  public HiveServer2JUnitRule(String databaseName, Map<String, String> configuration) {
+  HiveServer2JUnitExtension(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
+    hiveServer2Core = new HiveServer2Core(core);
   }
 
   @Override
-  protected void before() throws Throwable {
+  public void beforeEach(ExtensionContext context) throws Exception {
     hiveServer2Core.startServerSocket();
-    super.before();
+    super.beforeEach(context);
     hiveServer2Core.initialise();
   }
 
   @Override
-  protected void after() {
+  public void afterEach(ExtensionContext context) throws Exception {
     hiveServer2Core.shutdown();
-    super.after();
+    super.afterEach(context);
   }
 
   /**
@@ -89,6 +81,4 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   public String connectionURL() {
     return hiveServer2Core.getJdbcConnectionUrl();
   }
-
-
 }

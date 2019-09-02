@@ -26,11 +26,10 @@ import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
 
 public class HiveServer2Core {
 
+  private final BeejuCore beejuCore;
   private String jdbcConnectionUrl;
   private HiveServer2 hiveServer2;
   private int port;
-
-  private final BeejuCore beejuCore;
 
   public HiveServer2Core(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
@@ -82,5 +81,9 @@ public class HiveServer2Core {
 
   public HiveServer2 getHiveServer2() {
     return hiveServer2;
+  }
+
+  public BeejuCore getCore() {
+    return beejuCore;
   }
 }
