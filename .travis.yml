@@ -3,7 +3,6 @@ jdk:
   - openjdk8
 os:
   - linux
-dist: trusty
 cache:
   directories:
     - ~/.m2/repository
