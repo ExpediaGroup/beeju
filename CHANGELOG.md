@@ -1,4 +1,4 @@
-## [2.0.0] - 2019-08-30
+## [2.0.0] - 2019-09-02
 ### Added
 - Support for JUnit5 using `migration-support` dependency. NOTE - the transitive dependency for JUnit4 from Beeju has been removed so you must depend on it in your own POM.
 ### Changed
