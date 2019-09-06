@@ -1,4 +1,4 @@
-## [3.0.0] - TBD
+## [3.0.0] - 2019-09-06
 ### Changed
 - JDK version upgrade to 1.8 (was 1.7).
 
