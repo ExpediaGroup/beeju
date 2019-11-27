@@ -29,7 +29,7 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
   /**
    * Create a HiveServer2 service with a pre-created database "test_database".
    */
-  HiveServer2JUnitExtension() {
+  public HiveServer2JUnitExtension() {
     this("test_database");
   }
 
@@ -38,7 +38,7 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
    *
    * @param databaseName Database name.
    */
-  HiveServer2JUnitExtension(String databaseName) {
+  public HiveServer2JUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
@@ -48,7 +48,7 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
    * @param databaseName Database name.
    * @param configuration Hive configuration properties.
    */
-  HiveServer2JUnitExtension(String databaseName, Map<String, String> configuration) {
+  public HiveServer2JUnitExtension(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
     hiveServer2Core = new HiveServer2Core(core);
   }
