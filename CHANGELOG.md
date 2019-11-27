@@ -1,3 +1,7 @@
+## [3.0.1] - 2019-09-27
+### Changed
+- `HiveMetaStoreJUnitExtension` and `HiveServer2JUnitExtension` constructors made public to allow access to classes outside of the extensions package. 
+
 ## [3.0.0] - 2019-09-06
 ### Changed
 - JDK version upgrade to 1.8 (was 1.7).
