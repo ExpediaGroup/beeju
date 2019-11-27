@@ -35,7 +35,7 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
   /**
    * Create a Hive Metastore with a pre-created database "test_database".
    */
-  HiveMetaStoreJUnitExtension() {
+  public HiveMetaStoreJUnitExtension() {
     this("test_database");
   }
 
@@ -44,7 +44,7 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
    *
    * @param databaseName Database name.
    */
-  HiveMetaStoreJUnitExtension(String databaseName) {
+  public HiveMetaStoreJUnitExtension(String databaseName) {
     this(databaseName, null);
   }
 
@@ -54,7 +54,7 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
    * @param databaseName Database name.
    * @param configuration Hive configuration properties.
    */
-  HiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
+  public HiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
     super(databaseName, configuration);
     hiveMetaStoreCore = new HiveMetaStoreCore(core);
   }
