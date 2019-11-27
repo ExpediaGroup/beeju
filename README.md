@@ -70,7 +70,7 @@ This extension creates an in-memory Hive database, a Thrift Hive Metastore servi
 
 Example usage: Class under test drops a table via Hive JDBC.
 
-    @Rule
+    @RegisterExtension
     public HiveServer2JUnitExtension hive = new HiveServer2JUnitExtension("foo_db");
     
     @Test
