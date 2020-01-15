@@ -4,7 +4,6 @@
 - Depend on `junit-jupiter` (was `junit-jupiter-api`).
 - `hotels-oss-parent` version updated to `4.2.0` (was `4.1.0`).
 
-
 ## [3.0.1] - 2019-09-27
 ### Changed
 - `HiveMetaStoreJUnitExtension` and `HiveServer2JUnitExtension` constructors made public to allow access to classes outside of the extensions package. 
