@@ -101,6 +101,10 @@ public class BeejuCore {
     conf.setVar(variable, value);
   }
 
+  void setHiveConf(String variable, String value) {
+    conf.set(variable, value);
+  }
+
   void setHiveIntVar(HiveConf.ConfVars variable, int value) {
     conf.setIntVar(variable, value);
   }
