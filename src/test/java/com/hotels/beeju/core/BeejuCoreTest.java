@@ -78,6 +78,12 @@ public class BeejuCoreTest {
   }
 
   @Test
+  public void setHiveConf() {
+    defaultCore.setHiveConf("my.custom.key", "test");
+    assertThat(defaultCore.conf().get("my.custom.key"), is("test"));
+  }
+
+  @Test
   public void setHiveIntVar() {
     defaultCore.setHiveIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT, 00000);
     assertThat(defaultCore.conf().getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT), is(00000));
