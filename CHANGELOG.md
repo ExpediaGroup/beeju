@@ -1,4 +1,4 @@
-## [3.1.0] - TBD
+## [3.1.0] - 2020-05-13
 ### Changed
 - JUnit version updated to `5.5.2` (was 5.5.1).
 - Depend on `junit-jupiter` (was `junit-jupiter-api`).
