@@ -1,3 +1,8 @@
+## [3.2.0] - TBD
+### Added
+- Support for setting Thrift Hive Metastore port in tests.
+- A `ThriftHiveMetaStoreApp` which can be used to run the the Thrift Hive Metastore service locally.
+
 ## [3.1.0] - 2020-05-13
 ### Changed
 - JUnit version updated to `5.5.2` (was 5.5.1).

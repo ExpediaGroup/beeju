@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2020 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class ThriftHiveMetaStoreCore {
   private static final Logger LOG = LoggerFactory.getLogger(ThriftHiveMetaStoreCore.class);
   private final ExecutorService thriftServer;
   private final BeejuCore beejuCore;
-  private int thriftPort;
+  private int thriftPort = -1;
 
   public ThriftHiveMetaStoreCore(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
@@ -45,11 +45,14 @@ public class ThriftHiveMetaStoreCore {
   }
 
   public void initialise() throws Exception {
-    thriftPort = -1;
     final Lock startLock = new ReentrantLock();
     final Condition startCondition = startLock.newCondition();
     final AtomicBoolean startedServing = new AtomicBoolean();
-    try (ServerSocket socket = new ServerSocket(0)) {
+    int socketPort = 0;
+    if (thriftPort > 0) {
+      socketPort = thriftPort;
+    }
+    try (ServerSocket socket = new ServerSocket(socketPort)) {
       thriftPort = socket.getLocalPort();
     }
     beejuCore.setHiveVar(HiveConf.ConfVars.METASTOREURIS, getThriftConnectionUri());
@@ -97,6 +100,16 @@ public class ThriftHiveMetaStoreCore {
    */
   public int getThriftPort() {
     return thriftPort;
+  }
+  
+  /**
+   * @param thriftPort The Port to use for the Thrift Hive metastore, if not set then a port number will automatically be allocated.
+   */
+  public void setThriftPort(int thriftPort) {
+    if (thriftPort < 0) {
+      throw new IllegalArgumentException("Thrift port must be >=0, not " + thriftPort);
+    }
+    this.thriftPort = thriftPort;
   }
 
   public String getDatabaseName(){

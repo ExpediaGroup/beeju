@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2020 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,6 +80,13 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    */
   public int getThriftPort() {
     return thriftHiveMetaStoreCore.getThriftPort();
+  }
+  
+  /**
+   * @param thriftPort The Port to use for the Thrift Hive metastore, if not set then a port number will automatically be allocated.
+   */
+  public void setThriftPort(int thriftPort) {
+    thriftHiveMetaStoreCore.setThriftPort(thriftPort);
   }
 
 }

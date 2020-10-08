@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2020 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -104,6 +104,13 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
   @Test(expected = InvalidObjectException.class)
   public void createDatabaseInvalidName() throws TException {
     hiveDefaultName.createDatabase("");
+  }
+
+  @Test
+  public void thriftPort() {
+    int thriftPort = 3333;
+    hiveDefaultName.setThriftPort(thriftPort);
+    assertThat(hiveDefaultName.getThriftPort(), is(thriftPort));
   }
 
   @AfterClass
