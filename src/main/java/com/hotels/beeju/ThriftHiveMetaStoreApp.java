@@ -23,8 +23,7 @@ public class ThriftHiveMetaStoreApp {
     ThriftHiveMetaStoreJUnitRule rule = new ThriftHiveMetaStoreJUnitRule();
     rule.setThriftPort(22334);
     rule.before();
-    System.out.println("Beeju Thrift Hive Metastore listening on: " + rule.getThriftConnectionUri());
-    // TODO: also test BeeJU still works with these changes in a local downstream project
+    System.out.println("BeeJU Thrift Hive Metastore listening on: " + rule.getThriftConnectionUri());
     CountDownLatch latch = new CountDownLatch(1);
     latch.await();
   }
