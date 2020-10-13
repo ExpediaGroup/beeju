@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2020 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,20 @@ public class ThriftHiveMetaStoreCoreTest {
     List<String> databases = client.getAllDatabases();
     assertThat(databases.size(), is(1));
     assertThat(databases.get(0), is("default"));
+  }
+
+  @Test
+  public void validThriftPort() throws Exception {
+    int thriftPort = 3333;
+    thriftHiveMetaStoreCore.setThriftPort(3333);
+    assertThat(thriftHiveMetaStoreCore.getThriftPort(), is(thriftPort));
+    thriftHiveMetaStoreCore.initialise();
+    assertThat(thriftHiveMetaStoreCore.getThriftPort(), is(thriftPort));
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void invalidThriftPort() {
+    thriftHiveMetaStoreCore.setThriftPort(-1);
   }
 
 }
