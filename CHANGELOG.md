@@ -1,4 +1,4 @@
-## [3.2.0] - TBD
+## [3.2.0] - 2020-10-14
 ### Added
 - Support for setting Thrift Hive Metastore port in tests.
 - A `ThriftHiveMetaStoreApp` which can be used to run the the Thrift Hive Metastore service locally.
