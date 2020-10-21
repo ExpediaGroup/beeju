@@ -87,7 +87,7 @@ public class BeejuCore {
       throw new RuntimeException(e);
     }
   }
-  
+
   /**
    * Initialise the warehouse path.
    *
