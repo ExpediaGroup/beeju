@@ -17,7 +17,6 @@ package com.hotels.beeju;
 
 import java.util.Map;
 
-import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
