@@ -15,11 +15,9 @@
  */
 package com.hotels.beeju;
 
-import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
-
 import java.util.Map;
 
-import org.apache.hadoop.hive.conf.HiveConf;
+import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
 /**
  * A JUnit Rule that creates a Hive Metastore Thrift service backed by a Hive Metastore using an HSQLDB in-memory
