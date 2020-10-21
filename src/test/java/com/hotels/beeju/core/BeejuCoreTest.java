@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 public class BeejuCoreTest {
 
+  private static final String HIVE_SERVER2_WEBUI_PORT = "hive.server2.webui.port";
   private final BeejuCore defaultCore = new BeejuCore();
   private final BeejuCore dbNameCore = new BeejuCore("test_db");
   private final BeejuCore dbNameAndConfCore = new BeejuCore("test_db_2", createConf());
@@ -40,27 +41,27 @@ public class BeejuCoreTest {
   private Map<String, String> createConf() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
-    conf.put("hive.server2.webui.port", "3333");
+    conf.put(HIVE_SERVER2_WEBUI_PORT, "3333"); //override a value that core sets as a default
     return conf;
   }
 
   @Test
   public void initialisedDefaultConstructor() {
     assertThat(defaultCore.databaseName(), is("test_database"));
-    assertThat(defaultCore.conf().get("hive.server2.webui.port"), is("0"));
+    assertThat(defaultCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("0"));
   }
 
   @Test
   public void initialisedDbNameConstructor() {
     assertThat(dbNameCore.databaseName(), is("test_db"));
-    assertThat(dbNameCore.conf().get("hive.server2.webui.port"), is("0"));
+    assertThat(dbNameCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("0"));
   }
 
   @Test
   public void intialisedDbNameAndConfConstructor() {
     assertThat(dbNameAndConfCore.databaseName(), is("test_db_2"));
     assertThat(dbNameAndConfCore.conf().get("my.custom.key"), is("my.custom.value"));
-    assertThat(dbNameAndConfCore.conf().get("hive.server2.webui.port"), is("3333"));
+    assertThat(dbNameAndConfCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("3333"));
   }
 
   @Test
@@ -104,7 +105,7 @@ public class BeejuCoreTest {
     assertThat(defaultCore.conf().getBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF), is(true));
     assertThat(defaultCore.conf().get("datanucleus.schema.autoCreateAll"), is("true"));
     assertThat(defaultCore.conf().get("hive.metastore.schema.verification"), is("false"));
-    assertThat(defaultCore.conf().get("hive.server2.webui.port"), is("0"));
+    assertThat(defaultCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("0"));
     assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
 
