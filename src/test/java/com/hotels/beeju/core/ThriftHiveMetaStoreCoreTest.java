@@ -16,13 +16,14 @@
 package com.hotels.beeju.core;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.List;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ThriftHiveMetaStoreCoreTest {
 
@@ -52,9 +53,9 @@ public class ThriftHiveMetaStoreCoreTest {
     assertThat(thriftHiveMetaStoreCore.getThriftPort(), is(thriftPort));
   }
 
-  @Test(expected = IllegalArgumentException.class)
+  @Test
   public void invalidThriftPort() {
-    thriftHiveMetaStoreCore.setThriftPort(-1);
+    assertThrows(IllegalArgumentException.class, () -> thriftHiveMetaStoreCore.setThriftPort(-1));
   }
 
 }

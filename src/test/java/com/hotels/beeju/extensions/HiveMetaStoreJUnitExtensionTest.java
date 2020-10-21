@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2020 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,9 @@
  */
 package com.hotels.beeju.extensions;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
@@ -44,9 +45,9 @@ public class HiveMetaStoreJUnitExtensionTest {
     String databaseName = hive.databaseName();
     Database database = hive.client().getDatabase(databaseName);
 
-    assertThat(database.getName(), is(databaseName));
+    assertThat(database.getName(), is(equalTo(databaseName)));
     File databaseFolder = new File(hive.getTempDirectory(), databaseName);
-    assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
+    assertThat(new File(database.getLocationUri()) + "/", is(equalTo(databaseFolder.toURI().toString())));
   }
 
   private Map<String, String> customConfProperties() {

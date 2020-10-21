@@ -1,3 +1,9 @@
+## [4.0.0] - TBD
+### Changed
+- The values from the optional `Map<String, String> configuration` that can be passed to the Rule and Extension constructors now *override* any 
+  default values that BeeJU sets. This allows for these to be overridden which can be useful in certain situations. The previous behavious was 
+  the opposite - BeeJU's defaults would override the passed configuration values.
+
 ## [3.2.0] - 2020-10-14
 ### Added
 - Support for setting Thrift Hive Metastore port in tests.

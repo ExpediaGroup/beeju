@@ -17,8 +17,8 @@ package com.hotels.beeju.core;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,7 +29,7 @@ import org.apache.derby.jdbc.EmbeddedDriver;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class BeejuCoreTest {
 
@@ -40,23 +40,27 @@ public class BeejuCoreTest {
   private Map<String, String> createConf() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
+    conf.put("hive.server2.webui.port", "3333");
     return conf;
   }
 
   @Test
   public void initialisedDefaultConstructor() {
     assertThat(defaultCore.databaseName(), is("test_database"));
+    assertThat(defaultCore.conf().get("hive.server2.webui.port"), is("0"));
   }
 
   @Test
   public void initialisedDbNameConstructor() {
     assertThat(dbNameCore.databaseName(), is("test_db"));
+    assertThat(dbNameCore.conf().get("hive.server2.webui.port"), is("0"));
   }
 
   @Test
   public void intialisedDbNameAndConfConstructor() {
     assertThat(dbNameAndConfCore.databaseName(), is("test_db_2"));
     assertThat(dbNameAndConfCore.conf().get("my.custom.key"), is("my.custom.value"));
+    assertThat(dbNameAndConfCore.conf().get("hive.server2.webui.port"), is("3333"));
   }
 
   @Test

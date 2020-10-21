@@ -55,13 +55,7 @@ public class BeejuCore {
   public BeejuCore(String databaseName, Map<String, String> configuration) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
-
-    if (configuration != null && !configuration.isEmpty()) {
-      for (Map.Entry<String, String> entry : configuration.entrySet()) {
-        conf.set(entry.getKey(), entry.getValue());
-      }
-    }
-
+    
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
@@ -75,6 +69,13 @@ public class BeejuCore {
     conf.setBoolean("hive.metastore.schema.verification", false);
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
+    
+    if (configuration != null && !configuration.isEmpty()) {
+      for (Map.Entry<String, String> entry : configuration.entrySet()) {
+        conf.set(entry.getKey(), entry.getValue());
+      }
+    }
+    
     try {
       // overriding default derby log path to go to tmp
       String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
@@ -86,7 +87,7 @@ public class BeejuCore {
       throw new RuntimeException(e);
     }
   }
-
+  
   /**
    * Initialise the warehouse path.
    *
