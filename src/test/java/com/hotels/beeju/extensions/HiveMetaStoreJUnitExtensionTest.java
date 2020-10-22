@@ -15,7 +15,6 @@
  */
 package com.hotels.beeju.extensions;
 
-import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -45,9 +44,9 @@ public class HiveMetaStoreJUnitExtensionTest {
     String databaseName = hive.databaseName();
     Database database = hive.client().getDatabase(databaseName);
 
-    assertThat(database.getName(), is(equalTo(databaseName)));
+    assertThat(database.getName(), is(databaseName));
     File databaseFolder = new File(hive.getTempDirectory(), databaseName);
-    assertThat(new File(database.getLocationUri()) + "/", is(equalTo(databaseFolder.toURI().toString())));
+    assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
   }
 
   private Map<String, String> customConfProperties() {

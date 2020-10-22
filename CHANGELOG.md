@@ -2,6 +2,7 @@
 ### Changed
 - The values from the optional `Map<String, String> configuration` that can be passed to the Rule and Extension constructors now *override* any 
   default values that BeeJU sets. The previous behaviour was the opposite - BeeJU's defaults would override the passed configuration values.
+- JUnit version updated to `5.7.0` (was `5.5.2`).  
 
 ## [3.2.0] - 2020-10-14
 ### Added
@@ -13,7 +14,7 @@
 
 ## [3.1.0] - 2020-05-13
 ### Changed
-- JUnit version updated to `5.5.2` (was 5.5.1).
+- JUnit version updated to `5.5.2` (was `5.5.1`).
 - Depend on `junit-jupiter` (was `junit-jupiter-api`).
 - `hotels-oss-parent` version updated to `4.2.0` (was `4.1.0`).
 - Upgraded version of `hive.version` to `2.3.7` (was `2.3.4`). Allows BeeJU to be used on JDK>=9.
