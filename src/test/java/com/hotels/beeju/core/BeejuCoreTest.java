@@ -35,8 +35,8 @@ public class BeejuCoreTest {
   
   private String preKey = "my.custom.pre.key"; 
   private String preValue = "my.custom.pre.value";
-  private String postKey = "my.custom.pre.key"; 
-  private String postValue = "my.custom.pre.value"; 
+  private String postKey = "my.custom.post.key"; 
+  private String postValue = "my.custom.post.value"; 
   private String coreOverrideValue = "user-that-core-will-override";
   private String confOverrideValue = "password-that-will-override-core";
 
