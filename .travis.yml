@@ -7,6 +7,6 @@ cache:
   directories:
     - ~/.m2/repository
 install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V -P travis
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true --quiet --batch-mode --show-version --activate-profiles coveralls
 script:
-  - mvn clean test jacoco:report coveralls:report -B -P travis -DrepoToken=${COVERALLS_REPO_TOKEN} -Dtest.arguments='-Xmx512m -XX:MaxPermSize=256m'
+  - mvn package jacoco:report coveralls:report --batch-mode --activate-profiles coveralls -DrepoToken=${COVERALLS_REPO_TOKEN} -Dtest.arguments='-Xmx512m -XX:MaxPermSize=256m'

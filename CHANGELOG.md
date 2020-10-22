@@ -1,3 +1,9 @@
+## [3.3.0] - TBD
+### Changed
+- Allow passing in of "pre" and "post" configuration values so that BeeJU's defaults can be overridden.
+- JUnit version updated to `5.7.0` (was `5.5.2`).
+- `hotels-oss-parent` version updated to `5.0.0` (was `4.2.0`). 
+
 ## [3.2.0] - 2020-10-14
 ### Added
 - Support for setting Thrift Hive Metastore port in tests.
@@ -8,7 +14,7 @@
 
 ## [3.1.0] - 2020-05-13
 ### Changed
-- JUnit version updated to `5.5.2` (was 5.5.1).
+- JUnit version updated to `5.5.2` (was `5.5.1`).
 - Depend on `junit-jupiter` (was `junit-jupiter-api`).
 - `hotels-oss-parent` version updated to `4.2.0` (was `4.1.0`).
 - Upgraded version of `hive.version` to `2.3.7` (was `2.3.4`). Allows BeeJU to be used on JDK>=9.

@@ -186,11 +186,7 @@ Support is available to enable you to migrate your JUnit4 tests that currently u
 
 For any test classes using the BeeJU rules, add the class annotation `@EnableRuleMigrationSupport`. No further changes are needed to move your JUnit4 tests to JUnit5.
 
-# Credits
-
-Created by [Dave Maughan](https://github.com/nahguam), [Patrick Duin](https://github.com/patduin) & [Daniel del Castillo](https://github.com/ddcprg) with thanks to: [Adrian Woodhead](https://github.com/massdosage).
-
 # Legal
 This project is available under the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).
 
-Copyright 2016-2019 Expedia, Inc.
+Copyright 2016-2020 Expedia, Inc.
