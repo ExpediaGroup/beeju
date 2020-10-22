@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2020 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,9 @@ package com.hotels.beeju;
 
 import java.util.Map;
 
-import com.hotels.beeju.core.HiveServer2Core;
 import org.apache.hive.jdbc.HiveDriver;
+
+import com.hotels.beeju.core.HiveServer2Core;
 
 /**
  * A JUnit Rule that creates a HiveServer2 service and Thrift Metastore service backed by a Hive Metastore using an

@@ -21,7 +21,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -43,18 +47,37 @@ public class BeejuCore {
   private final String connectionURL;
   private final String driverClassName;
   private Path tempDir;
+  
+  private static Map<String, String> convertToPropertiesMap(HiveConf hiveConf) {
+    Map<String, String> properties = new HashMap<String, String>();
+    Iterator<Entry<String, String>> iterator = hiveConf.iterator();
+    while (iterator.hasNext()) {
+      Entry<String, String> next = iterator.next();
+      properties.put(next.getKey(), next.getValue());
+    }
+    return properties;
+  }
 
   public BeejuCore() {
     this("test_database");
   }
 
   public BeejuCore(String databaseName) {
-    this(databaseName, null);
+    this(databaseName, Collections.emptyMap());
   }
-
-  public BeejuCore(String databaseName, Map<String, String> configuration) {
+  
+  public BeejuCore(String databaseName, HiveConf preConfiguration, HiveConf postConfiguration) {
+    this(databaseName, convertToPropertiesMap(preConfiguration), convertToPropertiesMap(postConfiguration));
+  }
+  
+  public BeejuCore(String databaseName, Map<String, String> preConfiguration) {
+    this(databaseName, preConfiguration, Collections.emptyMap());
+  }
+  
+  public BeejuCore(String databaseName, Map<String, String> preConfiguration, Map<String, String> postConfiguration) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
+    configure(preConfiguration);
     
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
@@ -70,12 +93,6 @@ public class BeejuCore {
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
     
-    if (configuration != null && !configuration.isEmpty()) {
-      for (Map.Entry<String, String> entry : configuration.entrySet()) {
-        conf.set(entry.getKey(), entry.getValue());
-      }
-    }
-    
     try {
       // overriding default derby log path to go to tmp
       String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
@@ -85,6 +102,16 @@ public class BeejuCore {
       createWarehousePath();
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+    
+    configure(postConfiguration);
+  }
+  
+  public void configure(Map<String, String> customConfiguration) {
+    if (customConfiguration != null && !customConfiguration.isEmpty()) {
+      for (Map.Entry<String, String> entry : customConfiguration.entrySet()) {
+        conf.set(entry.getKey(), entry.getValue());
+      }
     }
   }
 

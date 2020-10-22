@@ -50,10 +50,21 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    * Create a Thrift Hive Metastore service with a pre-created database using the provided name and configuration.
    *
    * @param databaseName Database name.
-   * @param configuration Hive configuration properties.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
    */
-  public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> configuration) {
-    super(databaseName, configuration);
+  public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> preConfiguration) {
+    super(databaseName, preConfiguration);
+  }
+  
+  /**
+   * Create a Thrift Hive Metastore service with a pre-created database using the provided name and configuration.
+   *
+   * @param databaseName Database name.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param postConfiguration Hive configuration properties that will be set to override BeeJU's defaults.
+   */
+  public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> preConfiguration, Map<String, String> postConfiguration) {
+    super(databaseName, preConfiguration, postConfiguration);
   }
 
   @Override

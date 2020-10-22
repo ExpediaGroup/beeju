@@ -32,36 +32,77 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.junit.jupiter.api.Test;
 
 public class BeejuCoreTest {
+  
+  private String preKey = "my.custom.pre.key"; 
+  private String preValue = "my.custom.pre.value";
+  private String postKey = "my.custom.pre.key"; 
+  private String postValue = "my.custom.pre.value"; 
+  private String coreOverrideValue = "user-that-core-will-override";
+  private String confOverrideValue = "password-that-will-override-core";
 
-  private static final String HIVE_SERVER2_WEBUI_PORT = "hive.server2.webui.port";
   private final BeejuCore defaultCore = new BeejuCore();
   private final BeejuCore dbNameCore = new BeejuCore("test_db");
-  private final BeejuCore dbNameAndConfCore = new BeejuCore("test_db_2", createConf());
+  private final BeejuCore dbNameAndMapConfCore = new BeejuCore("test_db_2", createPreConfigurationMap(), createPostConfigurationMap());
+  private final BeejuCore dbNameAndHiveConfCore = new BeejuCore("test_db_2", createPreHiveConf(), createPostHiveConf());
 
-  private Map<String, String> createConf() {
+  private Map<String, String> createPreConfigurationMap() {
     Map<String, String> conf = new HashMap<>();
-    conf.put("my.custom.key", "my.custom.value");
-    conf.put(HIVE_SERVER2_WEBUI_PORT, "3333"); //override a value that core sets as a default
+    conf.put(preKey, preValue);
+    conf.put(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME.toString(), coreOverrideValue);
+    return conf;
+  }
+  
+  private Map<String, String> createPostConfigurationMap() {
+    Map<String, String> conf = new HashMap<>();
+    conf.put(postKey, postValue);
+    conf.put(HiveConf.ConfVars.METASTOREPWD.toString(), confOverrideValue);
+    return conf;
+  }
+  
+  private HiveConf createPreHiveConf() {
+    HiveConf conf = new HiveConf();
+    conf.clear();
+    conf.set(preKey, preValue);
+    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, coreOverrideValue);
+    return conf;
+  }
+  
+  private HiveConf createPostHiveConf() {
+    HiveConf conf = new HiveConf();
+    conf.clear();
+    conf.set(postKey, postValue);
+    conf.setVar(HiveConf.ConfVars.METASTOREPWD, confOverrideValue);
     return conf;
   }
 
   @Test
   public void initialisedDefaultConstructor() {
     assertThat(defaultCore.databaseName(), is("test_database"));
-    assertThat(defaultCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("0"));
   }
 
   @Test
   public void initialisedDbNameConstructor() {
     assertThat(dbNameCore.databaseName(), is("test_db"));
-    assertThat(dbNameCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("0"));
   }
 
   @Test
-  public void intialisedDbNameAndConfConstructor() {
-    assertThat(dbNameAndConfCore.databaseName(), is("test_db_2"));
-    assertThat(dbNameAndConfCore.conf().get("my.custom.key"), is("my.custom.value"));
-    assertThat(dbNameAndConfCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("3333"));
+  public void intialisedDbNameAndMapConfConstructor() {
+    assertThat(dbNameAndMapConfCore.databaseName(), is("test_db_2"));
+    assertThat(dbNameAndMapConfCore.conf().get(preKey), is(preValue));
+    assertThat(dbNameAndMapConfCore.conf().get(postKey), is(postValue));
+    assertThat(dbNameAndMapConfCore.conf().get(postKey), is(postValue));
+    assertThat(dbNameAndMapConfCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
+    assertThat(dbNameAndMapConfCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is(confOverrideValue));
+  }
+  
+  @Test
+  public void intialisedDbNameAndHiveConfConstructor() {
+    assertThat(dbNameAndHiveConfCore.databaseName(), is("test_db_2"));
+    assertThat(dbNameAndHiveConfCore.conf().get(preKey), is(preValue));
+    assertThat(dbNameAndHiveConfCore.conf().get(postKey), is(postValue));
+    assertThat(dbNameAndHiveConfCore.conf().get(postKey), is(postValue));
+    assertThat(dbNameAndHiveConfCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
+    assertThat(dbNameAndHiveConfCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is(confOverrideValue));
   }
 
   @Test
@@ -105,7 +146,6 @@ public class BeejuCoreTest {
     assertThat(defaultCore.conf().getBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF), is(true));
     assertThat(defaultCore.conf().get("datanucleus.schema.autoCreateAll"), is("true"));
     assertThat(defaultCore.conf().get("hive.metastore.schema.verification"), is("false"));
-    assertThat(defaultCore.conf().get(HIVE_SERVER2_WEBUI_PORT), is("0"));
     assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
 
@@ -122,4 +162,5 @@ public class BeejuCoreTest {
     assertThat(db.getName(), is(databaseName.toLowerCase()));
     assertThat(db.getLocationUri(), is(String.format("file:%s/%s", defaultCore.tempDir(), databaseName)));
   }
+
 }

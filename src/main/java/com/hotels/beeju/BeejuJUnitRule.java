@@ -34,8 +34,15 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   protected BeejuCore core;
 
-  BeejuJUnitRule(String databaseName, Map<String, String> configuration) {
-    core = new BeejuCore(databaseName, configuration);
+  BeejuJUnitRule(String databaseName, Map<String, String> preConfiguration) {
+    core = new BeejuCore(databaseName, preConfiguration);
+  }
+
+  public BeejuJUnitRule(
+      String databaseName,
+      Map<String, String> preConfiguration,
+      Map<String, String> postConfiguration) {
+    core = new BeejuCore(databaseName, preConfiguration, postConfiguration);
   }
 
   @Override
