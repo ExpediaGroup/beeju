@@ -48,14 +48,14 @@ public class BeejuCore {
   private final String driverClassName;
   private Path tempDir;
   
-  private static Map<String, String> convertToPropertiesMap(HiveConf hiveConf) {
-    Map<String, String> properties = new HashMap<String, String>();
+  private static Map<String, String> convertToMap(HiveConf hiveConf) {
+    Map<String, String> converted = new HashMap<String, String>();
     Iterator<Entry<String, String>> iterator = hiveConf.iterator();
     while (iterator.hasNext()) {
       Entry<String, String> next = iterator.next();
-      properties.put(next.getKey(), next.getValue());
+      converted.put(next.getKey(), next.getValue());
     }
-    return properties;
+    return converted;
   }
 
   public BeejuCore() {
@@ -67,7 +67,7 @@ public class BeejuCore {
   }
   
   public BeejuCore(String databaseName, HiveConf preConfiguration, HiveConf postConfiguration) {
-    this(databaseName, convertToPropertiesMap(preConfiguration), convertToPropertiesMap(postConfiguration));
+    this(databaseName, convertToMap(preConfiguration), convertToMap(postConfiguration));
   }
   
   public BeejuCore(String databaseName, Map<String, String> preConfiguration) {
@@ -107,8 +107,8 @@ public class BeejuCore {
     configure(postConfiguration);
   }
   
-  public void configure(Map<String, String> customConfiguration) {
-    if (customConfiguration != null && !customConfiguration.isEmpty()) {
+  private void configure(Map<String, String> customConfiguration) {
+    if (customConfiguration != null) {
       for (Map.Entry<String, String> entry : customConfiguration.entrySet()) {
         conf.set(entry.getKey(), entry.getValue());
       }

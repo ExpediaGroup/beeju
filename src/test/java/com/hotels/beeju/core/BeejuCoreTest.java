@@ -86,22 +86,24 @@ public class BeejuCoreTest {
   }
 
   @Test
-  public void intialisedDbNameAndMapConfConstructor() {
+  public void initialisedDbNameAndMapConfConstructor() {
     assertThat(dbNameAndMapConfCore.databaseName(), is("test_db_2"));
     assertThat(dbNameAndMapConfCore.conf().get(preKey), is(preValue));
     assertThat(dbNameAndMapConfCore.conf().get(postKey), is(postValue));
-    assertThat(dbNameAndMapConfCore.conf().get(postKey), is(postValue));
+    //below still set to BeeJU default as pre-config not overridden
     assertThat(dbNameAndMapConfCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
+    //below overridden by post-config
     assertThat(dbNameAndMapConfCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is(confOverrideValue));
   }
   
   @Test
-  public void intialisedDbNameAndHiveConfConstructor() {
+  public void initialisedDbNameAndHiveConfConstructor() {
     assertThat(dbNameAndHiveConfCore.databaseName(), is("test_db_2"));
     assertThat(dbNameAndHiveConfCore.conf().get(preKey), is(preValue));
     assertThat(dbNameAndHiveConfCore.conf().get(postKey), is(postValue));
-    assertThat(dbNameAndHiveConfCore.conf().get(postKey), is(postValue));
+    // below still set to BeeJU default as pre-config not overridden
     assertThat(dbNameAndHiveConfCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
+    // below overridden by post-config
     assertThat(dbNameAndHiveConfCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is(confOverrideValue));
   }
 
