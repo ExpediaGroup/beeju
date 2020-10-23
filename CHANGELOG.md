@@ -1,3 +1,7 @@
+## [3.4.0] - TBD
+### Changed
+- `hotels-oss-parent` version updated to `6.1.0` (was `5.0.0`) to enable building with Java 11.
+
 ## [3.3.0] - 2020-10-23
 ### Changed
 - Allow passing in of "pre" and "post" configuration values so that BeeJU's defaults can be overridden.
