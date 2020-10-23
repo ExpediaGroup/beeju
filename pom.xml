@@ -6,7 +6,7 @@
   <parent>
     <groupId>com.hotels</groupId>
     <artifactId>hotels-oss-parent</artifactId>
-    <version>5.0.0</version>
+    <version>6.1.0</version>
   </parent>
 
   <artifactId>beeju</artifactId>
@@ -139,7 +139,7 @@
     </pluginManagement>
 
     <plugins>
-    <!-- below mess is needed in order to run both Junit4 and Junit5 tests, and is based on approach documented in
+      <!-- below mess is needed in order to run both Junit4 and Junit5 tests, and is based on approach documented in
       
          https://medium.com/@nieldw/running-junit5-and-junit4-tests-in-the-same-project-with-maven-122c8aa4f3bc
           
@@ -149,7 +149,7 @@
          
          But the approach documented there doesn't work. We should revisit this when 
          newer versions of Surefire and JUnit are released.
-         -->
+      -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
