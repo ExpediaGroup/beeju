@@ -1,4 +1,4 @@
-## [3.3.0] - TBD
+## [3.3.0] - 2020-10-23
 ### Changed
 - Allow passing in of "pre" and "post" configuration values so that BeeJU's defaults can be overridden.
 - JUnit version updated to `5.7.0` (was `5.5.2`).
