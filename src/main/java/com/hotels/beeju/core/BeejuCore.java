@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,15 @@
  * limitations under the License.
  */
 package com.hotels.beeju.core;
+
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.HMS_HANDLER_FORCE_RELOAD_CONF;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.PWD;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.SCHEMA_VERIFICATION;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -34,6 +43,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.thrift.TException;
 
 public class BeejuCore {
@@ -78,18 +88,32 @@ public class BeejuCore {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
     configure(preConfiguration);
-    
+
     driverClassName = EmbeddedDriver.class.getName();
-    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
-    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
-    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
-    conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
+
+    // This should NOT be set as a system property too
+    conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
+
+    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
+    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
+    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
+
+    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
+
+    setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
     // Hive 2.x compatibility
-    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
-    conf.setBoolean("hive.metastore.schema.verification", false);
+    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
+    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
+
+    // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
+    setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
+
+    // TODO: check if necessary or not
+//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "false");
+//    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
+//    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
+
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
     
@@ -105,6 +129,14 @@ public class BeejuCore {
     }
     
     configure(postConfiguration);
+  }
+
+  private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
+    conf.set(key.getVarname(), value);
+    conf.set(key.getHiveName(), value);
+
+    System.setProperty(key.getVarname(), value);
+    System.setProperty(key.getHiveName(), value);
   }
   
   private void configure(Map<String, String> customConfiguration) {
