@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,24 @@ package com.hotels.beeju.core;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.hadoop.hive.common.JvmPauseMonitor;
+import org.apache.hadoop.hive.common.ServerUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
+import org.apache.hadoop.hive.ql.exec.spark.session.SparkSessionManagerImpl;
 import org.apache.hive.service.Service;
 import org.apache.hive.service.server.HiveServer2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hotels.beeju.hiveserver2.RelaxedSQLStdHiveAuthorizerFactory;
 
 public class HiveServer2Core {
+  
+  private static final Logger log = LoggerFactory.getLogger(HiveServer2Core.class);
 
   private final BeejuCore beejuCore;
   private String jdbcConnectionUrl;
@@ -34,13 +44,73 @@ public class HiveServer2Core {
   public HiveServer2Core(BeejuCore beejuCore) {
     this.beejuCore = beejuCore;
   }
+  
+  private void startHiveServer2() throws Throwable {
+    long attempts = 0, maxAttempts = 1;
+    while (true) {
+      log.info("Starting HiveServer2");
+      HiveConf hiveConf = beejuCore.conf();
+      maxAttempts = hiveConf.getLongVar(HiveConf.ConfVars.HIVE_SERVER2_MAX_START_ATTEMPTS);
+      long retrySleepIntervalMs = hiveConf
+          .getTimeVar(ConfVars.HIVE_SERVER2_SLEEP_INTERVAL_BETWEEN_START_ATTEMPTS,
+              TimeUnit.MILLISECONDS);
+      hiveServer2 = null;
+      try {
+        // Cleanup the scratch dir before starting
+        ServerUtils.cleanUpScratchDir(hiveConf);
+        // Schedule task to cleanup dangling scratch dir periodically,
+        // initial wait for a random time between 0-10 min to
+        // avoid intial spike when using multiple HS2
+        HiveServer2.scheduleClearDanglingScratchDir(hiveConf, new Random().nextInt(600));
 
-  public void initialise() throws InterruptedException {
+        hiveServer2 = new HiveServer2();
+        hiveServer2.init(hiveConf);
+        hiveServer2.start();
+
+        try {
+          JvmPauseMonitor pauseMonitor = new JvmPauseMonitor(hiveConf);
+          pauseMonitor.start();
+        } catch (Throwable t) {
+          log.warn("Could not initiate the JvmPauseMonitor thread." + " GCs and Pauses may not be " +
+            "warned upon.", t);
+        }
+
+        if (hiveConf.getVar(ConfVars.HIVE_EXECUTION_ENGINE).equals("spark")) {
+          SparkSessionManagerImpl.getInstance().setup(hiveConf);
+        }
+        break;
+      } catch (Throwable throwable) {
+        if (hiveServer2 != null) {
+          try {
+            hiveServer2.stop();
+          } catch (Throwable t) {
+            log.info("Exception caught when calling stop of HiveServer2 before retrying start", t);
+          } finally {
+            hiveServer2 = null;
+          }
+        }
+        if (++attempts >= maxAttempts) {
+          throw new Error("Max start attempts " + maxAttempts + " exhausted", throwable);
+        } else {
+          log.warn("Error starting HiveServer2 on attempt " + attempts
+              + ", will retry in " + retrySleepIntervalMs + "ms", throwable);
+          try {
+            Thread.sleep(retrySleepIntervalMs);
+          } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+          }
+        }
+      }
+    }
+  }
+
+  public void initialise() throws Throwable {
     beejuCore.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         RelaxedSQLStdHiveAuthorizerFactory.class.getName());
-    hiveServer2 = new HiveServer2();
-    hiveServer2.init(beejuCore.conf());
-    hiveServer2.start();
+//    hiveServer2 = new HiveServer2();
+//    hiveServer2.init(beejuCore.conf());
+//    hiveServer2.start();
+    startHiveServer2();
     waitForHiveServer2StartUp();
 
     jdbcConnectionUrl = "jdbc:hive2://localhost:" + port + "/" + beejuCore.databaseName();

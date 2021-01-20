@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -37,50 +36,58 @@ import org.apache.hadoop.hive.metastore.api.SerDeInfo;
 import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hive.service.Service;
+import org.apache.hive.service.server.HiveServer2;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 public class HiveServer2CoreTest {
 
   private static final String DATABASE = "my_test_db";
-  private final BeejuCore core = new BeejuCore(DATABASE);
-  private final HiveServer2Core hiveServer2Core = new HiveServer2Core(core);
+  //private final BeejuCore core = new BeejuCore(DATABASE);
+  private HiveServer2Core hiveServer2Core; // = new HiveServer2Core(core);
+  
+  @AfterEach
+  public void cleanup() throws InterruptedException {
+    hiveServer2Core.shutdown();
+  }
+  
+  private void setupServer() throws Throwable {
+    hiveServer2Core = new HiveServer2Core(new BeejuCore(DATABASE));
+    hiveServer2Core.startServerSocket();
+    hiveServer2Core.initialise();
+    hiveServer2Core.getCore().createDatabase(DATABASE);
+  }
 
   @Test
-  public void initiateServer() throws InterruptedException {
-    hiveServer2Core.initialise();
+  public void initiateServer() throws Throwable {
+    setupServer();
     assertThat(hiveServer2Core.getJdbcConnectionUrl(),
-        is("jdbc:hive2://localhost:" + hiveServer2Core.getPort() + "/" + core.databaseName()));
+        is("jdbc:hive2://localhost:" + hiveServer2Core.getPort() + "/" + hiveServer2Core.getCore().databaseName()));
+    assertEquals(hiveServer2Core.getCore().conf().getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT), hiveServer2Core.getPort());
     assertThat(hiveServer2Core.getHiveServer2().getServiceState(), is(Service.STATE.STARTED));
   }
 
   @Test
-  public void closeServer() throws InterruptedException, IOException {
-    hiveServer2Core.startServerSocket();
-    hiveServer2Core.initialise();
+  public void closeServer() throws Throwable {
+    setupServer();
     hiveServer2Core.shutdown();
 
     assertThat(hiveServer2Core.getHiveServer2().getServiceState(), is(Service.STATE.STOPPED));
   }
 
   @Test
-  public void startServerSocket() throws IOException {
-    hiveServer2Core.startServerSocket();
-    assertEquals(core.conf().getIntVar(HiveConf.ConfVars.HIVE_SERVER2_THRIFT_PORT), hiveServer2Core.getPort());
-  }
-
-  @Test
-  public void dropTable() throws Exception {
-    HiveServer2Core server = setupServer();
+  public void dropTable() throws Throwable {
+    setupServer();
     String tableName = "my_table";
-    createUnpartitionedTable(DATABASE, tableName, server);
+    createUnpartitionedTable(DATABASE, tableName, hiveServer2Core);
 
-    try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
+    try (Connection connection = DriverManager.getConnection(hiveServer2Core.getJdbcConnectionUrl());
         Statement statement = connection.createStatement()) {
       String dropHql = String.format("DROP TABLE %s.%s", DATABASE, tableName);
       statement.execute(dropHql);
     }
 
-    HiveMetaStoreClient client = server.getCore().newClient();
+    HiveMetaStoreClient client = hiveServer2Core.getCore().newClient();
     try {
       client.getTable(DATABASE, tableName);
       fail(String.format("Table %s.%s was not deleted", DATABASE, tableName));
@@ -89,15 +96,15 @@ public class HiveServer2CoreTest {
     } finally {
       client.close();
     }
-    server.shutdown();
+    hiveServer2Core.shutdown();
   }
 
   @Test
-  public void createTable() throws Exception {
-    HiveServer2Core server = setupServer();
+  public void createTable() throws Throwable {
+    setupServer();
     String tableName = "my_test_table";
 
-    try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
+    try (Connection connection = DriverManager.getConnection(hiveServer2Core.getJdbcConnectionUrl());
         Statement statement = connection.createStatement()) {
       String createHql = new StringBuilder()
           .append("CREATE TABLE `" + DATABASE + "." + tableName + "`(`id` int, `name` string) ")
@@ -108,7 +115,7 @@ public class HiveServer2CoreTest {
       statement.execute(createHql);
     }
 
-    HiveMetaStoreClient client = server.getCore().newClient();
+    HiveMetaStoreClient client = hiveServer2Core.getCore().newClient();
     Table table = client.getTable(DATABASE, tableName);
     client.close();
     assertThat(table.getDbName(), is(DATABASE));
@@ -119,17 +126,17 @@ public class HiveServer2CoreTest {
     assertThat(table.getSd().getOutputFormat(), is("org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat"));
     assertThat(table.getSd().getSerdeInfo().getSerializationLib(),
         is("org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe"));
-    server.shutdown();
+    //server.shutdown();
   }
 
   @Test
-  public void showCreateTable() throws Exception {
-    HiveServer2Core server = setupServer();
+  public void showCreateTable() throws Throwable {
+    setupServer();
     String tableName = "my_table";
-    Table table = createUnpartitionedTable(DATABASE, tableName, server);
+    Table table = createUnpartitionedTable(DATABASE, tableName, hiveServer2Core);
 
     StringBuilder showCreateTable = new StringBuilder();
-    try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
+    try (Connection connection = DriverManager.getConnection(hiveServer2Core.getJdbcConnectionUrl());
         Statement statement = connection.createStatement()) {
       String showHql = String.format("SHOW CREATE TABLE %s.%s", DATABASE, tableName);
       ResultSet result = statement.executeQuery(showHql);
@@ -149,27 +156,26 @@ public class HiveServer2CoreTest {
         .append("OUTPUTFORMAT \n")
         .append("  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'\n")
         .append("LOCATION\n")
-        .append("  'file:" + server.getCore().tempDir() + "/" + DATABASE + "/my_table'\n")
+        .append("  'file:" + hiveServer2Core.getCore().tempDir() + "/" + DATABASE + "/my_table'\n")
         .append("TBLPROPERTIES (\n")
         .append("  'transient_lastDdlTime'='" + table.getParameters().get("transient_lastDdlTime") + "')\n")
         .toString();
     assertThat(showCreateTable.toString(), is(expectedShowCreateTable));
-    server.shutdown();
   }
 
   @Test
-  public void dropDatabase() throws Exception {
-    HiveServer2Core server = setupServer();
+  public void dropDatabase() throws Throwable {
+    setupServer();
     String databaseName = "Another_DB";
 
-    server.getCore().createDatabase(databaseName);
-    try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
+    hiveServer2Core.getCore().createDatabase(databaseName);
+    try (Connection connection = DriverManager.getConnection(hiveServer2Core.getJdbcConnectionUrl());
         Statement statement = connection.createStatement()) {
       String dropHql = String.format("DROP DATABASE %s", databaseName);
       statement.execute(dropHql);
     }
 
-    HiveMetaStoreClient client = server.getCore().newClient();
+    HiveMetaStoreClient client = hiveServer2Core.getCore().newClient();
     try {
       client.getDatabase(databaseName);
       fail(String.format("Database %s was not deleted", databaseName));
@@ -178,22 +184,22 @@ public class HiveServer2CoreTest {
     } finally {
       client.close();
     }
-    server.shutdown();
+    //hiveServer2Core.shutdown();
   }
 
   @Test
-  public void addPartition() throws Exception {
-    HiveServer2Core server = setupServer();
+  public void addPartition() throws Throwable {
+    setupServer();
     String tableName = "my_table";
-    createPartitionedTable(DATABASE, tableName, server);
+    createPartitionedTable(DATABASE, tableName, hiveServer2Core);
 
-    try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
+    try (Connection connection = DriverManager.getConnection(hiveServer2Core.getJdbcConnectionUrl());
         Statement statement = connection.createStatement()) {
       String addPartitionHql = String.format("ALTER TABLE %s.%s ADD PARTITION (partcol=1)", DATABASE, tableName);
       statement.execute(addPartitionHql);
     }
 
-    HiveMetaStoreClient client = server.getCore().newClient();
+    HiveMetaStoreClient client = hiveServer2Core.getCore().newClient();
     try {
       List<Partition> partitions = client.listPartitions(DATABASE, tableName, (short) -1);
       assertThat(partitions.size(), is(1));
@@ -201,21 +207,20 @@ public class HiveServer2CoreTest {
       assertThat(partitions.get(0).getTableName(), is(tableName));
       assertThat(partitions.get(0).getValues(), is(Arrays.asList("1")));
       assertThat(partitions.get(0).getSd().getLocation(),
-          is(String.format("file:%s/%s/%s/partcol=1", server.getCore().tempDir(), DATABASE, tableName)));
+          is(String.format("file:%s/%s/%s/partcol=1", hiveServer2Core.getCore().tempDir(), DATABASE, tableName)));
     } finally {
       client.close();
     }
-    server.shutdown();
   }
 
   @Test
-  public void dropPartition() throws Exception {
-    HiveServer2Core server = setupServer();
+  public void dropPartition() throws Throwable {
+    setupServer();
     String tableName = "my_table";
-    HiveMetaStoreClient client = server.getCore().newClient();
+    HiveMetaStoreClient client = hiveServer2Core.getCore().newClient();
 
     try {
-      Table table = createPartitionedTable(DATABASE, tableName, server);
+      Table table = createPartitionedTable(DATABASE, tableName, hiveServer2Core);
 
       Partition partition = new Partition();
       partition.setDbName(DATABASE);
@@ -223,10 +228,10 @@ public class HiveServer2CoreTest {
       partition.setValues(Arrays.asList("1"));
       partition.setSd(new StorageDescriptor(table.getSd()));
       partition.getSd().setLocation(
-          String.format("file:%s/%s/%s/partcol=1", server.getCore().tempDir(), DATABASE, tableName));
+          String.format("file:%s/%s/%s/partcol=1", hiveServer2Core.getCore().tempDir(), DATABASE, tableName));
       client.add_partition(partition);
 
-      try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());
+      try (Connection connection = DriverManager.getConnection(hiveServer2Core.getJdbcConnectionUrl());
           Statement statement = connection.createStatement()) {
         String dropPartitionHql = String.format("ALTER TABLE %s.%s DROP PARTITION (partcol=1)", DATABASE, tableName);
         statement.execute(dropPartitionHql);
@@ -237,15 +242,6 @@ public class HiveServer2CoreTest {
     } finally {
       client.close();
     }
-    server.shutdown();
-  }
-
-  private HiveServer2Core setupServer() throws Exception {
-    HiveServer2Core server = new HiveServer2Core(new BeejuCore(DATABASE));
-    server.startServerSocket();
-    server.initialise();
-    server.getCore().createDatabase(DATABASE);
-    return server;
   }
 
   private Table createUnpartitionedTable(String databaseName, String tableName, HiveServer2Core server)

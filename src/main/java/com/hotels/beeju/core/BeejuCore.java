@@ -15,14 +15,15 @@
  */
 package com.hotels.beeju.core;
 
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.*;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_POOLING_TYPE;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.HMS_HANDLER_FORCE_RELOAD_CONF;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.PWD;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.SCHEMA_VERIFICATION;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -110,12 +111,21 @@ public class BeejuCore {
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
 
     // TODO: check if necessary or not
-//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "false");
-//    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
-//    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
+    //NON_TRANSACTIONAL_READ -> true
+//   setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
+//   setMetastoreAndSystemProperty(HIVE_IN_TEZ_TEST, "true");
+   setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
+   setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
+//   setMetastoreAndSystemProperty(COMPACTOR_INITIATOR_ON, "true");
+//   setMetastoreAndSystemProperty(COMPACTOR_WORKER_THREADS, "2");
+   setMetastoreAndSystemProperty( TXN_TIMEOUT, "5");
+//   setMetastoreAndSystemProperty( TIMEDOUT_TXN_REAPER_START, "5");
+//   setMetastoreAndSystemProperty( TIMEDOUT_TXN_REAPER_INTERVAL, "5");
+   //setMetastoreAndSystemProperty(HIVE_TXN_MANAGER, "org.apache.hadoop.hive.ql.lockmgr.DbTxnManager");
 
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
+    //conf.setBoolean("hive.txn.strict.locking.mode", false); 
     
     try {
       // overriding default derby log path to go to tmp
@@ -181,6 +191,7 @@ public class BeejuCore {
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
       client.createDatabase(new Database(databaseName, null, databaseFolder, null));
+      
     } finally {
       client.close();
     }

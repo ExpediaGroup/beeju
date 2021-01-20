@@ -55,8 +55,10 @@ public class ThriftHiveMetaStoreCore {
     try (ServerSocket socket = new ServerSocket(socketPort)) {
       thriftPort = socket.getLocalPort();
     }
+    //TODO: should we change this for Hive 3?
     beejuCore.setHiveVar(HiveConf.ConfVars.METASTOREURIS, getThriftConnectionUri());
     final HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
+    //TODO: does the above hiveConf have all the things we expect for Hive 3?
     thriftServer.execute(() -> {
       try {
         HadoopThriftAuthBridge bridge = HadoopThriftAuthBridge23.getBridge();
