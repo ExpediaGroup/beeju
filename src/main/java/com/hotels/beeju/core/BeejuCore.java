@@ -187,11 +187,10 @@ public class BeejuCore {
    */
   public void createDatabase(String databaseName) throws TException {
     File tempFile = tempDir.toFile();
-    HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
+    HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf)); //TODO: why not use our own newClient() here?
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
-    try {
+    try { //TODO: try with resources for client?
       client.createDatabase(new Database(databaseName, null, databaseFolder, null));
-      
     } finally {
       client.close();
     }

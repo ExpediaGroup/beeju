@@ -20,7 +20,6 @@ import java.net.ServerSocket;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.hadoop.hive.common.JvmPauseMonitor;
 import org.apache.hadoop.hive.common.ServerUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
@@ -67,13 +66,13 @@ public class HiveServer2Core {
         hiveServer2.init(hiveConf);
         hiveServer2.start();
 
-        try {
-          JvmPauseMonitor pauseMonitor = new JvmPauseMonitor(hiveConf);
-          pauseMonitor.start();
-        } catch (Throwable t) {
-          log.warn("Could not initiate the JvmPauseMonitor thread." + " GCs and Pauses may not be " +
-            "warned upon.", t);
-        }
+//        try {
+//          JvmPauseMonitor pauseMonitor = new JvmPauseMonitor(hiveConf);
+//          pauseMonitor.start();
+//        } catch (Throwable t) {
+//          log.warn("Could not initiate the JvmPauseMonitor thread." + " GCs and Pauses may not be " +
+//            "warned upon.", t);
+//        }
 
         if (hiveConf.getVar(ConfVars.HIVE_EXECUTION_ENGINE).equals("spark")) {
           SparkSessionManagerImpl.getInstance().setup(hiveConf);

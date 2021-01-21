@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package com.hotels.beeju;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -39,7 +39,6 @@ public class HiveMetaStoreJUnitRuleTest {
   private static File tempRoot;
   public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule();
   public @Rule HiveMetaStoreJUnitRule hiveCustomName = new HiveMetaStoreJUnitRule("my_test_database");
-
 
   @Before
   public void before() {

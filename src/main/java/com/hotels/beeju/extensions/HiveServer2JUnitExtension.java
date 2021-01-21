@@ -60,7 +60,7 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
     try {
       hiveServer2Core.initialise();
     } catch (Throwable e) {
-      // TODO Auto-generated catch block
+      // TODO need to sort this out
       e.printStackTrace();
     }
   }

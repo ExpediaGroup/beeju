@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ public class ThriftHiveMetaStoreCoreTest {
     thriftHiveMetaStoreCore.initialise();
     assertThat(core.conf().getVar(HiveConf.ConfVars.METASTOREURIS),
         is(thriftHiveMetaStoreCore.getThriftConnectionUri()));
-
+    
     HiveConf conf = new HiveConf(this.getClass());
     conf.setVar(HiveConf.ConfVars.METASTOREURIS, thriftHiveMetaStoreCore.getThriftConnectionUri());
     HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
