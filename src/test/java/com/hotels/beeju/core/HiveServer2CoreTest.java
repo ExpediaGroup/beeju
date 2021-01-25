@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.hotels.beeju.core;
 
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -242,9 +243,16 @@ public class HiveServer2CoreTest {
 
   private HiveServer2Core setupServer() throws Exception {
     HiveServer2Core server = new HiveServer2Core(new BeejuCore(DATABASE));
+
+    // NOTE: if this is not set, the tests fail with various javax.jdo.JDOUserException exceptions
+    System.setProperty(CONNECT_URL_KEY.getVarname(), server.getCore().conf.get(CONNECT_URL_KEY.getVarname()));
+
     server.startServerSocket();
     server.initialise();
     server.getCore().createDatabase(DATABASE);
+
+    System.clearProperty(CONNECT_URL_KEY.getVarname());
+
     return server;
   }
 
