@@ -78,6 +78,7 @@ public class HiveServer2CoreTest {
     assertThat(hiveServer2Core.getHiveServer2().getServiceState(), is(Service.STATE.STOPPED));
   }
 
+  @Disabled
   @Test
   public void dropTable() throws Throwable {
     String tableName = "my_table";
@@ -131,7 +132,7 @@ public class HiveServer2CoreTest {
     //server.shutdown();
   }
 
-  @Disabled
+  //@Disabled
   @Test
   public void showCreateTable() throws Throwable {
     String tableName = "my_table";
@@ -165,7 +166,6 @@ public class HiveServer2CoreTest {
     assertThat(showCreateTable.toString(), is(expectedShowCreateTable));
   }
 
-  @Disabled
   @Test
   public void dropDatabase() throws Throwable {
     String databaseName = "Another_DB";
@@ -189,7 +189,6 @@ public class HiveServer2CoreTest {
     //hiveServer2Core.shutdown();
   }
 
-  @Disabled
   @Test
   public void addPartition() throws Throwable {
     String tableName = "my_table";
@@ -215,7 +214,6 @@ public class HiveServer2CoreTest {
     }
   }
 
-  @Disabled
   @Test
   public void dropPartition() throws Throwable {
     String tableName = "my_table";

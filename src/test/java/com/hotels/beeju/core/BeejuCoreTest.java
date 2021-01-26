@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,7 +109,7 @@ public class BeejuCoreTest {
 
   @Test
   public void createDirectory(){
-    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREWAREHOUSE), is(defaultCore.tempDir().toString()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREWAREHOUSE), is(defaultCore.warehouseDir().toString()));
   }
 
   @Test
@@ -140,15 +140,15 @@ public class BeejuCoreTest {
   @Test
   public void checkConfig() {
     assertThat(defaultCore.driverClassName(), is(EmbeddedDriver.class.getName()));
-    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORECONNECTURLKEY), is(defaultCore.connectionURL()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORECONNECTURLKEY), is(defaultCore.connectionURL() + ";create=true"));
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER),
         is(defaultCore.driverClassName()));
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME), is("db_user"));
     assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREPWD), is("db_password"));
-    assertThat(defaultCore.conf().getBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF), is(true));
+    assertThat(defaultCore.conf().getBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF), is(false));
     assertThat(defaultCore.conf().get("datanucleus.schema.autoCreateAll"), is("true"));
     assertThat(defaultCore.conf().get("hive.metastore.schema.verification"), is("false"));
-    assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
+    //assertThat(defaultCore.conf().get("hcatalog.hive.client.cache.disabled"), is("true"));
   }
 
   @Test

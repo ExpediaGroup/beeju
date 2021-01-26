@@ -37,7 +37,7 @@ public class HiveMetaStoreJUnitExtensionTest {
   HiveMetaStoreJUnitExtension hiveCustomDbName = new HiveMetaStoreJUnitExtension("my_test_database");
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_test_database",
+  HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_test_database_2",
       customConfProperties());
 
   private void assertRuleInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {

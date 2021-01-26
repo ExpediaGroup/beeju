@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
 
   public BeejuJUnitExtension(String databaseName, Map<String, String> configuration) {
     core = new BeejuCore(databaseName, configuration);
+    System.err.println("XXX CORE " + core + " CREATED FOR " + databaseName);
   }
 
   @Override
@@ -90,6 +91,7 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
+    System.err.println("CORE: " + core + ", CREATING DB " + databaseName);
     core.createDatabase(databaseName);
   }
 

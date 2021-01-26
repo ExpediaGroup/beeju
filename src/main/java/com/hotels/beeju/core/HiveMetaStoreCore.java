@@ -50,8 +50,10 @@ public class HiveMetaStoreCore {
    * @return the {@link HiveMetaStoreClient} backed by an HSQLDB in-memory database.
    */
   public HiveMetaStoreClient client() {
+    System.err.println("XXX CORE " + this.beejuCore + " RETURNING CLIENT " + client);
     return client;
   }
+  
   public static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
 
     private final HiveConf hiveConf;

@@ -56,6 +56,9 @@ public class ThriftHiveMetaStoreCore {
       thriftPort = socket.getLocalPort();
     }
     //TODO: should we change this for Hive 3?
+    
+    System.err.println("THRIFT PORT " + thriftPort);
+    
     beejuCore.setHiveVar(HiveConf.ConfVars.METASTOREURIS, getThriftConnectionUri());
     final HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
     //TODO: does the above hiveConf have all the things we expect for Hive 3?
