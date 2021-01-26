@@ -15,8 +15,11 @@
  */
 package com.hotels.beeju.core;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.METASTORE_VALIDATE_COLUMNS;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.METASTORE_VALIDATE_CONSTRAINTS;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.METASTORE_VALIDATE_TABLES;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.*;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH;
@@ -45,9 +48,13 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BeejuCore {
 
+  private static final Logger log = LoggerFactory.getLogger(BeejuCore.class);
+  
   // "user" conflicts with USER db and the metastore_db can't be created.
   private static final String METASTORE_DB_USER = "db_user";
   private static final String METASTORE_DB_PASSWORD = "db_password";
@@ -56,8 +63,9 @@ public class BeejuCore {
   private final String databaseName;
   private final String connectionURL;
   private final String driverClassName;
-  private Path tempDir;
-  
+  private Path warehouseDir;
+  private Path derbyHome;
+
   private static Map<String, String> convertToMap(HiveConf hiveConf) {
     Map<String, String> converted = new HashMap<String, String>();
     Iterator<Entry<String, String>> iterator = hiveConf.iterator();
@@ -75,21 +83,37 @@ public class BeejuCore {
   public BeejuCore(String databaseName) {
     this(databaseName, Collections.emptyMap());
   }
-  
+
   public BeejuCore(String databaseName, HiveConf preConfiguration, HiveConf postConfiguration) {
     this(databaseName, convertToMap(preConfiguration), convertToMap(postConfiguration));
   }
-  
+
   public BeejuCore(String databaseName, Map<String, String> preConfiguration) {
     this(databaseName, preConfiguration, Collections.emptyMap());
   }
+
+  private static int counter = 0;
   
   public BeejuCore(String databaseName, Map<String, String> preConfiguration, Map<String, String> postConfiguration) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
+    System.err.println(this + " " + databaseName + " conf is " + conf);
     configure(preConfiguration);
 
+    try {
+      derbyHome = Files.createTempDirectory("derby-home");
+      System.err.println(this + " " + databaseName + " CREATED DERBY HOME AT " + derbyHome);
+    } catch (IOException e1) {
+      throw new RuntimeException(e1);
+    }
+    System.setProperty("derby.system.home", derbyHome.toString());
+    System.err
+        .println(
+            this + " " + databaseName + " DERBY HOME SYSTEM PROPERTY IS " + System.getProperty("derby.system.home"));
+    // TODO: try a file DB instead of memory? so they all share the same?
+    // TODOL with file, something recreates older file location from first test after it has been deleted
     driverClassName = EmbeddedDriver.class.getName();
+    //connectionURL = "jdbc:derby:;databaseName=metastore_db_" + (counter++) + ";create=true";
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
 
     // This should NOT be set as a system property too
@@ -111,25 +135,67 @@ public class BeejuCore {
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
 
     // TODO: check if necessary or not
-//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "false");
-//    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
-//    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
+    // setMetastoreAndSystemProperty(HIVE_IN_TEST, "false");
+    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
+    // setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
 
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
-    
+
+    ////////////////
+
+    setMetastoreProperty("datanucleus.transactionIsolation", "read-uncommitted");
+
+    // below are from HiveRunner
+    setMetastoreProperty("datanucleus.schema.autoCreateAll", "true");
+    setMetastoreProperty("datanucleus.schema.autoCreateTables", "true");
+    setMetastoreProperty("hive.metastore.schema.verification", "false");
+    setMetastoreProperty("metastore.filter.hook", "org.apache.hadoop.hive.metastore.DefaultMetaStoreFilterHookImpl");
+
+    // setMetastoreProperty("datanucleus.connectiondrivername", jdbcDriver);
+    // setMetastoreProperty("javax.jdo.option.ConnectionDriverName", jdbcDriver);
+
+    // No pooling needed. This will save us a lot of threads
+    setMetastoreProperty("datanucleus.connectionPoolingType", "None");
+
+    setMetastoreProperty(METASTORE_VALIDATE_CONSTRAINTS.varname, "true");
+    setMetastoreProperty(METASTORE_VALIDATE_COLUMNS.varname, "true");
+    setMetastoreProperty(METASTORE_VALIDATE_TABLES.varname, "true");
+
+    ////////////////
+
     try {
       // overriding default derby log path to go to tmp
       String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
       System.setProperty("derby.stream.error.file", derbyLog);
 
-      //Creating temporary folder
+      // Creating temporary folder
       createWarehousePath();
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    
+
     configure(postConfiguration);
+  }
+
+  public void cleanUp() {
+      cleanupQuietly(warehouseDir);
+      cleanupQuietly(derbyHome);
+  }
+  
+  private void cleanupQuietly(Path path) {
+    try {
+      System.err.println(this + " " + databaseName + " ABOUT TO DELETE " + path.toFile());
+      FileUtils.deleteDirectory(path.toFile());
+      System.err.println(this + " " + databaseName + " DELETED " + path.toFile());
+    } catch (IOException e) {
+      log.error("Error cleaning up " + path, e);
+    }
+  }
+
+  protected final void setMetastoreProperty(String key, String value) {
+    conf.set(key, value);
+    System.setProperty(key, value);
   }
 
   private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
@@ -139,7 +205,7 @@ public class BeejuCore {
     System.setProperty(key.getVarname(), value);
     System.setProperty(key.getHiveName(), value);
   }
-  
+
   private void configure(Map<String, String> customConfiguration) {
     if (customConfiguration != null) {
       for (Map.Entry<String, String> entry : customConfiguration.entrySet()) {
@@ -154,8 +220,13 @@ public class BeejuCore {
    * @throws IOException If the initialisation fails.
    */
   private void createWarehousePath() throws IOException {
-    tempDir = Files.createTempDirectory("beeju_test");
-    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDir.toString());
+    warehouseDir = Files.createTempDirectory("beeju_test");
+    System.err.println(this + " " + databaseName + " XXX:  created " + warehouseDir);
+    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, warehouseDir.toString());
+    conf.set("metastore.warehouse.dir", warehouseDir.toString());
+    conf.set("hive.metastore.warehouse.dir", warehouseDir.toString());
+    conf.set("metastore.warehouse.external.dir", warehouseDir.toString());
+    conf.set("hive.metastore.warehouse.external.dir", warehouseDir.toString());
   }
 
   void setHiveVar(HiveConf.ConfVars variable, String value) {
@@ -177,7 +248,8 @@ public class BeejuCore {
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
-    File tempFile = tempDir.toFile();
+    File tempFile = warehouseDir.toFile();
+    System.err.println(this + " " + databaseName + "CREATING DATABASE " + databaseName + " AT " + tempFile);
     HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
@@ -189,7 +261,7 @@ public class BeejuCore {
 
   /**
    * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   * used by tests wishing to connect to the database.
+   *         used by tests wishing to connect to the database.
    */
   public HiveConf conf() {
     return new HiveConf(conf);
@@ -217,18 +289,7 @@ public class BeejuCore {
   }
 
   public Path tempDir() {
-    return tempDir;
-  }
-
-  /**
-   * Delete temporary files used during test
-   */
-  private void deleteTempDir() throws IOException {
-    FileUtils.deleteDirectory(tempDir.toFile());
-  }
-
-  public void cleanUp() throws IOException {
-    deleteTempDir();
+    return warehouseDir;
   }
 
   /**
@@ -246,4 +307,5 @@ public class BeejuCore {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }
   }
+
 }

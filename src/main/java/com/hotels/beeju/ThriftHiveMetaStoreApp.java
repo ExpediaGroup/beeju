@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ public class ThriftHiveMetaStoreApp {
   public static void main(String[] args) throws Throwable {
     ThriftHiveMetaStoreJUnitRule rule = new ThriftHiveMetaStoreJUnitRule();
     rule.setThriftPort(22334);
-    rule.before();
+    rule.starting(null);
     System.out.println("BeeJU Thrift Hive Metastore listening on: " + rule.getThriftConnectionUri());
     CountDownLatch latch = new CountDownLatch(1);
     latch.await();

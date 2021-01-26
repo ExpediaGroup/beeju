@@ -15,11 +15,12 @@
  */
 package com.hotels.beeju;
 
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.junit.runner.Description;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
@@ -73,16 +74,24 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
-    System.clearProperty(CONNECT_URL_KEY.getVarname());
-    super.before();
-    hiveMetaStoreCore.initialise();
+  protected void starting(Description description) {
+    //System.clearProperty(CONNECT_URL_KEY.getVarname());
+    super.starting(description);
+    try {
+      hiveMetaStoreCore.initialise();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
-  protected void after() {
+  protected void finished(Description description) {
+    try {
     hiveMetaStoreCore.shutdown();
-    super.after();
+    } catch (Throwable t) {
+      t.printStackTrace();
+    }
+    super.finished(description);
   }
 
   /**

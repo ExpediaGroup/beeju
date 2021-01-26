@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 package com.hotels.beeju;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
-import org.junit.rules.ExternalResource;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import com.hotels.beeju.core.BeejuCore;
 
 /**
  * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
  */
-abstract class BeejuJUnitRule extends ExternalResource {
+abstract class BeejuJUnitRule extends TestWatcher {
 
   protected BeejuCore core;
 
@@ -46,17 +45,22 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   @Override
-  protected void before() throws Throwable {
-    createDatabase(databaseName());
+  protected void starting(Description description) {
+    // TODO: the problem with this rule and the others, is if before() creates something (like a folder)
+    // and then fails (e.g. creating a DB that already exists) then after() never gets called by Rule lifecycle
+    // and thus folder doesn't get cleaned up - we should fix this. Might also be a similar issue with Extension?
+    System.err.println(this + " CREATING DB " + databaseName());
+    try {
+      createDatabase(databaseName());
+    } catch (TException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override
-  protected void after() {
-    try {
-      core.cleanUp();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+  protected void finished(Description description) {
+    System.err.println(this + " CLEANING UP for " + databaseName());
+    core.cleanUp();
   }
 
   /**

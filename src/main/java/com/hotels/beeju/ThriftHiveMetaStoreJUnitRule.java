@@ -15,9 +15,9 @@
  */
 package com.hotels.beeju;
 
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
-
 import java.util.Map;
+
+import org.junit.runner.Description;
 
 import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
@@ -52,34 +52,46 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
    * Create a Thrift Hive Metastore service with a pre-created database using the provided name and configuration.
    *
    * @param databaseName Database name.
-   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+   *          with its defaults.
    */
   public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> preConfiguration) {
     super(databaseName, preConfiguration);
   }
-  
+
   /**
    * Create a Thrift Hive Metastore service with a pre-created database using the provided name and configuration.
    *
    * @param databaseName Database name.
-   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+   *          with its defaults.
    * @param postConfiguration Hive configuration properties that will be set to override BeeJU's defaults.
    */
-  public ThriftHiveMetaStoreJUnitRule(String databaseName, Map<String, String> preConfiguration, Map<String, String> postConfiguration) {
+  public ThriftHiveMetaStoreJUnitRule(
+      String databaseName,
+      Map<String, String> preConfiguration,
+      Map<String, String> postConfiguration) {
     super(databaseName, preConfiguration, postConfiguration);
   }
 
   @Override
-  protected void before() throws Throwable {
-    System.clearProperty(CONNECT_URL_KEY.getVarname());
-    thriftHiveMetaStoreCore.initialise();
-    super.before();
+  protected void starting(Description description) {
+    // System.clearProperty(CONNECT_URL_KEY.getVarname());
+    try {
+      thriftHiveMetaStoreCore.initialise();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    super.starting(description);
   }
 
   @Override
-  protected void after() {
-    thriftHiveMetaStoreCore.shutdown();
-    super.after();
+  protected void finished(Description description) {
+    try {
+      thriftHiveMetaStoreCore.shutdown();
+    } finally {
+      super.finished(description);
+    }
   }
 
   /**
@@ -95,9 +107,10 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   public int getThriftPort() {
     return thriftHiveMetaStoreCore.getThriftPort();
   }
-  
+
   /**
-   * @param thriftPort The Port to use for the Thrift Hive metastore, if not set then a port number will automatically be allocated.
+   * @param thriftPort The Port to use for the Thrift Hive metastore, if not set then a port number will automatically
+   *          be allocated.
    */
   public void setThriftPort(int thriftPort) {
     thriftHiveMetaStoreCore.setThriftPort(thriftPort);
