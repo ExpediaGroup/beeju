@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.hotels.beeju;
+
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
 import java.util.Map;
 
@@ -72,6 +74,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void before() throws Throwable {
+    System.clearProperty(CONNECT_URL_KEY.getVarname());
     super.before();
     hiveMetaStoreCore.initialise();
   }

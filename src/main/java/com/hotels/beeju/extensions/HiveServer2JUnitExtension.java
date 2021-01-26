@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 package com.hotels.beeju.extensions;
+
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
 import java.util.Map;
 
@@ -55,6 +57,7 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
+    System.clearProperty(CONNECT_URL_KEY.getVarname());
     hiveServer2Core.startServerSocket();
     super.beforeEach(context);
     hiveServer2Core.initialise();
