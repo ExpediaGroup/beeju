@@ -38,27 +38,25 @@ import org.apache.hadoop.hive.metastore.api.StorageDescriptor;
 import org.apache.hadoop.hive.metastore.api.Table;
 import org.apache.hive.service.Service;
 import org.apache.thrift.TException;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class HiveServer2CoreTest {
 
   private static final String DATABASE = "my_test_db";
   private final BeejuCore core = new BeejuCore(DATABASE);
   private final HiveServer2Core server = new HiveServer2Core(core);
 
-  @BeforeAll
-  public void beforeAll() throws InterruptedException, IOException, TException {
+  @BeforeEach
+  public void beforeEach() throws InterruptedException, IOException, TException {
     server.startServerSocket();
     server.initialise();
     server.getCore().createDatabase(DATABASE);
   }
 
-  @AfterAll
-  public void afterAll() {
+  @AfterEach
+  public void afterEach() {
     server.shutdown();
   }
 

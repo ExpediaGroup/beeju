@@ -17,7 +17,6 @@ package com.hotels.beeju.core;
 
 
 
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -40,7 +39,6 @@ public class HiveServer2Core {
   }
 
   public void initialise() throws InterruptedException {
-    System.setProperty(CONNECT_URL_KEY.getVarname(), beejuCore.conf.get(CONNECT_URL_KEY.getVarname()));
     beejuCore.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         RelaxedSQLStdHiveAuthorizerFactory.class.getName());
     hiveServer2 = new HiveServer2();
@@ -55,8 +53,6 @@ public class HiveServer2Core {
     if (hiveServer2 != null) {
       hiveServer2.stop();
     }
-
-    System.clearProperty(CONNECT_URL_KEY.getVarname());
   }
 
   private void waitForHiveServer2StartUp() throws InterruptedException {

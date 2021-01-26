@@ -93,7 +93,8 @@ public class BeejuCore {
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
 
     // This should NOT be set as a system property too
-    conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
+    // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
+    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
 
     setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
     setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
