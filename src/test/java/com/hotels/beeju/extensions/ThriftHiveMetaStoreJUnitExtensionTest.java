@@ -32,18 +32,19 @@ import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-import com.hotels.beeju.ThriftHiveMetaStoreJUnitRule;
-import com.hotels.beeju.ThriftHiveMetaStoreJUnitRuleTest;
-
-public class ThriftHiveMetaStoreJUnitExtensionTest{
+public class ThriftHiveMetaStoreJUnitExtensionTest {
 
   @RegisterExtension
-  ThriftHiveMetaStoreJUnitExtension hiveDefaultName = new ThriftHiveMetaStoreJUnitExtension();
+  ThriftHiveMetaStoreJUnitExtension defaultDbExtension = new ThriftHiveMetaStoreJUnitExtension();
 
   @RegisterExtension
-  ThriftHiveMetaStoreJUnitExtension hiveCustomName = new ThriftHiveMetaStoreJUnitExtension("my_test_database");
+  ThriftHiveMetaStoreJUnitExtension customDbExtension = new ThriftHiveMetaStoreJUnitExtension("my_test_database");
 
-  private void assertRuleInitialised(ThriftHiveMetaStoreJUnitExtension hive) throws Exception {
+  @RegisterExtension
+  ThriftHiveMetaStoreJUnitExtension customPropertiesExtension = new ThriftHiveMetaStoreJUnitExtension(
+      "custom_props_database", customConfProperties());
+
+  private void assertExtensionInitialised(ThriftHiveMetaStoreJUnitExtension hive) throws Exception {
     String databaseName = hive.databaseName();
 
     Database database = hive.client().getDatabase(databaseName);
@@ -53,52 +54,56 @@ public class ThriftHiveMetaStoreJUnitExtensionTest{
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
     assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
-    HiveConf conf = new HiveConf(ThriftHiveMetaStoreJUnitRuleTest.class);
+    HiveConf conf = new HiveConf(hive.conf());
     conf.setVar(HiveConf.ConfVars.METASTOREURIS, hive.getThriftConnectionUri());
-    HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
-    List<String> databases = client.getAllDatabases();
-    assertThat(databases.size(), is(2));
-    assertThat(databases.get(0), is("default"));
-    assertThat(databases.get(1), is(databaseName));
+    try (HiveMetaStoreClient client = new HiveMetaStoreClient(conf)) {
+      List<String> databases = client.getAllDatabases();
+      assertThat(databases.size(), is(2));
+      assertThat(databases.get(0), is("default"));
+      assertThat(databases.get(1), is(databaseName));
+    }
+  }
+
+  private Map<String, String> customConfProperties() {
+    return Collections.singletonMap("my.custom.key", "my.custom.value");
   }
 
   @Test
   public void hiveDefaultName() throws Exception {
-    assertRuleInitialised(hiveDefaultName);
+    assertExtensionInitialised(defaultDbExtension);
   }
 
   @Test
   public void hiveCustomName() throws Exception {
-    assertRuleInitialised(hiveCustomName);
+    assertExtensionInitialised(customDbExtension);
   }
 
   @Test
   public void customProperties() {
-    Map<String, String> conf = Collections.singletonMap("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new ThriftHiveMetaStoreJUnitRule("db", conf).conf();
+    HiveConf hiveConf = customPropertiesExtension.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test
   public void createExistingDatabase() {
-    assertThrows(AlreadyExistsException.class, ()
-        -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
+    assertThrows(AlreadyExistsException.class,
+        () -> defaultDbExtension.createDatabase(defaultDbExtension.databaseName()));
   }
 
   @Test
   public void createDatabaseNullName() {
-    assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
+    assertThrows(NullPointerException.class, () -> defaultDbExtension.createDatabase(null));
   }
 
   @Test
   public void createDatabaseInvalidName() {
-    assertThrows(InvalidObjectException.class, () -> hiveDefaultName.createDatabase(""));
+    assertThrows(InvalidObjectException.class, () -> defaultDbExtension.createDatabase(""));
   }
-  
+
   @Test
   public void thriftPort() {
     int thriftPort = 3333;
-    hiveDefaultName.setThriftPort(thriftPort);
-    assertThat(hiveDefaultName.getThriftPort(), is(thriftPort));
+    defaultDbExtension.setThriftPort(thriftPort);
+    assertThat(defaultDbExtension.getThriftPort(), is(thriftPort));
   }
 }

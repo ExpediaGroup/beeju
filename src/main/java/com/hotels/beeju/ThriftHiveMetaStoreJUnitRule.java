@@ -15,6 +15,8 @@
  */
 package com.hotels.beeju;
 
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
+
 import java.util.Map;
 
 import org.junit.runner.Description;
@@ -76,7 +78,7 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
 
   @Override
   protected void starting(Description description) {
-    // System.clearProperty(CONNECT_URL_KEY.getVarname());
+    System.clearProperty(CONNECT_URL_KEY.getVarname());
     try {
       thriftHiveMetaStoreCore.initialise();
     } catch (Exception e) {

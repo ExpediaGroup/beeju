@@ -19,8 +19,14 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.apache.hadoop.hive.conf.HiveConf;
+import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
+import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
+import org.apache.thrift.TException;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +34,7 @@ import org.junit.Test;
 public class HiveMetaStoreJUnitRuleTest {
 
   private static File tempRoot;
-  public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule("ZZZ");
+  public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule();
   public @Rule HiveMetaStoreJUnitRule hiveCustomName = new HiveMetaStoreJUnitRule("my_test_database");
 
 
@@ -59,28 +65,28 @@ public class HiveMetaStoreJUnitRuleTest {
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
   }
 
-//  @Test
-//  public void customProperties() {
-//    Map<String, String> conf = new HashMap<>();
-//    conf.put("my.custom.key", "my.custom.value");
-//    HiveConf hiveConf = new HiveMetaStoreJUnitRule("db", conf).conf();
-//    assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
-//  }
+  @Test
+  public void customProperties() {
+    Map<String, String> conf = new HashMap<>();
+    conf.put("my.custom.key", "my.custom.value");
+    HiveConf hiveConf = new HiveMetaStoreJUnitRule("db", conf).conf();
+    assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
+  }
 
-//  @Test(expected = AlreadyExistsException.class)
-//  public void createExistingDatabase() throws TException {
-//    hiveDefaultName.createDatabase(hiveDefaultName.databaseName());
-//  }
-//
-//  @Test(expected = NullPointerException.class)
-//  public void createDatabaseNullName() throws TException {
-//    hiveDefaultName.createDatabase(null);
-//  }
-//
-//  @Test(expected = InvalidObjectException.class)
-//  public void createDatabaseInvalidName() throws TException {
-//    hiveDefaultName.createDatabase("");
-//  }
+  @Test(expected = AlreadyExistsException.class)
+  public void createExistingDatabase() throws TException {
+    hiveDefaultName.createDatabase(hiveDefaultName.databaseName());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void createDatabaseNullName() throws TException {
+    hiveDefaultName.createDatabase(null);
+  }
+
+  @Test(expected = InvalidObjectException.class)
+  public void createDatabaseInvalidName() throws TException {
+    hiveDefaultName.createDatabase("");
+  }
 
 //  @AfterClass
 //  public static void afterClass() {

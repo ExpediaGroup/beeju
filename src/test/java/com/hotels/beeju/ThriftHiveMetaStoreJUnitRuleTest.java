@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -74,7 +74,7 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
     assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
-    HiveConf conf = new HiveConf(ThriftHiveMetaStoreJUnitRuleTest.class);
+    HiveConf conf = new HiveConf(hive.conf());
     conf.setVar(ConfVars.METASTOREURIS, hive.getThriftConnectionUri());
     HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
     List<String> databases = client.getAllDatabases();

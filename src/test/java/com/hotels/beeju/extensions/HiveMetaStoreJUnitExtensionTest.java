@@ -40,7 +40,7 @@ public class HiveMetaStoreJUnitExtensionTest {
   HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_test_database",
       customConfProperties());
 
-  private void assertRuleInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
+  private void assertExtensionInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
     String databaseName = hive.databaseName();
     Database database = hive.client().getDatabase(databaseName);
 
@@ -57,17 +57,17 @@ public class HiveMetaStoreJUnitExtensionTest {
 
   @Test
   public void defaultDbNameInitialised() throws Exception {
-    assertRuleInitialised(hiveDefaultName);
+    assertExtensionInitialised(hiveDefaultName);
   }
 
   @Test
   public void customDbNameInitialised() throws Exception {
-    assertRuleInitialised(hiveCustomDbName);
+    assertExtensionInitialised(hiveCustomDbName);
   }
 
   @Test
   public void customDbNameAndConfInitialised() throws Exception {
-    assertRuleInitialised(hiveCustomDbNameAndConf);
+    assertExtensionInitialised(hiveCustomDbNameAndConf);
   }
 
   @Test
