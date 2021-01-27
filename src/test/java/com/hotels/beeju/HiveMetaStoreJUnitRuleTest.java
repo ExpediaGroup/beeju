@@ -34,12 +34,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+//TODO: this test leaves one derby home folder behind 
 public class HiveMetaStoreJUnitRuleTest {
 
   private static File tempRoot;
-  public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule();
-  public @Rule HiveMetaStoreJUnitRule hiveCustomName = new HiveMetaStoreJUnitRule("my_test_database");
-  public @Rule HiveMetaStoreJUnitRule hiveCustomProperties = new HiveMetaStoreJUnitRule("custom_props_database", customConfProperties());
+  public @Rule HiveMetaStoreJUnitRule defaultDbRule = new HiveMetaStoreJUnitRule();
+  public @Rule HiveMetaStoreJUnitRule customDbRule = new HiveMetaStoreJUnitRule("my_test_database");
+  public @Rule HiveMetaStoreJUnitRule customPropertiesRule = new HiveMetaStoreJUnitRule("custom_props_database", customConfProperties());
 
   private Map<String, String> customConfProperties() {
     return Collections.singletonMap("my.custom.key", "my.custom.value");
@@ -47,18 +48,18 @@ public class HiveMetaStoreJUnitRuleTest {
 
   @Before
   public void before() {
-    tempRoot = hiveDefaultName.tempDir();
+    tempRoot = defaultDbRule.tempDir();
     assertTrue(tempRoot.exists());
   }
 
   @Test
   public void hiveDefaultName() throws Exception {
-    assertRuleInitialised(hiveDefaultName);
+    assertRuleInitialised(defaultDbRule);
   }
 
   @Test
   public void hiveCustomName() throws Exception {
-    assertRuleInitialised(hiveCustomName);
+    assertRuleInitialised(customDbRule);
   }
 
   private static void assertRuleInitialised(HiveMetaStoreJUnitRule hive) throws Exception {
@@ -72,23 +73,23 @@ public class HiveMetaStoreJUnitRuleTest {
 
   @Test
   public void customProperties() {
-    HiveConf hiveConf = hiveCustomProperties.conf();
+    HiveConf hiveConf = customPropertiesRule.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test(expected = AlreadyExistsException.class)
   public void createExistingDatabase() throws TException {
-    hiveDefaultName.createDatabase(hiveDefaultName.databaseName());
+    defaultDbRule.createDatabase(defaultDbRule.databaseName());
   }
 
   @Test(expected = NullPointerException.class)
   public void createDatabaseNullName() throws TException {
-    hiveDefaultName.createDatabase(null);
+    defaultDbRule.createDatabase(null);
   }
 
   @Test(expected = InvalidObjectException.class)
   public void createDatabaseInvalidName() throws TException {
-    hiveDefaultName.createDatabase("");
+    defaultDbRule.createDatabase("");
   }
 
   @AfterClass

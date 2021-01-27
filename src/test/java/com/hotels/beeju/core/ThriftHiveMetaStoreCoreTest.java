@@ -23,12 +23,19 @@ import java.util.List;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+//TODO: test leaves behind a derby home folder
 public class ThriftHiveMetaStoreCoreTest {
 
   private final BeejuCore core = new BeejuCore();
   private final ThriftHiveMetaStoreCore thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
+  
+  @AfterEach
+  public void cleanUp() {
+    core.cleanUp();
+  }
 
   @Test
   public void before() throws Exception {

@@ -25,15 +25,17 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+//TODO: tests fail with open transaction errors
+//TODO: test leaves behind a derby home folder
 public class HiveServer2JUnitExtensionTest {
 
   private static final String DATABASE = "my_test_db";
 
   @RegisterExtension
-  HiveServer2JUnitExtension customDbExtension = new HiveServer2JUnitExtension(DATABASE);
-
-  @RegisterExtension
   HiveServer2JUnitExtension defaultDbExtension = new HiveServer2JUnitExtension();
+  
+  @RegisterExtension
+  HiveServer2JUnitExtension customDbExtension = new HiveServer2JUnitExtension(DATABASE);
 
   @RegisterExtension
   HiveServer2JUnitExtension customPropertiesExtension = new HiveServer2JUnitExtension("custom_props_database",

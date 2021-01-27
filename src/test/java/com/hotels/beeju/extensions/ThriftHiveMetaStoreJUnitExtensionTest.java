@@ -32,6 +32,7 @@ import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+//TODO: test leaves behind a derby home folder
 public class ThriftHiveMetaStoreJUnitExtensionTest {
 
   @RegisterExtension

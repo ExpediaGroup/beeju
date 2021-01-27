@@ -28,16 +28,17 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+//TODO: test leaves behind a derby home folder
 public class HiveMetaStoreJUnitExtensionTest {
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveDefaultName = new HiveMetaStoreJUnitExtension();
+  HiveMetaStoreJUnitExtension defaultDbExtension = new HiveMetaStoreJUnitExtension();
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveCustomDbName = new HiveMetaStoreJUnitExtension("my_test_database");
+  HiveMetaStoreJUnitExtension customDbExtension = new HiveMetaStoreJUnitExtension("my_test_database");
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_custom_props_database",
+  HiveMetaStoreJUnitExtension customPropertiesExtension = new HiveMetaStoreJUnitExtension("custom_props_database",
       customConfProperties());
 
   private void assertExtensionInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
@@ -57,27 +58,27 @@ public class HiveMetaStoreJUnitExtensionTest {
 
   @Test
   public void defaultDbNameInitialised() throws Exception {
-    assertExtensionInitialised(hiveDefaultName);
+    assertExtensionInitialised(defaultDbExtension);
   }
 
   @Test
   public void customDbNameInitialised() throws Exception {
-    assertExtensionInitialised(hiveCustomDbName);
+    assertExtensionInitialised(customDbExtension);
   }
 
   @Test
   public void customDbNameAndConfInitialised() throws Exception {
-    assertExtensionInitialised(hiveCustomDbNameAndConf);
+    assertExtensionInitialised(customPropertiesExtension);
   }
 
   @Test
   public void createExistingDatabase() {
     assertThrows(AlreadyExistsException.class,
-        () -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
+        () -> defaultDbExtension.createDatabase(defaultDbExtension.databaseName()));
   }
 
   @Test
   public void createDatabaseNullName() {
-    assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
+    assertThrows(NullPointerException.class, () -> defaultDbExtension.createDatabase(null));
   }
 }

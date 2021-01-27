@@ -18,6 +18,7 @@ package com.hotels.beeju;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,20 +27,28 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+//TODO: this test is failing due to active transactions
+//TODO: is also leaves a derby home folder behind
 public class HiveServer2JUnitRuleTest {
 
   private static final String DATABASE = "my_test_db";
 
-  public @Rule HiveServer2JUnitRule server = new HiveServer2JUnitRule(DATABASE);
+  public @Rule HiveServer2JUnitRule defaultDbRule = new HiveServer2JUnitRule();
+  public @Rule HiveServer2JUnitRule customDbRule = new HiveServer2JUnitRule(DATABASE);
+  public @Rule HiveServer2JUnitRule customPropertiesRule = new HiveServer2JUnitRule("custom_props_database", customConfProperties());
+  
+  private Map<String, String> customConfProperties() {
+    return Collections.singletonMap("my.custom.key", "my.custom.value");
+  }
 
   @Before
   public void init() throws Exception {
-    Class.forName(server.driverClassName());
+    Class.forName(customDbRule.driverClassName());
   }
 
   @Test
   public void defaultDatabaseName() {
-    String defaultDbName = new HiveServer2JUnitRule().databaseName();
+    String defaultDbName = defaultDbRule.databaseName();
     assertThat(defaultDbName, is("test_database"));
   }
 
@@ -47,12 +56,12 @@ public class HiveServer2JUnitRuleTest {
   public void customProperties() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new HiveServer2JUnitRule(DATABASE, conf).conf();
+    HiveConf hiveConf = customPropertiesRule.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test
   public void databaseName() {
-    assertThat(server.databaseName(), is(DATABASE));
+    assertThat(customDbRule.databaseName(), is(DATABASE));
   }
 }

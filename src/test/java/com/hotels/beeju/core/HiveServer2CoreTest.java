@@ -42,6 +42,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+//TODO: test leaves behind a derby home folder
 public class HiveServer2CoreTest {
 
   private static final String DATABASE = "my_test_db";
@@ -83,6 +84,7 @@ public class HiveServer2CoreTest {
   @AfterEach
   public void afterEach() {
     server.shutdown();
+    core.cleanUp();
     // System.setSecurityManager(null);
   }
 
