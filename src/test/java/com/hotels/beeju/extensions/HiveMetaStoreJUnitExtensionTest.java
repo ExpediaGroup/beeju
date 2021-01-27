@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ public class HiveMetaStoreJUnitExtensionTest {
   HiveMetaStoreJUnitExtension hiveCustomDbName = new HiveMetaStoreJUnitExtension("my_test_database");
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_test_database",
+  HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_custom_props_database",
       customConfProperties());
 
   private void assertExtensionInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {

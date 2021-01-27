@@ -16,10 +16,12 @@
 package com.hotels.beeju;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -27,6 +29,7 @@ import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.apache.thrift.TException;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -36,17 +39,20 @@ public class HiveMetaStoreJUnitRuleTest {
   private static File tempRoot;
   public @Rule HiveMetaStoreJUnitRule hiveDefaultName = new HiveMetaStoreJUnitRule();
   public @Rule HiveMetaStoreJUnitRule hiveCustomName = new HiveMetaStoreJUnitRule("my_test_database");
+  public @Rule HiveMetaStoreJUnitRule hiveCustomProperties = new HiveMetaStoreJUnitRule("custom_props_database", customConfProperties());
 
+  private Map<String, String> customConfProperties() {
+    return Collections.singletonMap("my.custom.key", "my.custom.value");
+  }
 
   @Before
   public void before() {
-    //tempRoot = hiveDefaultName.tempDir();
-    //assertTrue(tempRoot.exists());
+    tempRoot = hiveDefaultName.tempDir();
+    assertTrue(tempRoot.exists());
   }
 
   @Test
   public void hiveDefaultName() throws Exception {
-    System.err.println("RUNNING SECOND TEST");
     assertRuleInitialised(hiveDefaultName);
   }
 
@@ -57,7 +63,6 @@ public class HiveMetaStoreJUnitRuleTest {
 
   private static void assertRuleInitialised(HiveMetaStoreJUnitRule hive) throws Exception {
     String databaseName = hive.databaseName();
-    //TODO: need to check that client is talking to expected DB, possibly its getting wrong MS for conf from thread local...
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
@@ -67,9 +72,7 @@ public class HiveMetaStoreJUnitRuleTest {
 
   @Test
   public void customProperties() {
-    Map<String, String> conf = new HashMap<>();
-    conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new HiveMetaStoreJUnitRule("db", conf).conf();
+    HiveConf hiveConf = hiveCustomProperties.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
@@ -88,8 +91,8 @@ public class HiveMetaStoreJUnitRuleTest {
     hiveDefaultName.createDatabase("");
   }
 
-//  @AfterClass
-//  public static void afterClass() {
-//    assertFalse("Found folder at " + tempRoot, tempRoot.exists());
-//  }
+  @AfterClass
+  public static void afterClass() {
+    assertFalse("Found folder at " + tempRoot, tempRoot.exists());
+  }
 }

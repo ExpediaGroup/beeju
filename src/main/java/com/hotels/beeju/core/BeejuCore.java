@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -110,11 +109,10 @@ public class BeejuCore {
     System.err
         .println(
             this + " " + databaseName + " DERBY HOME SYSTEM PROPERTY IS " + System.getProperty("derby.system.home"));
-    // TODO: try a file DB instead of memory? so they all share the same?
     // TODOL with file, something recreates older file location from first test after it has been deleted
     driverClassName = EmbeddedDriver.class.getName();
-    //connectionURL = "jdbc:derby:;databaseName=metastore_db_" + (counter++) + ";create=true";
-    connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
+    connectionURL = "jdbc:derby:;databaseName=metastore_db_" + (counter++) + ";create=true";
+    //connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
 
     // This should NOT be set as a system property too
     // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);

@@ -21,9 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.IOException;
-import java.security.Permission;
-import java.security.Policy;
-import java.security.ProtectionDomain;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -51,60 +48,42 @@ public class HiveServer2CoreTest {
   private final BeejuCore core = new BeejuCore(DATABASE);
   private final HiveServer2Core server = new HiveServer2Core(core);
 
-  private static class NoExitSecurityManager extends SecurityManager {
-    @Override
-    public void checkPermission(Permission permission) {
-      if (permission.getName().startsWith("exitVM")) {
-        throw new RuntimeException("Something called exit ");
-      }
-    }
-
-    @Override
-    public void checkPermission(Permission permission, Object context) {
-      if (permission.getName().startsWith("exitVM")) {
-        throw new RuntimeException("Something called exit ");
-      }
-    }
-
-    @Override
-    public void checkExit(int status) {
-      Thread.dumpStack();
-      throw new RuntimeException("Something called exit with status " + status);
-    }
-
-    @Override
-    public void checkMemberAccess(Class<?> clazz, int which) {}
-
-    @Override
-    public void checkPackageAccess(String pkg) {}
-  }
+  /*
+   * private static class NoExitSecurityManager extends SecurityManager {
+   * @Override public void checkPermission(Permission permission) { if (permission.getName().startsWith("exitVM")) {
+   * throw new RuntimeException("Something called exit "); } }
+   * @Override public void checkPermission(Permission permission, Object context) { if
+   * (permission.getName().startsWith("exitVM")) { throw new RuntimeException("Something called exit "); } }
+   * @Override public void checkExit(int status) { Thread.dumpStack(); throw new
+   * RuntimeException("Something called exit with status " + status); }
+   * @Override public void checkMemberAccess(Class<?> clazz, int which) {}
+   * @Override public void checkPackageAccess(String pkg) {} }
+   */
 
   @BeforeEach
   public void beforeEach() throws InterruptedException, IOException, TException {
-    Policy.getPolicy();
-
-    Policy allPermissionPolicy = new Policy() {
-
-      @Override
-      public boolean implies(ProtectionDomain domain, Permission permission) {
-        return true;
-      }
-    };
-
-    Policy.setPolicy(allPermissionPolicy);
-    // SecurityManager securityManager = System.getSecurityManager();
+    // Policy.getPolicy();
+    //
+    // Policy allPermissionPolicy = new Policy() {
+    //
+    // @Override
+    // public boolean implies(ProtectionDomain domain, Permission permission) {
+    // return true;
+    // }
+    // };
+    //
+    // Policy.setPolicy(allPermissionPolicy);
     // System.setSecurityManager(new NoExitSecurityManager());
-    System.setSecurityManager(new NoExitSecurityManager());
     server.startServerSocket();
     server.initialise();
     server.getCore().createDatabase(DATABASE);
-    //org.apache.hadoop.hive.metastore.ObjectStore
+    // org.apache.hadoop.hive.metastore.ObjectStore
   }
 
   @AfterEach
   public void afterEach() {
     server.shutdown();
-    System.setSecurityManager(null);
+    // System.setSecurityManager(null);
   }
 
   @Test
@@ -119,8 +98,6 @@ public class HiveServer2CoreTest {
     server.shutdown();
 
     assertThat(server.getHiveServer2().getServiceState(), is(Service.STATE.STOPPED));
-
-    // server.initialise();
   }
 
   @Test
@@ -213,8 +190,6 @@ public class HiveServer2CoreTest {
 
   @Test
   public void dropDatabase() throws Exception {
-
-    org.apache.derby.jdbc.EmbeddedDriver bla = new org.apache.derby.jdbc.EmbeddedDriver();
     String databaseName = "Another_DB";
 
     server.getCore().createDatabase(databaseName);
