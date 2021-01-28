@@ -46,10 +46,7 @@ abstract class BeejuJUnitRule extends TestWatcher {
 
   @Override
   protected void starting(Description description) {
-    // TODO: the problem with this rule and the others, is if before() creates something (like a folder)
-    // and then fails (e.g. creating a DB that already exists) then after() never gets called by Rule lifecycle
-    // and thus folder doesn't get cleaned up - we should fix this. Might also be a similar issue with Extension?
-    System.err.println(this + " CREATING DB " + databaseName());
+    System.err.println(this + " RULE STARTING CREATING DB " + databaseName());
     try {
       createDatabase(databaseName());
     } catch (TException e) {
@@ -59,7 +56,7 @@ abstract class BeejuJUnitRule extends TestWatcher {
 
   @Override
   protected void finished(Description description) {
-    System.err.println(this + " CLEANING UP for " + databaseName());
+    System.err.println(this + " RULE FINISHED CLEANING UP for " + databaseName());
     core.cleanUp();
   }
 
