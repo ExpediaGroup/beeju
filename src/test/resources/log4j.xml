@@ -44,7 +44,7 @@
   </logger>
 
   <root>
-    <level value="WARN" />
+    <level value="ERROR" />
     <appender-ref ref="CONSOLE" />
   </root>
 
