@@ -25,11 +25,11 @@ import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
-import org.junit.jupiter.api.Disabled;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-@Disabled
+@Ignore
 public class HiveMetaStoreJUnitExtensionTest {
 
   @RegisterExtension

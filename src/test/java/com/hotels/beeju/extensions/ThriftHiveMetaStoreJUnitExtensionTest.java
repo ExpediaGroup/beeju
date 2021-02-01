@@ -29,14 +29,14 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.AlreadyExistsException;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
-import org.junit.jupiter.api.Disabled;
+import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import com.hotels.beeju.ThriftHiveMetaStoreJUnitRule;
 import com.hotels.beeju.ThriftHiveMetaStoreJUnitRuleTest;
 
-@Disabled
+@Ignore
 public class ThriftHiveMetaStoreJUnitExtensionTest{
 
   @RegisterExtension
