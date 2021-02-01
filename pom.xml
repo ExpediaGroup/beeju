@@ -165,7 +165,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.22.2</version>
         <configuration>
-          <argLine>-Xmx1024m -XX:MaxPermSize=256m</argLine>
+          <forkedProcessExitTimeoutInSeconds>120</forkedProcessExitTimeoutInSeconds>
         </configuration>
         <dependencies>
           <!-- let surefire run JUnit 4 but also JUnit 5 tests -->
