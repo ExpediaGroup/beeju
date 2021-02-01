@@ -22,6 +22,7 @@ import java.util.Map;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import com.hotels.beeju.NoExitSecurityManager;
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
 /**
@@ -64,6 +65,11 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
+
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    securityManager.setPolicy();
+    System.setSecurityManager(securityManager);
+
     super.beforeEach(context);
     hiveMetaStoreCore.initialise();
   }

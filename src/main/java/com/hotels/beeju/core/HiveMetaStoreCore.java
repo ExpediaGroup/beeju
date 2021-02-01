@@ -15,9 +15,6 @@
  */
 package com.hotels.beeju.core;
 
-import java.security.Permission;
-import java.security.Policy;
-import java.security.ProtectionDomain;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +22,8 @@ import java.util.concurrent.Executors;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+
+import com.hotels.beeju.NoExitSecurityManager;
 
 public class HiveMetaStoreCore {
 
@@ -36,19 +35,6 @@ public class HiveMetaStoreCore {
   }
 
   public void initialise() throws InterruptedException, ExecutionException {
-    Policy.getPolicy();
-
-    Policy allPermissionPolicy = new Policy() {
-      @Override
-      public boolean implies(ProtectionDomain domain, Permission permission) {
-        return true;
-      }
-    };
-
-    Policy.setPolicy(allPermissionPolicy);
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    System.setSecurityManager(securityManager);
-
     HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
@@ -56,48 +42,11 @@ public class HiveMetaStoreCore {
     } finally {
       singleThreadExecutor.shutdown();
     }
-
-    securityManager.setExitAllowed(true);
-  }
-
-  class NoExitSecurityManager extends SecurityManager {
-
-    private boolean isExitAllowedFlag;
-
-    public NoExitSecurityManager() {
-      super();
-      isExitAllowedFlag = false;
-    }
-
-    public boolean isExitAllowed() {
-      return isExitAllowedFlag;
-    }
-
-    @Override
-    public void checkExit(int status) {
-      if (!isExitAllowed()) {
-        throw new SecurityException();
-      }
-      super.checkExit(status);
-    }
-
-    public void setExitAllowed(boolean f) {
-      isExitAllowedFlag = f;
-    }
   }
 
   public void shutdown() {
-    Policy.getPolicy();
-
-    Policy allPermissionPolicy = new Policy() {
-      @Override
-      public boolean implies(ProtectionDomain domain, Permission permission) {
-        return true;
-      }
-    };
-
-    Policy.setPolicy(allPermissionPolicy);
     NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    securityManager.setPolicy();
     System.setSecurityManager(securityManager);
 
     client.close();
