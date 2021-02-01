@@ -36,6 +36,19 @@ public class HiveMetaStoreCore {
   }
 
   public void initialise() throws InterruptedException, ExecutionException {
+    Policy.getPolicy();
+
+    Policy allPermissionPolicy = new Policy() {
+      @Override
+      public boolean implies(ProtectionDomain domain, Permission permission) {
+        return true;
+      }
+    };
+
+    Policy.setPolicy(allPermissionPolicy);
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    System.setSecurityManager(securityManager);
+
     HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
     ExecutorService singleThreadExecutor = Executors.newSingleThreadExecutor();
     try {
@@ -43,6 +56,8 @@ public class HiveMetaStoreCore {
     } finally {
       singleThreadExecutor.shutdown();
     }
+
+    securityManager.setExitAllowed(true);
   }
 
   class NoExitSecurityManager extends SecurityManager {
