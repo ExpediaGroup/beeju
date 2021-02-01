@@ -35,7 +35,7 @@ public class NoExitSecurityManager extends SecurityManager {
   @Override
   public void checkExit(int status) {
     if (!isExitAllowed()) {
-      throw new SecurityException();
+      System.out.println("System.exit call intercepted and ignored.");
     }
     super.checkExit(status);
   }

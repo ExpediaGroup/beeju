@@ -22,7 +22,6 @@ import java.util.Map;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.hotels.beeju.NoExitSecurityManager;
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
 /**
