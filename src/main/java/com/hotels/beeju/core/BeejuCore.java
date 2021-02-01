@@ -15,6 +15,7 @@
  */
 package com.hotels.beeju.core;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
@@ -36,6 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -100,7 +102,13 @@ public class BeejuCore {
     setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
     setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
 
+     conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+
+//    conf.setInt(HMS_HANDLER_ATTEMPTS.getHiveName(), 12);
+//    conf.setInt(HMS_HANDLER_ATTEMPTS.getVarname(), 12);
+
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
+    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
 
     setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
     // Hive 2.x compatibility
@@ -110,10 +118,16 @@ public class BeejuCore {
     // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
 
+     conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+
     // TODO: check if necessary or not
-//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "false");
+//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
 //    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
 //    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
+
+//    setMetastoreAndSystemProperty(MULTITHREADED, "false");
+//    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
+//    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
 
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
@@ -181,6 +195,10 @@ public class BeejuCore {
     HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
+      client.createDatabase(new Database(databaseName, null, databaseFolder, null));
+    } catch (Exception ex) {
+      // TODO: remove sout and improve
+      System.out.println("### BeejuCore: Retrying after exception " + ex.getClass() + " ...");
       client.createDatabase(new Database(databaseName, null, databaseFolder, null));
     } finally {
       client.close();
