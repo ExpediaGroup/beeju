@@ -22,11 +22,9 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
-import org.junit.Ignore;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-@Ignore
 public class HiveServer2JUnitExtensionTest {
 
   private static final String DATABASE = "my_test_db";

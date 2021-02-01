@@ -34,11 +34,9 @@ import org.apache.hadoop.hive.metastore.api.InvalidObjectException;
 import org.apache.thrift.TException;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-@Ignore
 public class ThriftHiveMetaStoreJUnitRuleTest {
 
   public @Rule ThriftHiveMetaStoreJUnitRule hiveDefaultName = new ThriftHiveMetaStoreJUnitRule();
