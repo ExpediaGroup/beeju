@@ -15,7 +15,6 @@
  */
 package com.hotels.beeju.core;
 
-import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
@@ -94,6 +93,8 @@ public class BeejuCore {
     driverClassName = EmbeddedDriver.class.getName();
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
 
+    System.setProperty("derby.system.home", "metastore_db_parent_" + UUID.randomUUID());
+
     // This should NOT be set as a system property too
     // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
     setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
@@ -108,7 +109,9 @@ public class BeejuCore {
 //    conf.setInt(HMS_HANDLER_ATTEMPTS.getVarname(), 12);
 
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
+
     conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
+    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
 
     setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
     // Hive 2.x compatibility
@@ -117,8 +120,6 @@ public class BeejuCore {
 
     // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
-
-     conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
 
     // TODO: check if necessary or not
 //    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");

@@ -68,7 +68,7 @@ public class HiveServer2CoreTest {
   }
 
   @Test
-  public void closeServer() throws InterruptedException {
+  public void closeServer() {
     server.shutdown();
 
     assertThat(server.getHiveServer2().getServiceState(), is(Service.STATE.STOPPED));
