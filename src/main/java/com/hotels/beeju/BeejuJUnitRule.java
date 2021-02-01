@@ -47,11 +47,19 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    securityManager.setPolicy();
+    System.setSecurityManager(securityManager);
+
     createDatabase(databaseName());
   }
 
   @Override
   protected void after() {
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    securityManager.setPolicy();
+    System.setSecurityManager(securityManager);
+
     try {
       core.cleanUp();
     } catch (IOException e) {

@@ -65,11 +65,6 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
-
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     super.beforeEach(context);
     hiveMetaStoreCore.initialise();
   }

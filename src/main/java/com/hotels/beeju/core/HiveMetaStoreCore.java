@@ -23,8 +23,6 @@ import java.util.concurrent.Executors;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 
-import com.hotels.beeju.NoExitSecurityManager;
-
 public class HiveMetaStoreCore {
 
   private HiveMetaStoreClient client;
@@ -45,13 +43,7 @@ public class HiveMetaStoreCore {
   }
 
   public void shutdown() {
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     client.close();
-
-    securityManager.setExitAllowed(true);
   }
 
   /**
