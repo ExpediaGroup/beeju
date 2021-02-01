@@ -72,8 +72,6 @@ public class HiveServer2CoreTest {
     server.shutdown();
 
     assertThat(server.getHiveServer2().getServiceState(), is(Service.STATE.STOPPED));
-
-    server.initialise();
   }
 
   @Test
