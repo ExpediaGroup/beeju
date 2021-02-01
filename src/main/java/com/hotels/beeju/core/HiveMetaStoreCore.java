@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
  */
 package com.hotels.beeju.core;
 
+import java.security.Permission;
+import java.security.Policy;
+import java.security.ProtectionDomain;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -42,8 +45,49 @@ public class HiveMetaStoreCore {
     }
   }
 
+  class NoExitSecurityManager extends SecurityManager {
+
+    private boolean isExitAllowedFlag;
+
+    public NoExitSecurityManager() {
+      super();
+      isExitAllowedFlag = false;
+    }
+
+    public boolean isExitAllowed() {
+      return isExitAllowedFlag;
+    }
+
+    @Override
+    public void checkExit(int status) {
+      if (!isExitAllowed()) {
+        throw new SecurityException();
+      }
+      super.checkExit(status);
+    }
+
+    public void setExitAllowed(boolean f) {
+      isExitAllowedFlag = f;
+    }
+  }
+
   public void shutdown() {
+    Policy.getPolicy();
+
+    Policy allPermissionPolicy = new Policy() {
+      @Override
+      public boolean implies(ProtectionDomain domain, Permission permission) {
+        return true;
+      }
+    };
+
+    Policy.setPolicy(allPermissionPolicy);
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    System.setSecurityManager(securityManager);
+
     client.close();
+
+    securityManager.setExitAllowed(true);
   }
 
   /**
