@@ -25,7 +25,9 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
 
+@Disabled
 public class HiveServer2JUnitRuleTest {
 
   private static final String DATABASE = "my_test_db";
