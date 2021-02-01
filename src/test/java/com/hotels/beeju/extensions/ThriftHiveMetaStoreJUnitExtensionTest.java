@@ -36,7 +36,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import com.hotels.beeju.ThriftHiveMetaStoreJUnitRule;
 import com.hotels.beeju.ThriftHiveMetaStoreJUnitRuleTest;
 
-@Disabled
 public class ThriftHiveMetaStoreJUnitExtensionTest{
 
   @RegisterExtension
