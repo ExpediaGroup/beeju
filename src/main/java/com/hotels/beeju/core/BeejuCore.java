@@ -116,6 +116,9 @@ public class BeejuCore {
     // Used to prevent "Error polling for notification events" error
     conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
 
+    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
+    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
+
     // TODO: check if necessary or not
 //    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
 //    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
@@ -124,9 +127,6 @@ public class BeejuCore {
 //    setMetastoreAndSystemProperty(MULTITHREADED, "false");
 //    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
 //    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
-
-//    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
-//    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
 
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 2000); // ConfVars.HIVE_SERVER2_WEBUI_PORT
