@@ -41,18 +41,12 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     createDatabase(databaseName());
   }
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
     core.cleanUp();
-
-    System.setSecurityManager(null);
   }
 
   /**
