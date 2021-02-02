@@ -39,14 +39,20 @@ public class HiveServer2Core {
   }
 
   public void initialise() throws InterruptedException {
+    System.err.println("XXX Starting HiveServer2 for " + this);
     beejuCore.setHiveVar(HiveConf.ConfVars.HIVE_AUTHORIZATION_MANAGER,
         RelaxedSQLStdHiveAuthorizerFactory.class.getName());
     hiveServer2 = new HiveServer2();
+    
+    String connectionUrl = beejuCore.conf().get("javax.jdo.option.ConnectionURL");
+    System.err.println("ZZZ javax.jdo.option.ConnectionURL is " + connectionUrl);
+        
     hiveServer2.init(beejuCore.conf());
     hiveServer2.start();
     waitForHiveServer2StartUp();
 
     jdbcConnectionUrl = "jdbc:hive2://localhost:" + port + "/" + beejuCore.databaseName();
+    System.err.println("ZZZ JDBC Connection URL for " + this + " is " + jdbcConnectionUrl);
   }
 
   public void shutdown() {

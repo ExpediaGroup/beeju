@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -116,18 +117,19 @@ public class BeejuCore {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-    System.setProperty("derby.system.home", derbyHome.toString());
-    System.err
-        .println(
-            this + " " + databaseName + " DERBY HOME SYSTEM PROPERTY IS " + System.getProperty("derby.system.home"));
+//    System.setProperty("derby.system.home", derbyHome.toString());
+//    System.err
+//        .println(
+//            this + " " + databaseName + " DERBY HOME SYSTEM PROPERTY IS " + System.getProperty("derby.system.home"));
     // TODOL with file, something recreates older file location from first test after it has been deleted
     driverClassName = EmbeddedDriver.class.getName();
-    connectionURL = "jdbc:derby:;databaseName=beeju_metastore_db_" + (counter++) + ";create=true";
-    // connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
+    //connectionURL = "jdbc:derby:;databaseName=beeju_metastore_db_" + (counter++) + ";create=true";
+    connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
 
     // This should NOT be set as a system property too
     // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
     setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
+    System.err.println("ZZZ Setting javax.jdo.option.ConnectionURL to " + connectionURL);
 
     setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
     setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);

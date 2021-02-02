@@ -38,7 +38,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-//TODO: test leaves behind a dery home folder
+//TODO: test leaves behind a derby home folder
 public class ThriftHiveMetaStoreJUnitRuleTest {
 
   public @Rule ThriftHiveMetaStoreJUnitRule defaultDbRule = new ThriftHiveMetaStoreJUnitRule();
