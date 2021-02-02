@@ -131,7 +131,7 @@ public class BeejuCore {
 //    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
 
     // override default port as some of our test environments claim it is in use.
-    conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
+    conf.setInt("hive.server2.webui.port", 2000); // ConfVars.HIVE_SERVER2_WEBUI_PORT
     
     try {
       // overriding default derby log path to go to tmp
