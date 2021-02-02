@@ -15,6 +15,8 @@
  */
 package com.hotels.beeju.core;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
@@ -117,8 +119,13 @@ public class BeejuCore {
     conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
 
     // Has to be added to exclude failures related to the HiveMaterializedViewsRegistry
-    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
-    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
+    conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+    System.setProperty(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+
+    // Override default port as some of our test environments claim it is in use.
+    // This should not be equal to 0 as this would actually disable the WebUI and potentially
+    // cause errors.
+    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 20002); // ConfVars.HIVE_SERVER2_WEBUI_PORT
 
     // TODO: check if necessary or not
 //    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
@@ -128,9 +135,6 @@ public class BeejuCore {
 //    setMetastoreAndSystemProperty(MULTITHREADED, "false");
 //    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
 //    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
-
-    // override default port as some of our test environments claim it is in use.
-    conf.setInt("hive.server2.webui.port", 2000); // ConfVars.HIVE_SERVER2_WEBUI_PORT
     
     try {
       // overriding default derby log path to go to tmp
