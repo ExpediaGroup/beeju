@@ -72,8 +72,8 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   @Override
   protected void before() throws Throwable {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
-    thriftHiveMetaStoreCore.initialise();
     super.before();
+    thriftHiveMetaStoreCore.initialise();
   }
 
   @Override

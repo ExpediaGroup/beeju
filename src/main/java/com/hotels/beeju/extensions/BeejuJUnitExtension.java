@@ -46,6 +46,8 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
     System.setSecurityManager(securityManager);
 
     createDatabase(databaseName());
+
+    System.setSecurityManager(null);
   }
 
   @Override
@@ -55,6 +57,8 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
     System.setSecurityManager(securityManager);
 
     core.cleanUp();
+
+    System.setSecurityManager(null);
   }
 
   /**

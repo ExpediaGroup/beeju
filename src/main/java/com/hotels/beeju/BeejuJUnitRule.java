@@ -52,6 +52,8 @@ abstract class BeejuJUnitRule extends ExternalResource {
     System.setSecurityManager(securityManager);
 
     createDatabase(databaseName());
+
+    System.setSecurityManager(null);
   }
 
   @Override
@@ -65,6 +67,8 @@ abstract class BeejuJUnitRule extends ExternalResource {
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
+
+    System.setSecurityManager(null);
   }
 
   /**

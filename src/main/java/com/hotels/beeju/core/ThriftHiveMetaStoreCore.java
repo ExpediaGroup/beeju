@@ -32,7 +32,6 @@ import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge23;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.hotels.beeju.NoExitSecurityManager;
 
 public class ThriftHiveMetaStoreCore {
 
@@ -84,10 +83,6 @@ public class ThriftHiveMetaStoreCore {
   }
 
   public void shutdown() {
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     thriftServer.shutdown();
   }
 

@@ -64,8 +64,8 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
-    thriftHiveMetaStoreCore.initialise();
     super.beforeEach(context);
+    thriftHiveMetaStoreCore.initialise();
   }
 
   @Override
