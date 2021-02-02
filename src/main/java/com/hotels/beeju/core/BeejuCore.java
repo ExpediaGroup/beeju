@@ -197,10 +197,6 @@ public class BeejuCore {
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
       client.createDatabase(new Database(databaseName, null, databaseFolder, null));
-    } catch (Exception ex) {
-      // TODO: remove sout and improve
-      System.out.println("### BeejuCore: Retrying after exception " + ex.getClass() + " ...");
-      client.createDatabase(new Database(databaseName, null, databaseFolder, null));
     } finally {
       client.close();
     }
