@@ -17,6 +17,8 @@ package com.hotels.beeju.core;
 
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_IN_TEST;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_ENABLED;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SUPPORT_CONCURRENCY;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.LOCALSCRATCHDIR;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.METASTORE_VALIDATE_COLUMNS;
@@ -46,6 +48,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -117,7 +120,7 @@ public class BeejuCore {
     } catch (IOException e) {
       throw new RuntimeException(e);
     }
-//    System.setProperty("derby.system.home", derbyHome.toString());
+    System.setProperty("derby.system.home", derbyHome.toString());
 //    System.err
 //        .println(
 //            this + " " + databaseName + " DERBY HOME SYSTEM PROPERTY IS " + System.getProperty("derby.system.home"));
@@ -129,8 +132,7 @@ public class BeejuCore {
     // This should NOT be set as a system property too
     // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
     setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
-    System.err.println("ZZZ Setting javax.jdo.option.ConnectionURL to " + connectionURL);
-
+    
     setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
     setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
     setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
@@ -150,8 +152,17 @@ public class BeejuCore {
     setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
     setMetastoreProperty(HIVE_SUPPORT_CONCURRENCY.varname, "false");
 
+//   setMetastoreAndSystemProperty(MULTITHREADED, "false");
+//  setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
+//  setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
+
+    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+//
+    conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+    System.setProperty(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+    
     // override default port as some of our test environments claim it is in use.
-    conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
+    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
 
     ////////////////
     // setMetastoreProperty("datanucleus.transactionIsolation", "read-uncommitted");

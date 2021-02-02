@@ -46,18 +46,24 @@ abstract class BeejuJUnitRule extends TestWatcher {
 
   @Override
   protected void starting(Description description) {
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    securityManager.setPolicy();
+    System.setSecurityManager(securityManager);
+    
     System.err.println(this + " RULE STARTING CREATING DB " + databaseName());
     try {
       createDatabase(databaseName());
     } catch (TException e) {
       throw new RuntimeException(e);
     }
+    //System.setSecurityManager(null);
   }
 
   @Override
   protected void finished(Description description) {
     System.err.println(this + " RULE FINISHED CLEANING UP for " + databaseName());
     core.cleanUp();
+    //System.setSecurityManager(null);
   }
 
   /**

@@ -301,4 +301,5 @@ public class HiveServer2CoreTest {
     client.close();
     return table;
   }
+  
 }

@@ -22,6 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -175,4 +177,12 @@ public class BeejuCoreTest {
     assertThat(db.getLocationUri(), is(String.format("file:%s/%s", defaultCore.tempDir(), databaseName)));
   }
 
+  
+  public void bla() {
+    Connection mockConnection = Mockito.mock(Connection.class);
+    try(MockedStatic<DriverManager> mockedDriverManager = mockStatic(DriverManager.class)) {
+        mockedDriverManager.when(() -> DriverManager.getConnection(any(), any(), any())).thenReturn(mockConnection);
+    }
+  }
+  
 }

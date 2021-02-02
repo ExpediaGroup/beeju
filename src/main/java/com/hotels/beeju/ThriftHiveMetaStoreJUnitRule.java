@@ -84,6 +84,7 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    //TODO: should we call super.starting() before we init the MS?
     super.starting(description);
   }
 

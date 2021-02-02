@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
+import com.hotels.beeju.NoExitSecurityManager;
 import com.hotels.beeju.core.BeejuCore;
 
 /**
@@ -40,12 +41,19 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
+    //TODO: compare this with ant and codehaus versions
+    NoExitSecurityManager securityManager = new NoExitSecurityManager();
+    securityManager.setPolicy();
+    System.setSecurityManager(securityManager);
+
     createDatabase(databaseName());
   }
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
     core.cleanUp();
+    
+    //System.setSecurityManager(null);
   }
 
   /**
