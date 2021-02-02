@@ -36,7 +36,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -103,15 +102,7 @@ public class BeejuCore {
     setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
     setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
 
-     conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
-
-//    conf.setInt(HMS_HANDLER_ATTEMPTS.getHiveName(), 12);
-//    conf.setInt(HMS_HANDLER_ATTEMPTS.getVarname(), 12);
-
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
-
-    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
-    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
 
     setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
     // Hive 2.x compatibility
@@ -129,6 +120,11 @@ public class BeejuCore {
 //    setMetastoreAndSystemProperty(MULTITHREADED, "false");
 //    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
 //    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
+
+//    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+//
+//    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
+//    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
 
     // override default port as some of our test environments claim it is in use.
     conf.setInt("hive.server2.webui.port", 2000); // ConfVars.HIVE_SERVER2_WEBUI_PORT
