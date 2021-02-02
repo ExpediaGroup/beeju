@@ -15,7 +15,6 @@
  */
 package com.hotels.beeju;
 
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
 import java.util.Map;
 
@@ -66,7 +65,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void before() throws Throwable {
-    System.clearProperty(CONNECT_URL_KEY.getVarname());
+    // System.clearProperty(CONNECT_URL_KEY.getVarname());
     hiveServer2Core.startServerSocket();
     super.before();
     hiveServer2Core.initialise();
