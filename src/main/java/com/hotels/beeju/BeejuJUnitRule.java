@@ -57,8 +57,6 @@ abstract class BeejuJUnitRule extends ExternalResource {
     } catch (IOException e) {
       throw new UncheckedIOException(e);
     }
-
-    System.setSecurityManager(null);
   }
 
   /**
