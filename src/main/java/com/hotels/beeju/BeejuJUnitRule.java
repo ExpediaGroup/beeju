@@ -26,6 +26,7 @@ import org.apache.thrift.TException;
 import org.junit.rules.ExternalResource;
 
 import com.hotels.beeju.core.BeejuCore;
+import com.hotels.beeju.utils.NoExitSecurityManager;
 
 /**
  * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
@@ -47,13 +48,7 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     createDatabase(databaseName());
-
-    System.setSecurityManager(null);
   }
 
   @Override

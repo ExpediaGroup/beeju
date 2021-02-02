@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.hotels.beeju.NoExitSecurityManager;
 import com.hotels.beeju.core.BeejuCore;
 
 /**

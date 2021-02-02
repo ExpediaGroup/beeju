@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.hotels.beeju;
+package com.hotels.beeju.utils;
 
 import java.security.Permission;
 import java.security.Policy;
@@ -35,7 +35,6 @@ public class NoExitSecurityManager extends SecurityManager {
   @Override
   public void checkExit(int status) {
     if (!isExitAllowed()) {
-      System.out.println("System.exit call intercepted and ignored.");
       throw new SecurityException("SecurityException: System.exit call intercepted and ignored.");
     }
     super.checkExit(status);
