@@ -58,10 +58,6 @@ abstract class BeejuJUnitRule extends ExternalResource {
 
   @Override
   protected void after() {
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     try {
       core.cleanUp();
     } catch (IOException e) {
