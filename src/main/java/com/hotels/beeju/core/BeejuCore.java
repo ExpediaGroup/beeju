@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -112,6 +113,9 @@ public class BeejuCore {
     // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
 
+    // Used to prevent "Error polling for notification events" error
+    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+
     // TODO: check if necessary or not
 //    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
 //    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
@@ -121,8 +125,6 @@ public class BeejuCore {
 //    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
 //    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
 
-//    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
-//
 //    conf.set("hive.server2.materializedviews.registry.impl", "DUMMY");
 //    System.setProperty("hive.server2.materializedviews.registry.impl", "DUMMY");
 
