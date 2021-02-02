@@ -16,6 +16,8 @@
 package com.hotels.beeju.extensions;
 
 
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
+
 import java.util.Map;
 
 import org.apache.hive.jdbc.HiveDriver;
@@ -56,7 +58,7 @@ public class HiveServer2JUnitExtension extends BeejuJUnitExtension {
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    // System.clearProperty(CONNECT_URL_KEY.getVarname());
+    System.clearProperty(CONNECT_URL_KEY.getVarname());
     hiveServer2Core.startServerSocket();
     super.beforeEach(context);
     hiveServer2Core.initialise();
