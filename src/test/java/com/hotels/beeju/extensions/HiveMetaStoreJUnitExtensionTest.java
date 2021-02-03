@@ -28,7 +28,6 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-//TODO: test leaves behind a derby home folder
 public class HiveMetaStoreJUnitExtensionTest {
 
   @RegisterExtension

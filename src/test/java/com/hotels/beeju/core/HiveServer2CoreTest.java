@@ -42,50 +42,23 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-//TODO: test leaves behind a derby home folder
 public class HiveServer2CoreTest {
 
   private static final String DATABASE = "my_test_db";
   private final BeejuCore core = new BeejuCore(DATABASE);
   private final HiveServer2Core server = new HiveServer2Core(core);
 
-  /*
-   * private static class NoExitSecurityManager extends SecurityManager {
-   * @Override public void checkPermission(Permission permission) { if (permission.getName().startsWith("exitVM")) {
-   * throw new RuntimeException("Something called exit "); } }
-   * @Override public void checkPermission(Permission permission, Object context) { if
-   * (permission.getName().startsWith("exitVM")) { throw new RuntimeException("Something called exit "); } }
-   * @Override public void checkExit(int status) { Thread.dumpStack(); throw new
-   * RuntimeException("Something called exit with status " + status); }
-   * @Override public void checkMemberAccess(Class<?> clazz, int which) {}
-   * @Override public void checkPackageAccess(String pkg) {} }
-   */
-
   @BeforeEach
   public void beforeEach() throws InterruptedException, IOException, TException {
-    // Policy.getPolicy();
-    //
-    // Policy allPermissionPolicy = new Policy() {
-    //
-    // @Override
-    // public boolean implies(ProtectionDomain domain, Permission permission) {
-    // return true;
-    // }
-    // };
-    //
-    // Policy.setPolicy(allPermissionPolicy);
-    // System.setSecurityManager(new NoExitSecurityManager());
     server.startServerSocket();
     server.initialise();
     server.getCore().createDatabase(DATABASE);
-    // org.apache.hadoop.hive.metastore.ObjectStore
   }
 
   @AfterEach
   public void afterEach() {
     server.shutdown();
     core.cleanUp();
-    // System.setSecurityManager(null);
   }
 
   @Test
@@ -118,6 +91,7 @@ public class HiveServer2CoreTest {
       statement.execute(dropHql);
     }
 
+    //TODO move this into a try with resources
     HiveMetaStoreClient client = server.getCore().newClient();
     try {
       client.getTable(DATABASE, tableName);

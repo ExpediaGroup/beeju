@@ -26,7 +26,6 @@ import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-//TODO: test leaves behind a derby home folder
 public class ThriftHiveMetaStoreCoreTest {
 
   private final BeejuCore core = new BeejuCore();

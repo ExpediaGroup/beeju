@@ -38,7 +38,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-//TODO: test leaves behind a derby home folder
 public class ThriftHiveMetaStoreJUnitRuleTest {
 
   public @Rule ThriftHiveMetaStoreJUnitRule defaultDbRule = new ThriftHiveMetaStoreJUnitRule();
@@ -82,11 +81,14 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
     HiveConf conf = new HiveConf(hive.conf());
     conf.setVar(ConfVars.METASTOREURIS, hive.getThriftConnectionUri());
-    try (HiveMetaStoreClient client = new HiveMetaStoreClient(conf)) {
+    HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
+    try {
       List<String> databases = client.getAllDatabases();
       assertThat(databases.size(), is(2));
       assertThat(databases.get(0), is("default"));
       assertThat(databases.get(1), is(databaseName));
+    } finally {
+      client.close();
     }
   }
 

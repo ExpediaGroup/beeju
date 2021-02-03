@@ -25,8 +25,6 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-//TODO: tests fail with open transaction errors
-//TODO: test leaves behind a derby home folder
 public class HiveServer2JUnitExtensionTest {
 
   private static final String DATABASE = "my_test_db";
@@ -53,7 +51,6 @@ public class HiveServer2JUnitExtensionTest {
 
   @Test
   public void defaultDatabaseName() throws Exception {
-    // TODO: this is still leaving a derby home folder behind...
     String defaultDbName = defaultDbExtension.databaseName();
     assertThat(defaultDbName, is("test_database"));
   }

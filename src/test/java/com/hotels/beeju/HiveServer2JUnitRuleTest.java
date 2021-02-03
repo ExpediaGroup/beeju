@@ -26,8 +26,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-//TODO: this test is failing due to active transactions
-//TODO: is also leaves a derby home folder behind
 public class HiveServer2JUnitRuleTest {
 
   private static final String DATABASE = "my_test_db";

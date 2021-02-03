@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.hotels.beeju.NoExitSecurityManager;
 import com.hotels.beeju.core.BeejuCore;
 
 /**
@@ -41,19 +40,12 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
 
   @Override
   public void beforeEach(ExtensionContext context) throws Exception {
-    //TODO: compare this with ant and codehaus versions
-    NoExitSecurityManager securityManager = new NoExitSecurityManager();
-    securityManager.setPolicy();
-    System.setSecurityManager(securityManager);
-
     createDatabase(databaseName());
   }
 
   @Override
   public void afterEach(ExtensionContext context) throws Exception {
     core.cleanUp();
-    
-    //System.setSecurityManager(null);
   }
 
   /**

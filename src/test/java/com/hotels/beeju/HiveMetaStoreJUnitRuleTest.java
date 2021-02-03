@@ -34,7 +34,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-//TODO: this test leaves one derby home folder behind 
 public class HiveMetaStoreJUnitRuleTest {
 
   private static File tempRoot;

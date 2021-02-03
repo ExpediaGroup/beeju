@@ -15,13 +15,13 @@
  */
 package com.hotels.beeju;
 
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
-
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
@@ -31,6 +31,8 @@ import com.hotels.beeju.core.HiveMetaStoreCore;
  * A fresh database instance will be created for each test method.
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
+  
+  private static final Logger log = LoggerFactory.getLogger(HiveMetaStoreJUnitRule.class);
 
   private final HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
@@ -54,7 +56,8 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
    * Create a Hive Metastore with a pre-created database using the provided name and configuration.
    *
    * @param databaseName Database name.
-   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+   *          with its defaults.
    */
   public HiveMetaStoreJUnitRule(String databaseName, Map<String, String> preConfiguration) {
     super(databaseName, preConfiguration);
@@ -62,9 +65,10 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   /**
    * Create a Hive Metastore with a pre-created database using the provided name and configuration.
-   *    
+   * 
    * @param databaseName Database name.
-   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+   *          with its defaults.
    * @param postConfiguration Hive configuration properties that will be set to override BeeJU's defaults.
    */
   public HiveMetaStoreJUnitRule(
@@ -76,7 +80,6 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   @Override
   protected void starting(Description description) {
-    System.clearProperty(CONNECT_URL_KEY.getVarname());
     super.starting(description);
     try {
       hiveMetaStoreCore.initialise();
@@ -88,9 +91,9 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   @Override
   protected void finished(Description description) {
     try {
-    hiveMetaStoreCore.shutdown();
+      hiveMetaStoreCore.shutdown();
     } catch (Throwable t) {
-      t.printStackTrace();
+      log.warn("Error shutting down metastore core", t);
     }
     super.finished(description);
   }
