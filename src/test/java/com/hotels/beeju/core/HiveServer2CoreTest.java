@@ -157,7 +157,7 @@ public class HiveServer2CoreTest {
         .append("OUTPUTFORMAT \n")
         .append("  'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat'\n")
         .append("LOCATION\n")
-        .append("  'file:" + server.getCore().tempDir() + "/" + DATABASE + "/" + tableName + "'\n")
+        .append("  'file:" + server.getCore().warehouseDir() + "/" + DATABASE + "/" + tableName + "'\n")
         .append("TBLPROPERTIES (\n")
         .append("  'transient_lastDdlTime'='" + table.getParameters().get("transient_lastDdlTime") + "')\n")
         .toString();
@@ -205,7 +205,7 @@ public class HiveServer2CoreTest {
       assertThat(partitions.get(0).getTableName(), is(tableName));
       assertThat(partitions.get(0).getValues(), is(Arrays.asList("1")));
       assertThat(partitions.get(0).getSd().getLocation(),
-          is(String.format("file:%s/%s/%s/partcol=1", server.getCore().tempDir(), DATABASE, tableName)));
+          is(String.format("file:%s/%s/%s/partcol=1", server.getCore().warehouseDir(), DATABASE, tableName)));
     } finally {
       client.close();
     }
@@ -226,7 +226,7 @@ public class HiveServer2CoreTest {
       partition.setSd(new StorageDescriptor(table.getSd()));
       partition
           .getSd()
-          .setLocation(String.format("file:%s/%s/%s/partcol=1", server.getCore().tempDir(), DATABASE, tableName));
+          .setLocation(String.format("file:%s/%s/%s/partcol=1", server.getCore().warehouseDir(), DATABASE, tableName));
       client.add_partition(partition);
 
       try (Connection connection = DriverManager.getConnection(server.getJdbcConnectionUrl());

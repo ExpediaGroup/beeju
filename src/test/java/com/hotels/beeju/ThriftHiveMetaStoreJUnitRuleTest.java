@@ -75,7 +75,7 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.tempDir(), databaseName);
+    File databaseFolder = new File(hive.warehouseDir(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
     assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));

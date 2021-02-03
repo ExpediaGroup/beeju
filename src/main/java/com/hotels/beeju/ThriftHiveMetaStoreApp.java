@@ -22,7 +22,6 @@ public class ThriftHiveMetaStoreApp {
   public static void main(String[] args) throws Throwable {
     ThriftHiveMetaStoreJUnitRule rule = new ThriftHiveMetaStoreJUnitRule();
     rule.setThriftPort(22334);
-    //TODO: should we create an empty description or is this fine?
     rule.starting(null);
     System.out.println("BeeJU Thrift Hive Metastore listening on: " + rule.getThriftConnectionUri());
     CountDownLatch latch = new CountDownLatch(1);

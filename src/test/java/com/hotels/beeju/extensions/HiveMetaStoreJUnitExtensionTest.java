@@ -45,7 +45,7 @@ public class HiveMetaStoreJUnitExtensionTest {
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.getTempDirectory(), databaseName);
+    File databaseFolder = new File(hive.getWarehouseDirectory(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
   }
 

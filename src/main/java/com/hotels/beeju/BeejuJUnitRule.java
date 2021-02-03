@@ -99,6 +99,13 @@ abstract class BeejuJUnitRule extends TestWatcher {
   File tempDir() {
     return core.tempDir().toFile();
   }
+  
+  /**
+   * @return Root of warehouse directory
+   */
+  File warehouseDir() {
+    return core.warehouseDir().toFile();
+  }
 
   /**
    * Create a new database with the specified name.

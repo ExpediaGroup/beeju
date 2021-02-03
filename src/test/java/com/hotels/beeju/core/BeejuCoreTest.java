@@ -119,13 +119,14 @@ public class BeejuCoreTest {
 
   @Test
   public void createDirectory() {
-    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREWAREHOUSE), is(defaultCore.tempDir().toString()));
+    assertThat(defaultCore.conf().getVar(HiveConf.ConfVars.METASTOREWAREHOUSE), is(defaultCore.warehouseDir().toString()));
   }
 
   @Test
   public void deleteDirectory() throws IOException {
     BeejuCore testCore = new BeejuCore();
     testCore.cleanUp();
+    assertFalse(Files.exists(testCore.warehouseDir()));
     assertFalse(Files.exists(testCore.tempDir()));
   }
 
@@ -172,7 +173,7 @@ public class BeejuCoreTest {
 
     assertThat(db, is(notNullValue()));
     assertThat(db.getName(), is(databaseName.toLowerCase()));
-    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", defaultCore.tempDir(), databaseName)));
+    assertThat(db.getLocationUri(), is(String.format("file:%s/%s", defaultCore.warehouseDir(), databaseName)));
   }
   
 }
