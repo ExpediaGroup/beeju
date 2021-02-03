@@ -185,6 +185,16 @@
           </dependency>
         </dependencies>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- If this class is not excluded, Jacoco throws a MethodTooLargeException when instrumenting it -->
+            <exclude>org/apache/hadoop/hive/ql/parse/HiveParser</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
