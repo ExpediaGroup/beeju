@@ -91,7 +91,6 @@ public class HiveServer2CoreTest {
       statement.execute(dropHql);
     }
 
-    //TODO move this into a try with resources
     HiveMetaStoreClient client = server.getCore().newClient();
     try {
       client.getTable(DATABASE, tableName);
