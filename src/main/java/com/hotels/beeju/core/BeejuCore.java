@@ -53,8 +53,8 @@ public class BeejuCore {
 
   protected final HiveConf conf = new HiveConf();
   private final String databaseName;
-  private final String connectionURL;
-  private final String driverClassName;
+  private String connectionURL;
+  private String driverClassName;
   private Path warehouseDir;
   private Path derbyHome;
   private Path baseDir;
@@ -91,25 +91,22 @@ public class BeejuCore {
     configure(preConfiguration);
 
     configureFolders();
-
-    driverClassName = EmbeddedDriver.class.getName();
-    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
-    connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
-    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
-    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
-    conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
-
-    // Hive 2.x compatibility
-    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
-    conf.setBoolean("hive.metastore.schema.verification", false);
-
-    // override default port as some of our test environments claim it is in use.
-    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
+    
+    configureMetastore();
+    
+    configureMisc();
 
     configure(postConfiguration);
+  }
+
+  private void configureMisc() {
+    // override default port as some of our test environments claim it is in use.
+    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
+    
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+    
+    // Disable to get rid of clean up exception when stopping the Session.
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_ENABLED, false);
   }
 
   private void configureFolders() {
@@ -124,6 +121,22 @@ public class BeejuCore {
     } catch (IOException e) {
       throw new UncheckedIOException("Error creating temporary folders", e);
     }
+  }
+  
+  private void configureMetastore() {
+    driverClassName = EmbeddedDriver.class.getName();
+    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
+    connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
+    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
+    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
+    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
+    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
+    conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
+
+    // Hive 2.x compatibility
+    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
+    conf.setBoolean("hive.metastore.schema.verification", false);
   }
 
   private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
