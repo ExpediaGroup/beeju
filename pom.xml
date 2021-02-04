@@ -137,7 +137,8 @@
           <configuration>
             <!-- excluding files that don't need a header update -->
             <excludes>
-              <exclude>src/main/java/com/hotels/beeju/core/BeejuCore.java</exclude>
+                <exclude>src/main/java/com/hotels/beeju/core/BeejuCore.java</exclude>
+                <exclude>src/main/java/com/hotels/beeju/hiveserver2/RelaxedSQLStdHiveAuthorizerFactory.java</exclude>
             </excludes>
           </configuration>
         </plugin>
@@ -146,15 +147,15 @@
 
     <plugins>
       <!-- below mess is needed in order to run both Junit4 and Junit5 tests, and is based on approach documented in
-
-        https://medium.com/@nieldw/running-junit5-and-junit4-tests-in-the-same-project-with-maven-122c8aa4f3bc
-
-        JUnit claim that Surefire plugin 2.22.2 can be used to do this:
-
-        https://junit.org/junit5/docs/current/user-guide/#running-tests-build-maven
-
-        But the approach documented there doesn't work. We should revisit this when
-        newer versions of Surefire and JUnit are released.
+      
+         https://medium.com/@nieldw/running-junit5-and-junit4-tests-in-the-same-project-with-maven-122c8aa4f3bc
+          
+         JUnit claim that Surefire plugin 2.22.2 can be used to do this:
+         
+         https://junit.org/junit5/docs/current/user-guide/#running-tests-build-maven
+         
+         But the approach documented there doesn't work. We should revisit this when 
+         newer versions of Surefire and JUnit are released.
       -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
