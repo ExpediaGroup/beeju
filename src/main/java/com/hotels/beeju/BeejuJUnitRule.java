@@ -45,7 +45,7 @@ abstract class BeejuJUnitRule extends TestWatcher {
   }
 
   @Override
-  protected void starting(Description description) {
+  public void starting(Description description) {
     try {
       createDatabase(databaseName());
     } catch (TException e) {
@@ -54,7 +54,7 @@ abstract class BeejuJUnitRule extends TestWatcher {
   }
 
   @Override
-  protected void finished(Description description) {
+  public void finished(Description description) {
     core.cleanUp();
   }
 

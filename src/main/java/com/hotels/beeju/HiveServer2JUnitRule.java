@@ -66,7 +66,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void starting(Description description) {
+  public void starting(Description description) {
     try {
       hiveServer2Core.startServerSocket();
     } catch (IOException e) {
@@ -81,7 +81,7 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void finished(Description description) {
+  public void finished(Description description) {
     try {
       hiveServer2Core.shutdown();
     } finally {

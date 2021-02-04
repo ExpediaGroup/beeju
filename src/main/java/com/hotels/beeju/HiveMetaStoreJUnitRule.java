@@ -79,7 +79,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void starting(Description description) {
+  public void starting(Description description) {
     super.starting(description);
     try {
       hiveMetaStoreCore.initialise();
@@ -89,7 +89,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void finished(Description description) {
+  public void finished(Description description) {
     try {
       hiveMetaStoreCore.shutdown();
     } catch (Throwable t) {
