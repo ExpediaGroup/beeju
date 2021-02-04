@@ -76,12 +76,12 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
 
   @Override
   public void starting(Description description) {
-    super.starting(description);
     try {
       thriftHiveMetaStoreCore.initialise();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+    super.starting(description);
   }
 
   @Override
