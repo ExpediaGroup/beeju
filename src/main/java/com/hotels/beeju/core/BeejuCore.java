@@ -125,7 +125,7 @@ public class BeejuCore {
     // Override default port as some of our test environments claim it is in use.
     // This should not be equal to 0 as this would actually disable the WebUI and potentially
     // cause errors.
-    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
+    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 20002); // ConfVars.HIVE_SERVER2_WEBUI_PORT
 
     // TODO: check if necessary or not
 //    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
