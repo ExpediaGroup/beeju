@@ -7,8 +7,8 @@
 - Hive version updated to `2.3.8` (was `2.3.7`).
 - `hive-exec` dependency changed to use `core` classifier to allow source code retrieval for easier debugging.
 - Hive's `METASTORE_CONNECTION_POOLING_TYPE` is now set to `"NONE"`.
-- Hive's `HIVESTATSAUTOGATHER` is now set to `false"`.
-- Hive's `HIVE_SERVER2_LOGGING_OPERATION_ENABLED` is now set to `false"`.
+- Hive's `HIVESTATSAUTOGATHER` is now set to `false`.
+- Hive's `HIVE_SERVER2_LOGGING_OPERATION_ENABLED` is now set to `false`.
 - Various Derby, scratch and similar folders now configured to use a base temporary folder.
 - JUnit4 Rules now extend `TestWatcher` instead of `ExternalResource` to allow cleanup of temporary folders on test failures.
 - `BeejuCore` `tempDir()` returns base temporary test folder instead of temporary Hive warehouse dir.

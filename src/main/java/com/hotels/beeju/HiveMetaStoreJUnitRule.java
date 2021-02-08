@@ -84,7 +84,7 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
     try {
       hiveMetaStoreCore.initialise();
     } catch (InterruptedException | ExecutionException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error initialising metastore core", e);
     }
   }
 

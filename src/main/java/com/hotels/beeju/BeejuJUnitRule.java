@@ -49,7 +49,7 @@ abstract class BeejuJUnitRule extends TestWatcher {
     try {
       createDatabase(databaseName());
     } catch (TException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error starting rule", e);
     }
   }
 

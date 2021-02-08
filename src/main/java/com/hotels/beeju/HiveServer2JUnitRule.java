@@ -70,13 +70,13 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
     try {
       hiveServer2Core.startServerSocket();
     } catch (IOException e) {
-      throw new UncheckedIOException(e);
+      throw new UncheckedIOException("Error starting HiveServer2 server socket", e);
     }
     super.starting(description);
     try {
       hiveServer2Core.initialise();
     } catch (InterruptedException e) {
-      throw new RuntimeException(e);
+      throw new RuntimeException("Error initialising HiveServer2 core", e);
     }
   }
 
