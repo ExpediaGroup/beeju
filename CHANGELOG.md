@@ -1,4 +1,4 @@
-## [4.0.0] - TBD
+## [4.0.0] - 2021-02-09
 ### Fixed
 - Intermediate temporary folders now cleaned up as part of test lifecycle.
 - `HiveMetaStoreCore` performs a null check before attempting to close its metastore client.
