@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,29 +40,33 @@ import org.junit.Test;
 
 public class ThriftHiveMetaStoreJUnitRuleTest {
 
-  public @Rule ThriftHiveMetaStoreJUnitRule hiveDefaultName = new ThriftHiveMetaStoreJUnitRule();
-
-  public @Rule ThriftHiveMetaStoreJUnitRule hiveCustomName = new ThriftHiveMetaStoreJUnitRule("my_test_database");
+  public @Rule ThriftHiveMetaStoreJUnitRule defaultDbRule = new ThriftHiveMetaStoreJUnitRule();
+  public @Rule ThriftHiveMetaStoreJUnitRule customDbRule = new ThriftHiveMetaStoreJUnitRule("my_test_database");
+  public @Rule ThriftHiveMetaStoreJUnitRule customPropertiesRule = new ThriftHiveMetaStoreJUnitRule("custom_props_database", customConfProperties());
 
   private static File defaultTempRoot;
   private static File customTempRoot;
+  
+  private Map<String, String> customConfProperties() {
+    return Collections.singletonMap("my.custom.key", "my.custom.value");
+  }
 
   @Before
   public void before() {
-    defaultTempRoot = hiveDefaultName.tempDir();
+    defaultTempRoot = defaultDbRule.tempDir();
     assertTrue(defaultTempRoot.exists());
-    customTempRoot = hiveCustomName.tempDir();
+    customTempRoot = customDbRule.tempDir();
     assertTrue(customTempRoot.exists());
   }
 
   @Test
   public void hiveDefaultName() throws Exception {
-    assertRuleInitialised(hiveDefaultName);
+    assertRuleInitialised(defaultDbRule);
   }
 
   @Test
   public void hiveCustomName() throws Exception {
-    assertRuleInitialised(hiveCustomName);
+    assertRuleInitialised(customDbRule);
   }
 
   private void assertRuleInitialised(ThriftHiveMetaStoreJUnitRule hive) throws Exception {
@@ -70,47 +75,51 @@ public class ThriftHiveMetaStoreJUnitRuleTest {
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.tempDir(), databaseName);
+    File databaseFolder = new File(hive.warehouseDir(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
 
     assertThat(hive.getThriftConnectionUri(), is("thrift://localhost:" + hive.getThriftPort()));
-    HiveConf conf = new HiveConf(ThriftHiveMetaStoreJUnitRuleTest.class);
+    HiveConf conf = new HiveConf(hive.conf());
     conf.setVar(ConfVars.METASTOREURIS, hive.getThriftConnectionUri());
     HiveMetaStoreClient client = new HiveMetaStoreClient(conf);
-    List<String> databases = client.getAllDatabases();
-    assertThat(databases.size(), is(2));
-    assertThat(databases.get(0), is("default"));
-    assertThat(databases.get(1), is(databaseName));
+    try {
+      List<String> databases = client.getAllDatabases();
+      assertThat(databases.size(), is(2));
+      assertThat(databases.get(0), is("default"));
+      assertThat(databases.get(1), is(databaseName));
+    } finally {
+      client.close();
+    }
   }
 
   @Test
   public void customProperties() {
     Map<String, String> conf = new HashMap<>();
     conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new ThriftHiveMetaStoreJUnitRule("db", conf).conf();
+    HiveConf hiveConf = customPropertiesRule.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test(expected = AlreadyExistsException.class)
   public void createExistingDatabase() throws TException {
-    hiveDefaultName.createDatabase(hiveDefaultName.databaseName());
+    defaultDbRule.createDatabase(defaultDbRule.databaseName());
   }
 
   @Test(expected = NullPointerException.class)
   public void createDatabaseNullName() throws TException {
-    hiveDefaultName.createDatabase(null);
+    defaultDbRule.createDatabase(null);
   }
 
   @Test(expected = InvalidObjectException.class)
   public void createDatabaseInvalidName() throws TException {
-    hiveDefaultName.createDatabase("");
+    defaultDbRule.createDatabase("");
   }
 
   @Test
   public void thriftPort() {
     int thriftPort = 3333;
-    hiveDefaultName.setThriftPort(thriftPort);
-    assertThat(hiveDefaultName.getThriftPort(), is(thriftPort));
+    defaultDbRule.setThriftPort(thriftPort);
+    assertThat(defaultDbRule.getThriftPort(), is(thriftPort));
   }
 
   @AfterClass

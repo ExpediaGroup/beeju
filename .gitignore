@@ -47,10 +47,6 @@ MANIFEST
 .\#*
 \#*
 
-# Hive
-derby.log
-metastore_db/
-
 # Ignore GPG files
 **/*.gpg
 **/*.key

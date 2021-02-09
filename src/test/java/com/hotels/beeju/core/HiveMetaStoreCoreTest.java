@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.util.concurrent.ExecutionException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 public class HiveMetaStoreCoreTest {
@@ -30,5 +31,10 @@ public class HiveMetaStoreCoreTest {
   public void clientStarted() throws ExecutionException, InterruptedException {
     hiveMetaStoreCore.initialise();
     assertNotNull(hiveMetaStoreCore.client());
+  }
+  
+  @AfterEach
+  public void cleanUp() {
+    core.cleanUp();
   }
 }

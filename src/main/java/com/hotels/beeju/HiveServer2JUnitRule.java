@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,9 +15,12 @@
  */
 package com.hotels.beeju;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 import org.apache.hive.jdbc.HiveDriver;
+import org.junit.runner.Description;
 
 import com.hotels.beeju.core.HiveServer2Core;
 
@@ -63,16 +66,27 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
-    hiveServer2Core.startServerSocket();
-    super.before();
-    hiveServer2Core.initialise();
+  public void starting(Description description) {
+    try {
+      hiveServer2Core.startServerSocket();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Error starting HiveServer2 server socket", e);
+    }
+    super.starting(description);
+    try {
+      hiveServer2Core.initialise();
+    } catch (InterruptedException e) {
+      throw new RuntimeException("Error initialising HiveServer2 core", e);
+    }
   }
 
   @Override
-  protected void after() {
-    hiveServer2Core.shutdown();
-    super.after();
+  public void finished(Description description) {
+    try {
+      hiveServer2Core.shutdown();
+    } finally {
+      super.finished(description);
+    }
   }
 
   /**
@@ -90,6 +104,5 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   public String connectionURL() {
     return hiveServer2Core.getJdbcConnectionUrl();
   }
-
 
 }

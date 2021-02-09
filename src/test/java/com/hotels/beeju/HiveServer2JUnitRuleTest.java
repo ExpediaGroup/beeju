@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.hotels.beeju;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -30,29 +30,33 @@ public class HiveServer2JUnitRuleTest {
 
   private static final String DATABASE = "my_test_db";
 
-  public @Rule HiveServer2JUnitRule server = new HiveServer2JUnitRule(DATABASE);
+  public @Rule HiveServer2JUnitRule defaultDbRule = new HiveServer2JUnitRule();
+  public @Rule HiveServer2JUnitRule customDbRule = new HiveServer2JUnitRule(DATABASE);
+  public @Rule HiveServer2JUnitRule customPropertiesRule = new HiveServer2JUnitRule("custom_props_database", customConfProperties());
+  
+  private Map<String, String> customConfProperties() {
+    return Collections.singletonMap("my.custom.key", "my.custom.value");
+  }
 
   @Before
   public void init() throws Exception {
-    Class.forName(server.driverClassName());
+    Class.forName(customDbRule.driverClassName());
   }
 
   @Test
   public void defaultDatabaseName() {
-    String defaultDbName = new HiveServer2JUnitRule().databaseName();
+    String defaultDbName = defaultDbRule.databaseName();
     assertThat(defaultDbName, is("test_database"));
   }
 
   @Test
   public void customProperties() {
-    Map<String, String> conf = new HashMap<>();
-    conf.put("my.custom.key", "my.custom.value");
-    HiveConf hiveConf = new HiveServer2JUnitRule(DATABASE, conf).conf();
+    HiveConf hiveConf = customPropertiesRule.conf();
     assertThat(hiveConf.get("my.custom.key"), is("my.custom.value"));
   }
 
   @Test
   public void databaseName() {
-    assertThat(server.databaseName(), is(DATABASE));
+    assertThat(customDbRule.databaseName(), is(DATABASE));
   }
 }

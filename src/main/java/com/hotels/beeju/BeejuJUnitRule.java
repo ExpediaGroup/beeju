@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,20 @@
 package com.hotels.beeju;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.thrift.TException;
-import org.junit.rules.ExternalResource;
+import org.junit.rules.TestWatcher;
+import org.junit.runner.Description;
 
 import com.hotels.beeju.core.BeejuCore;
 
 /**
  * Base class for BeeJU JUnit Rules that require a Hive Metastore database configuration pre-set.
  */
-abstract class BeejuJUnitRule extends ExternalResource {
+abstract class BeejuJUnitRule extends TestWatcher {
 
   protected BeejuCore core;
 
@@ -46,17 +45,17 @@ abstract class BeejuJUnitRule extends ExternalResource {
   }
 
   @Override
-  protected void before() throws Throwable {
-    createDatabase(databaseName());
+  public void starting(Description description) {
+    try {
+      createDatabase(databaseName());
+    } catch (TException e) {
+      throw new RuntimeException("Error starting rule", e);
+    }
   }
 
   @Override
-  protected void after() {
-    try {
-      core.cleanUp();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+  public void finished(Description description) {
+    core.cleanUp();
   }
 
   /**
@@ -99,6 +98,13 @@ abstract class BeejuJUnitRule extends ExternalResource {
    */
   File tempDir() {
     return core.tempDir().toFile();
+  }
+  
+  /**
+   * @return Root of warehouse directory
+   */
+  File warehouseDir() {
+    return core.warehouseDir().toFile();
   }
 
   /**

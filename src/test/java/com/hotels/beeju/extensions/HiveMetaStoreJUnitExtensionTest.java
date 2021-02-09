@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,21 +31,21 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 public class HiveMetaStoreJUnitExtensionTest {
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveDefaultName = new HiveMetaStoreJUnitExtension();
+  HiveMetaStoreJUnitExtension defaultDbExtension = new HiveMetaStoreJUnitExtension();
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveCustomDbName = new HiveMetaStoreJUnitExtension("my_test_database");
+  HiveMetaStoreJUnitExtension customDbExtension = new HiveMetaStoreJUnitExtension("my_test_database");
 
   @RegisterExtension
-  HiveMetaStoreJUnitExtension hiveCustomDbNameAndConf = new HiveMetaStoreJUnitExtension("my_test_database",
+  HiveMetaStoreJUnitExtension customPropertiesExtension = new HiveMetaStoreJUnitExtension("custom_props_database",
       customConfProperties());
 
-  private void assertRuleInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
+  private void assertExtensionInitialised(HiveMetaStoreJUnitExtension hive) throws Exception {
     String databaseName = hive.databaseName();
     Database database = hive.client().getDatabase(databaseName);
 
     assertThat(database.getName(), is(databaseName));
-    File databaseFolder = new File(hive.getTempDirectory(), databaseName);
+    File databaseFolder = new File(hive.getWarehouseDirectory(), databaseName);
     assertThat(new File(database.getLocationUri()) + "/", is(databaseFolder.toURI().toString()));
   }
 
@@ -57,27 +57,27 @@ public class HiveMetaStoreJUnitExtensionTest {
 
   @Test
   public void defaultDbNameInitialised() throws Exception {
-    assertRuleInitialised(hiveDefaultName);
+    assertExtensionInitialised(defaultDbExtension);
   }
 
   @Test
   public void customDbNameInitialised() throws Exception {
-    assertRuleInitialised(hiveCustomDbName);
+    assertExtensionInitialised(customDbExtension);
   }
 
   @Test
   public void customDbNameAndConfInitialised() throws Exception {
-    assertRuleInitialised(hiveCustomDbNameAndConf);
+    assertExtensionInitialised(customPropertiesExtension);
   }
 
   @Test
   public void createExistingDatabase() {
     assertThrows(AlreadyExistsException.class,
-        () -> hiveDefaultName.createDatabase(hiveDefaultName.databaseName()));
+        () -> defaultDbExtension.createDatabase(defaultDbExtension.databaseName()));
   }
 
   @Test
   public void createDatabaseNullName() {
-    assertThrows(NullPointerException.class, () -> hiveDefaultName.createDatabase(null));
+    assertThrows(NullPointerException.class, () -> defaultDbExtension.createDatabase(null));
   }
 }

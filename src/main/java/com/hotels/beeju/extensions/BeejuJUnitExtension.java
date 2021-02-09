@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,5 +98,12 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
    */
   public File getTempDirectory() {
     return core.tempDir().toFile();
+  }
+  
+  /**
+   * @return Root warehouse directory as a file.
+   */
+  public File getWarehouseDirectory() {
+    return core.warehouseDir().toFile();
   }
 }

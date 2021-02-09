@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc. and Klarna AB.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -30,13 +31,21 @@ import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
+import org.apache.hadoop.fs.FileUtil;
+import org.apache.hadoop.fs.permission.FsPermission;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+// This class contains some code sourced from and inspired by HiveRunner, specifically 
+// https://github.com/klarna/HiveRunner/blob/fb00a98f37abdb779547c1c98ef6fbe54d373e0c/src/main/java/com/klarna/hiverunner/StandaloneHiveServerContext.java
 public class BeejuCore {
+
+  private static final Logger log = LoggerFactory.getLogger(BeejuCore.class);
 
   // "user" conflicts with USER db and the metastore_db can't be created.
   private static final String METASTORE_DB_USER = "db_user";
@@ -44,10 +53,12 @@ public class BeejuCore {
 
   protected final HiveConf conf = new HiveConf();
   private final String databaseName;
-  private final String connectionURL;
-  private final String driverClassName;
-  private Path tempDir;
-  
+  private String connectionURL;
+  private String driverClassName;
+  private Path warehouseDir;
+  private Path derbyHome;
+  private Path baseDir;
+
   private static Map<String, String> convertToMap(HiveConf hiveConf) {
     Map<String, String> converted = new HashMap<String, String>();
     Iterator<Entry<String, String>> iterator = hiveConf.iterator();
@@ -65,20 +76,54 @@ public class BeejuCore {
   public BeejuCore(String databaseName) {
     this(databaseName, Collections.emptyMap());
   }
-  
+
   public BeejuCore(String databaseName, HiveConf preConfiguration, HiveConf postConfiguration) {
     this(databaseName, convertToMap(preConfiguration), convertToMap(postConfiguration));
   }
-  
+
   public BeejuCore(String databaseName, Map<String, String> preConfiguration) {
     this(databaseName, preConfiguration, Collections.emptyMap());
   }
-  
+
   public BeejuCore(String databaseName, Map<String, String> preConfiguration, Map<String, String> postConfiguration) {
     checkNotNull(databaseName, "databaseName is required");
     this.databaseName = databaseName;
     configure(preConfiguration);
+
+    configureFolders();
     
+    configureMetastore();
+    
+    configureMisc();
+
+    configure(postConfiguration);
+  }
+
+  private void configureMisc() {
+    // override default port as some of our test environments claim it is in use.
+    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
+    
+    conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
+    
+    // Disable to get rid of clean up exception when stopping the Session.
+    conf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_ENABLED, false);
+  }
+
+  private void configureFolders() {
+    try {
+      baseDir = Files.createTempDirectory("beeju-basedir-");
+      createAndSetFolderProperty(HiveConf.ConfVars.SCRATCHDIR, "scratchdir");
+      createAndSetFolderProperty(HiveConf.ConfVars.LOCALSCRATCHDIR, "localscratchdir");
+      createAndSetFolderProperty(HiveConf.ConfVars.HIVEHISTORYFILELOC, "hive-history");
+      
+      createDerbyPaths();
+      createWarehousePath();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Error creating temporary folders", e);
+    }
+  }
+  
+  private void configureMetastore() {
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
@@ -86,43 +131,57 @@ public class BeejuCore {
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
     conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
     conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
+
     // Hive 2.x compatibility
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("hive.metastore.schema.verification", false);
-    // override default port as some of our test environments claim it is in use.
-    conf.setInt("hive.server2.webui.port", 0); // ConfVars.HIVE_SERVER2_WEBUI_PORT
-    
-    try {
-      // overriding default derby log path to go to tmp
-      String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
-      System.setProperty("derby.stream.error.file", derbyLog);
-
-      //Creating temporary folder
-      createWarehousePath();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    
-    configure(postConfiguration);
   }
-  
+
+  private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
+    String folderPath = newFolder(baseDir, childFolderName).toAbsolutePath().toString();
+    conf.setVar(var, folderPath);
+  }
+
+  private Path newFolder(Path basedir, String folder) throws IOException {
+    Path newFolder = Files.createTempDirectory(basedir, folder);
+    FileUtil.setPermission(newFolder.toFile(), FsPermission.getDirDefault());
+    return newFolder;
+  }
+
+  private void createDerbyPaths() throws IOException {
+    derbyHome = Files.createTempDirectory(baseDir, "derby-home-");
+    System.setProperty("derby.system.home", derbyHome.toString());
+
+    // overriding default derby log path to go to tmp
+    String derbyLog = Files.createTempFile(baseDir, "derby", ".log").toString();
+    System.setProperty("derby.stream.error.file", derbyLog);
+  }
+
+  private void createWarehousePath() throws IOException {
+    warehouseDir = Files.createTempDirectory(baseDir, "hive-warehouse-");
+    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, warehouseDir.toString());
+  }
+
+  public void cleanUp() {
+    deleteDirectory(baseDir);
+  }
+
+  private void deleteDirectory(Path path) {
+    try {
+      FileUtils.deleteDirectory(path.toFile());
+    } catch (IOException e) {
+      log.warn("Error cleaning up " + path, e);
+    }
+  }
+
   private void configure(Map<String, String> customConfiguration) {
     if (customConfiguration != null) {
       for (Map.Entry<String, String> entry : customConfiguration.entrySet()) {
         conf.set(entry.getKey(), entry.getValue());
       }
     }
-  }
-
-  /**
-   * Initialise the warehouse path.
-   *
-   * @throws IOException If the initialisation fails.
-   */
-  private void createWarehousePath() throws IOException {
-    tempDir = Files.createTempDirectory("beeju_test");
-    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDir.toString());
   }
 
   void setHiveVar(HiveConf.ConfVars variable, String value) {
@@ -144,9 +203,9 @@ public class BeejuCore {
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
-    File tempFile = tempDir.toFile();
-    HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
+    File tempFile = warehouseDir.toFile();
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
+    HiveMetaStoreClient client = newClient();
     try {
       client.createDatabase(new Database(databaseName, null, databaseFolder, null));
     } finally {
@@ -156,7 +215,7 @@ public class BeejuCore {
 
   /**
    * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   * used by tests wishing to connect to the database.
+   *         used by tests wishing to connect to the database.
    */
   public HiveConf conf() {
     return new HiveConf(conf);
@@ -184,18 +243,11 @@ public class BeejuCore {
   }
 
   public Path tempDir() {
-    return tempDir;
+    return baseDir;
   }
 
-  /**
-   * Delete temporary files used during test
-   */
-  private void deleteTempDir() throws IOException {
-    FileUtils.deleteDirectory(tempDir.toFile());
-  }
-
-  public void cleanUp() throws IOException {
-    deleteTempDir();
+  public Path warehouseDir() {
+    return warehouseDir;
   }
 
   /**
@@ -213,4 +265,5 @@ public class BeejuCore {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }
   }
+
 }

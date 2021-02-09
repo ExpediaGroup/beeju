@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ public class ThriftHiveMetaStoreCore {
   }
 
   /**
-   * @return The Thrift connection {@link URI} string for the Metastore service.
+   * @return The Thrift connection string for the Metastore service.
    */
   public String getThriftConnectionUri() {
     return "thrift://localhost:" + thriftPort;

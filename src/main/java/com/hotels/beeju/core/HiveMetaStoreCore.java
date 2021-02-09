@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2019 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,9 @@ public class HiveMetaStoreCore {
   }
 
   public void shutdown() {
-    client.close();
+    if (client != null) {
+      client.close();
+    }
   }
 
   /**
@@ -52,6 +54,7 @@ public class HiveMetaStoreCore {
   public HiveMetaStoreClient client() {
     return client;
   }
+
   public static class CallableHiveClient implements Callable<HiveMetaStoreClient> {
 
     private final HiveConf hiveConf;

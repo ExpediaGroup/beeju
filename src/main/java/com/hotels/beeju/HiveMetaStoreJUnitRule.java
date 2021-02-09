@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2020 Expedia, Inc.
+ * Copyright (C) 2015-2021 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,12 @@
 package com.hotels.beeju;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
@@ -27,6 +31,8 @@ import com.hotels.beeju.core.HiveMetaStoreCore;
  * A fresh database instance will be created for each test method.
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
+  
+  private static final Logger log = LoggerFactory.getLogger(HiveMetaStoreJUnitRule.class);
 
   private final HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
@@ -50,7 +56,8 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
    * Create a Hive Metastore with a pre-created database using the provided name and configuration.
    *
    * @param databaseName Database name.
-   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+   *          with its defaults.
    */
   public HiveMetaStoreJUnitRule(String databaseName, Map<String, String> preConfiguration) {
     super(databaseName, preConfiguration);
@@ -58,9 +65,10 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
 
   /**
    * Create a Hive Metastore with a pre-created database using the provided name and configuration.
-   *    
+   * 
    * @param databaseName Database name.
-   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these with its defaults.
+   * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+   *          with its defaults.
    * @param postConfiguration Hive configuration properties that will be set to override BeeJU's defaults.
    */
   public HiveMetaStoreJUnitRule(
@@ -71,15 +79,23 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
-    super.before();
-    hiveMetaStoreCore.initialise();
+  public void starting(Description description) {
+    super.starting(description);
+    try {
+      hiveMetaStoreCore.initialise();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException("Error initialising metastore core", e);
+    }
   }
 
   @Override
-  protected void after() {
-    hiveMetaStoreCore.shutdown();
-    super.after();
+  public void finished(Description description) {
+    try {
+      hiveMetaStoreCore.shutdown();
+    } catch (Throwable t) {
+      log.warn("Error shutting down metastore core", t);
+    }
+    super.finished(description);
   }
 
   /**

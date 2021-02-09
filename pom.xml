@@ -1,5 +1,6 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -9,7 +10,7 @@
   </parent>
 
   <artifactId>beeju</artifactId>
-  <version>3.4.0-SNAPSHOT</version>
+  <version>4.0.0-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/HotelsDotCom/beeju.git</connection>
@@ -20,13 +21,19 @@
 
   <properties>
     <hadoop.version>2.7.2</hadoop.version>
-    <hive.version>2.3.7</hive.version>
+    <hive.version>2.3.8</hive.version>
     <jdk.version>1.8</jdk.version>
     <junit.jupiter.version>5.7.0</junit.jupiter.version>
     <junit.platform.version>1.3.2</junit.platform.version>
   </properties>
 
   <dependencies>
+    <!-- kryo needed for hive-exec with "core" classifier -->
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo-shaded</artifactId>
+      <version>3.0.3</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
@@ -52,6 +59,7 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-exec</artifactId>
       <version>${hive.version}</version>
+      <classifier>core</classifier>
       <exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
@@ -130,6 +138,7 @@
           <configuration>
             <!-- excluding files that don't need a header update -->
             <excludes>
+              <exclude>src/main/java/com/hotels/beeju/core/BeejuCore.java</exclude>
               <exclude>src/main/java/com/hotels/beeju/hiveserver2/RelaxedSQLStdHiveAuthorizerFactory.java</exclude>
             </excludes>
           </configuration>
@@ -139,15 +148,15 @@
 
     <plugins>
       <!-- below mess is needed in order to run both Junit4 and Junit5 tests, and is based on approach documented in
-      
-         https://medium.com/@nieldw/running-junit5-and-junit4-tests-in-the-same-project-with-maven-122c8aa4f3bc
-          
-         JUnit claim that Surefire plugin 2.22.2 can be used to do this:
-         
-         https://junit.org/junit5/docs/current/user-guide/#running-tests-build-maven
-         
-         But the approach documented there doesn't work. We should revisit this when 
-         newer versions of Surefire and JUnit are released.
+
+        https://medium.com/@nieldw/running-junit5-and-junit4-tests-in-the-same-project-with-maven-122c8aa4f3bc
+
+        JUnit claim that Surefire plugin 2.22.2 can be used to do this:
+
+        https://junit.org/junit5/docs/current/user-guide/#running-tests-build-maven
+
+        But the approach documented there doesn't work. We should revisit this when
+        newer versions of Surefire and JUnit are released.
       -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
