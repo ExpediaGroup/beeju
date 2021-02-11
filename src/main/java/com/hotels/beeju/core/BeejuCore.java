@@ -52,8 +52,15 @@ import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
 import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.thrift.TException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+
+// This class contains some code sourced from and inspired by HiveRunner, specifically
+// https://github.com/klarna/HiveRunner/blob/fb00a98f37abdb779547c1c98ef6fbe54d373e0c/src/main/java/com/klarna/hiverunner/StandaloneHiveServerContext.java
 public class BeejuCore {
+
+  private static final Logger log = LoggerFactory.getLogger(BeejuCore.class);
 
   // "user" conflicts with USER db and the metastore_db can't be created.
   private static final String METASTORE_DB_USER = "db_user";
@@ -66,7 +73,7 @@ public class BeejuCore {
   private Path warehouseDir;
   private Path derbyHome;
   private Path baseDir;
-  
+
   private static Map<String, String> convertToMap(HiveConf hiveConf) {
     Map<String, String> converted = new HashMap<String, String>();
     Iterator<Entry<String, String>> iterator = hiveConf.iterator();
@@ -169,67 +176,21 @@ public class BeejuCore {
     System.setProperty("derby.stream.error.file", derbyLog);
   }
 
-  private void configureAll() {
-    System.setProperty("derby.system.home", "metastore_db_parent_" + UUID.randomUUID());
-
-    // This should NOT be set as a system property too
-    // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
-    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
-
-    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
-    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
-    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
-
-    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
-
-    setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
-    // Hive 2.x compatibility
-    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
-    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
-
-    // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
-    setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
-
-    // Used to prevent "Error polling for notification events" error
-    conf.setTimeVar(HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
-
-    // Has to be added to exclude failures related to the HiveMaterializedViewsRegistry
-    conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
-    System.setProperty(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
-
-    // Override default port as some of our test environments claim it is in use.
-    // This should not be equal to 0 as this would actually disable the WebUI and potentially
-    // cause errors.
-    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 20002); // ConfVars.HIVE_SERVER2_WEBUI_PORT
-
-    // TODO: check if necessary or not
-//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
-//    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
-//    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
-
-//    setMetastoreAndSystemProperty(MULTITHREADED, "false");
-//    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
-//    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
-
-    try {
-      // overriding default derby log path to go to tmp
-      String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
-      System.setProperty("derby.stream.error.file", derbyLog);
-
-      //Creating temporary folder
-      createWarehousePath();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
+  private void createWarehousePath() throws IOException {
+    warehouseDir = Files.createTempDirectory(baseDir, "hive-warehouse-");
+    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, warehouseDir.toString());
   }
 
-  private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
-    conf.set(key.getVarname(), value);
-    conf.set(key.getHiveName(), value);
+  public void cleanUp() throws IOException {
+    deleteDirectory(baseDir);
+  }
 
-    System.setProperty(key.getVarname(), value);
-    System.setProperty(key.getHiveName(), value);
+  private void deleteDirectory(Path path) {
+    try {
+      FileUtils.deleteDirectory(path.toFile());
+    } catch (IOException e) {
+      log.warn("Error cleaning up " + path, e);
+    }
   }
   
   private void configure(Map<String, String> customConfiguration) {
@@ -238,16 +199,6 @@ public class BeejuCore {
         conf.set(entry.getKey(), entry.getValue());
       }
     }
-  }
-
-  /**
-   * Initialise the warehouse path.
-   *
-   * @throws IOException If the initialisation fails.
-   */
-  private void createWarehousePath() throws IOException {
-    warehouseDir = Files.createTempDirectory(baseDir, "hive-warehouse-");
-    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, warehouseDir.toString());
   }
 
   void setHiveVar(HiveConf.ConfVars variable, String value) {
@@ -312,17 +263,6 @@ public class BeejuCore {
     return baseDir;
   }
 
-  /**
-   * Delete temporary files used during test
-   */
-  private void deleteTempDir() throws IOException {
-    FileUtils.deleteDirectory(warehouseDir.toFile());
-  }
-
-  public void cleanUp() throws IOException {
-    deleteTempDir();
-  }
-
   public Path warehouseDir() {
     return warehouseDir;
   }
@@ -341,5 +281,68 @@ public class BeejuCore {
     } catch (MetaException e) {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }
+  }
+
+  private void configureAll() {
+    System.setProperty("derby.system.home", "metastore_db_parent_" + UUID.randomUUID());
+
+    // This should NOT be set as a system property too
+    // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
+    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
+
+    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
+    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
+    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
+
+    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
+
+    setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
+    // Hive 2.x compatibility
+    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
+    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
+
+    // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
+    setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
+
+    // Used to prevent "Error polling for notification events" error
+    conf.setTimeVar(HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+
+    // Has to be added to exclude failures related to the HiveMaterializedViewsRegistry
+    conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+    System.setProperty(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+
+    // Override default port as some of our test environments claim it is in use.
+    // This should not be equal to 0 as this would actually disable the WebUI and potentially
+    // cause errors.
+    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 20002); // ConfVars.HIVE_SERVER2_WEBUI_PORT
+
+    // TODO: check if necessary or not
+//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
+//    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
+//    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
+
+//    setMetastoreAndSystemProperty(MULTITHREADED, "false");
+//    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
+//    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
+
+    try {
+      // overriding default derby log path to go to tmp
+      String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
+      System.setProperty("derby.stream.error.file", derbyLog);
+
+      //Creating temporary folder
+      createWarehousePath();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
+
+  }
+
+  private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
+    conf.set(key.getVarname(), value);
+    conf.set(key.getHiveName(), value);
+
+    System.setProperty(key.getVarname(), value);
+    System.setProperty(key.getHiveName(), value);
   }
 }
