@@ -17,15 +17,7 @@ package com.hotels.beeju.core;
 
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
-import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.HMS_HANDLER_FORCE_RELOAD_CONF;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.PWD;
-import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.SCHEMA_VERIFICATION;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -111,7 +103,7 @@ public class BeejuCore {
 
     configureMisc();
 
-    configureAll();
+    configureHive3Specific();
 
     configure(postConfiguration);
   }
@@ -148,12 +140,23 @@ public class BeejuCore {
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
     conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+
+//    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
+//    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
+//    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
+//    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
+
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
     conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
+
+//    setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
 
     // Hive 2.x compatibility
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("hive.metastore.schema.verification", false);
+
+//    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
+//    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
   }
 
   private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
@@ -181,7 +184,7 @@ public class BeejuCore {
     setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, warehouseDir.toString());
   }
 
-  public void cleanUp() throws IOException {
+  public void cleanUp() {
     deleteDirectory(baseDir);
   }
 
@@ -283,23 +286,8 @@ public class BeejuCore {
     }
   }
 
-  private void configureAll() {
+  private void configureHive3Specific() {
     System.setProperty("derby.system.home", "metastore_db_parent_" + UUID.randomUUID());
-
-    // This should NOT be set as a system property too
-    // conf.set(CONNECT_URL_KEY.getVarname(), connectionURL);
-    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
-
-    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
-    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
-    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
-
-    conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
-
-    setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
-    // Hive 2.x compatibility
-    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
-    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
 
     // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
@@ -314,28 +302,7 @@ public class BeejuCore {
     // Override default port as some of our test environments claim it is in use.
     // This should not be equal to 0 as this would actually disable the WebUI and potentially
     // cause errors.
-    conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 20002); // ConfVars.HIVE_SERVER2_WEBUI_PORT
-
-    // TODO: check if necessary or not
-//    setMetastoreAndSystemProperty(HIVE_IN_TEST, "true");
-//    setMetastoreAndSystemProperty(CONNECTION_POOLING_TYPE, "NONE");
-//    setMetastoreAndSystemProperty(HIVE_SUPPORT_CONCURRENCY, "false");
-
-//    setMetastoreAndSystemProperty(MULTITHREADED, "false");
-//    setMetastoreAndSystemProperty(NON_TRANSACTIONAL_READ, "false");
-//    setMetastoreAndSystemProperty(DATANUCLEUS_TRANSACTION_ISOLATION, "serializable");
-
-    try {
-      // overriding default derby log path to go to tmp
-      String derbyLog = File.createTempFile("derby", ".log").getCanonicalPath();
-      System.setProperty("derby.stream.error.file", derbyLog);
-
-      //Creating temporary folder
-      createWarehousePath();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
+    // conf.setInt(HIVE_SERVER2_WEBUI_PORT.varname, 20002); // ConfVars.HIVE_SERVER2_WEBUI_PORT
   }
 
   private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
