@@ -18,9 +18,12 @@ package com.hotels.beeju;
 
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 import org.apache.hive.jdbc.HiveDriver;
+import org.junit.runner.Description;
 
 import com.hotels.beeju.core.HiveServer2Core;
 
@@ -66,17 +69,28 @@ public class HiveServer2JUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
+  public void starting(Description description) {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
-    hiveServer2Core.startServerSocket();
-    super.before();
-    hiveServer2Core.initialise();
+    try {
+      hiveServer2Core.startServerSocket();
+    } catch (IOException e) {
+      throw new UncheckedIOException("Error starting HiveServer2 server socket", e);
+    }
+    super.starting(description);
+    try {
+      hiveServer2Core.initialise();
+    } catch (InterruptedException e) {
+      throw new RuntimeException("Error initialising HiveServer2 core", e);
+    }
   }
 
   @Override
-  protected void after() {
-    hiveServer2Core.shutdown();
-    super.after();
+  public void finished(Description description) {
+    try {
+      hiveServer2Core.shutdown();
+    } finally {
+      super.finished(description);
+    }
   }
 
   /**

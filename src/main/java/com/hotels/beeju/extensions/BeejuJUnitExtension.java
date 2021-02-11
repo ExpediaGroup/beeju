@@ -99,4 +99,11 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
   public File getTempDirectory() {
     return core.tempDir().toFile();
   }
+
+  /**
+   * @return Root warehouse directory as a file.
+   */
+  public File getWarehouseDirectory() {
+    return core.warehouseDir().toFile();
+  }
 }

@@ -20,6 +20,8 @@ import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNE
 
 import java.util.Map;
 
+import org.junit.runner.Description;
+
 import com.hotels.beeju.core.ThriftHiveMetaStoreCore;
 
 /**
@@ -71,16 +73,23 @@ public class ThriftHiveMetaStoreJUnitRule extends HiveMetaStoreJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
+  public void starting(Description description) {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
-    thriftHiveMetaStoreCore.initialise();
-    super.before();
+    try {
+      thriftHiveMetaStoreCore.initialise();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    super.starting(description);
   }
 
   @Override
-  protected void after() {
-    thriftHiveMetaStoreCore.shutdown();
-    super.after();
+  public void finished(Description description) {
+    try {
+      thriftHiveMetaStoreCore.shutdown();
+    } finally {
+      super.finished(description);
+    }
   }
 
   /**

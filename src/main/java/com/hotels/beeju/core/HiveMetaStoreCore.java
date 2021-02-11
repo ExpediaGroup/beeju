@@ -43,7 +43,9 @@ public class HiveMetaStoreCore {
   }
 
   public void shutdown() {
-    client.close();
+    if (client != null) {
+      client.close();
+    }
   }
 
   /**

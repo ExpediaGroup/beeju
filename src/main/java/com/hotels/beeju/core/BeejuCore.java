@@ -60,7 +60,7 @@ public class BeejuCore {
   private final String databaseName;
   private final String connectionURL;
   private final String driverClassName;
-  private Path tempDir;
+  private Path warehouseDir;
   
   private static Map<String, String> convertToMap(HiveConf hiveConf) {
     Map<String, String> converted = new HashMap<String, String>();
@@ -173,8 +173,8 @@ public class BeejuCore {
    * @throws IOException If the initialisation fails.
    */
   private void createWarehousePath() throws IOException {
-    tempDir = Files.createTempDirectory("beeju_test");
-    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, tempDir.toString());
+    warehouseDir = Files.createTempDirectory("beeju_test");
+    setHiveVar(HiveConf.ConfVars.METASTOREWAREHOUSE, warehouseDir.toString());
   }
 
   void setHiveVar(HiveConf.ConfVars variable, String value) {
@@ -196,7 +196,7 @@ public class BeejuCore {
    * @throws TException If an error occurs creating the database.
    */
   public void createDatabase(String databaseName) throws TException {
-    File tempFile = tempDir.toFile();
+    File tempFile = warehouseDir.toFile();
     HiveMetaStoreClient client = new HiveMetaStoreClient(new HiveConf(conf));
     String databaseFolder = new File(tempFile, databaseName).toURI().toString();
     try {
@@ -236,18 +236,22 @@ public class BeejuCore {
   }
 
   public Path tempDir() {
-    return tempDir;
+    return warehouseDir;
   }
 
   /**
    * Delete temporary files used during test
    */
   private void deleteTempDir() throws IOException {
-    FileUtils.deleteDirectory(tempDir.toFile());
+    FileUtils.deleteDirectory(warehouseDir.toFile());
   }
 
   public void cleanUp() throws IOException {
     deleteTempDir();
+  }
+
+  public Path warehouseDir() {
+    return warehouseDir;
   }
 
   /**

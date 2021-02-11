@@ -19,8 +19,12 @@ package com.hotels.beeju;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
+import org.junit.runner.Description;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.hotels.beeju.core.HiveMetaStoreCore;
 
@@ -30,6 +34,7 @@ import com.hotels.beeju.core.HiveMetaStoreCore;
  * A fresh database instance will be created for each test method.
  */
 public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
+  private static final Logger log = LoggerFactory.getLogger(HiveMetaStoreJUnitRule.class);
 
   private final HiveMetaStoreCore hiveMetaStoreCore = new HiveMetaStoreCore(core);
 
@@ -74,16 +79,24 @@ public class HiveMetaStoreJUnitRule extends BeejuJUnitRule {
   }
 
   @Override
-  protected void before() throws Throwable {
+  public void starting(Description description) {
     System.clearProperty(CONNECT_URL_KEY.getVarname());
-    super.before();
-    hiveMetaStoreCore.initialise();
+    super.starting(description);
+    try {
+      hiveMetaStoreCore.initialise();
+    } catch (InterruptedException | ExecutionException e) {
+      throw new RuntimeException("Error initialising metastore core", e);
+    }
   }
 
   @Override
-  protected void after() {
-    hiveMetaStoreCore.shutdown();
-    super.after();
+  public void finished(Description description) {
+    try {
+      hiveMetaStoreCore.shutdown();
+    } catch (Throwable t) {
+      log.warn("Error shutting down metastore core", t);
+    }
+    super.finished(description);
   }
 
   /**
