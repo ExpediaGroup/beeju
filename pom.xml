@@ -28,6 +28,12 @@
   </properties>
 
   <dependencies>
+    <!-- kryo needed for hive-exec with "core" classifier -->
+    <dependency>
+      <groupId>com.esotericsoftware</groupId>
+      <artifactId>kryo-shaded</artifactId>
+      <version>3.0.3</version>
+    </dependency>
     <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-common</artifactId>
@@ -53,6 +59,7 @@
       <groupId>org.apache.hive</groupId>
       <artifactId>hive-exec</artifactId>
       <version>${hive.version}</version>
+      <classifier>core</classifier>
       <exclusions>
         <exclusion>
           <groupId>org.apache.logging.log4j</groupId>
@@ -141,6 +148,7 @@
           <configuration>
             <!-- excluding files that don't need a header update -->
             <excludes>
+              <exclude>src/main/java/com/hotels/beeju/core/BeejuCore.java</exclude>
               <exclude>src/main/java/com/hotels/beeju/hiveserver2/RelaxedSQLStdHiveAuthorizerFactory.java</exclude>
             </excludes>
           </configuration>
