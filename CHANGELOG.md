@@ -1,3 +1,7 @@
+## [5.0.0] - TBD
+### Changed
+- Hive version updated to `3.1.2` (was `2.3.7`) and Hadoop version updated to `3.1.0` (was `2.7.2`).
+
 ## [3.4.0] - TBD
 ### Changed
 - `hotels-oss-parent` version updated to `6.1.0` (was `5.0.0`) to enable building with Java 11.

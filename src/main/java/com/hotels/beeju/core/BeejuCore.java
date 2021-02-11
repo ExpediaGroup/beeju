@@ -15,6 +15,7 @@
  */
 package com.hotels.beeju.core;
 
+import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
@@ -116,7 +117,7 @@ public class BeejuCore {
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
 
     // Used to prevent "Error polling for notification events" error
-    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+    conf.setTimeVar(HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
 
     // Has to be added to exclude failures related to the HiveMaterializedViewsRegistry
     conf.set(HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
