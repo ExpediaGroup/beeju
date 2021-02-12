@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -27,7 +28,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -103,8 +103,8 @@ public class BeejuCore {
   }
 
   private void configureMisc() {
-    Random random = new Random();
-    int webUIPort = random.ints(20000, 21000).findFirst().getAsInt();
+    int webUIPort = getWebUIPort();
+
     // override default port as some of our test environments claim it is in use.
     conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, webUIPort);
     
@@ -130,6 +130,17 @@ public class BeejuCore {
 
     System.setProperty(key.getVarname(), value);
     System.setProperty(key.getHiveName(), value);
+  }
+
+  private int getWebUIPort() {
+    // Try to find a free port, if impossible return the default port 0 which disables the WebUI altogether
+    int DEFAULT_PORT = 0;
+
+    try (ServerSocket socket = new ServerSocket(0)) {
+      return socket.getLocalPort();
+    } catch (IOException e) {
+      return DEFAULT_PORT;
+    }
   }
 
   private void configureFolders() {
