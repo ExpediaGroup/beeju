@@ -147,10 +147,17 @@ public class BeejuCore {
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
-    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
-    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+
+//    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
+//    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
+//    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
+//    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.CONNECT_URL_KEY, connectionURL);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.CONNECTION_DRIVER, driverClassName);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.CONNECTION_USER_NAME, METASTORE_DB_USER);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.PWD, METASTORE_DB_PASSWORD);
+
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
     conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
 
