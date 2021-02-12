@@ -162,11 +162,8 @@ public class BeejuCore {
     conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
 
     // Hive 2.x compatibility
-    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
-    conf.setBoolean("hive.metastore.schema.verification", false);
-
-    System.setProperty("datanucleus.schema.autoCreateAll", "true");
-    System.setProperty("hive.metastore.schema.verification", "false");
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.AUTO_CREATE_ALL, "true");
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.SCHEMA_VERIFICATION, "false");
   }
 
   private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
