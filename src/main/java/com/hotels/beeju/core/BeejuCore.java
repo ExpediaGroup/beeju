@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -37,6 +38,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,6 +109,24 @@ public class BeejuCore {
     
     // Disable to get rid of clean up exception when stopping the Session.
     conf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_ENABLED, false);
+
+    // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH, "false");
+
+    // Used to prevent "Error polling for notification events" error
+    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+
+    // Has to be added to exclude failures related to the HiveMaterializedViewsRegistry
+    conf.set(HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+    System.setProperty(HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+  }
+
+  private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
+    conf.set(key.getVarname(), value);
+    conf.set(key.getHiveName(), value);
+
+    System.setProperty(key.getVarname(), value);
+    System.setProperty(key.getHiveName(), value);
   }
 
   private void configureFolders() {
@@ -137,6 +157,9 @@ public class BeejuCore {
     // Hive 2.x compatibility
     conf.setBoolean("datanucleus.schema.autoCreateAll", true);
     conf.setBoolean("hive.metastore.schema.verification", false);
+
+    System.setProperty("datanucleus.schema.autoCreateAll", "true");
+    System.setProperty("hive.metastore.schema.verification", "false");
   }
 
   private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
