@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -102,8 +103,10 @@ public class BeejuCore {
   }
 
   private void configureMisc() {
+    Random random = new Random();
+    int webUIPort = random.ints(20000, 21000).findFirst().getAsInt();
     // override default port as some of our test environments claim it is in use.
-    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
+    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, webUIPort);
     
     conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
     
