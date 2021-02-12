@@ -103,7 +103,7 @@ public class BeejuCore {
 
   private void configureMisc() {
     // override default port as some of our test environments claim it is in use.
-    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
+    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 20002);
     
     conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
     
