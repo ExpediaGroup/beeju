@@ -17,7 +17,13 @@ package com.hotels.beeju.core;
 
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL;
 import static org.apache.hadoop.hive.conf.HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.AUTO_CREATE_ALL;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_DRIVER;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECTION_USER_NAME;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
 import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.PWD;
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.SCHEMA_VERIFICATION;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -135,15 +141,16 @@ public class BeejuCore {
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
-    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
-    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
 
-//    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
-//    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
-//    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
-//    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
+//    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
+//    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
+//    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
+//    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+
+    setMetastoreAndSystemProperty(CONNECT_URL_KEY, connectionURL);
+    setMetastoreAndSystemProperty(CONNECTION_DRIVER, driverClassName);
+    setMetastoreAndSystemProperty(CONNECTION_USER_NAME, METASTORE_DB_USER);
+    setMetastoreAndSystemProperty(PWD, METASTORE_DB_PASSWORD);
 
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
     conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
@@ -151,11 +158,11 @@ public class BeejuCore {
 //    setMetastoreAndSystemProperty(HMS_HANDLER_FORCE_RELOAD_CONF, "true");
 
     // Hive 2.x compatibility
-    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
-    conf.setBoolean("hive.metastore.schema.verification", false);
+//    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
+//    conf.setBoolean("hive.metastore.schema.verification", false);
 
-//    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
-//    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
+    setMetastoreAndSystemProperty(AUTO_CREATE_ALL, "true");
+    setMetastoreAndSystemProperty(SCHEMA_VERIFICATION, "false");
   }
 
   private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
@@ -286,7 +293,7 @@ public class BeejuCore {
   }
 
   private void configureHive3Specific() {
-    System.setProperty("derby.system.home", "metastore_db_parent_" + UUID.randomUUID());
+    // System.setProperty("derby.system.home", "metastore_db_parent_" + UUID.randomUUID());
 
     // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
     setMetastoreAndSystemProperty(EVENT_DB_NOTIFICATION_API_AUTH, "false");
