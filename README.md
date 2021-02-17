@@ -26,6 +26,10 @@ Depend on BeeJU using:
     </dependency>
 ```
 
+## Hive version compatibility
+
+This version of BeeJU is intended for use with Hive 3.1.2. For Hive 2.x support, please use BeeJU 4.0.0.
+
 ## JUnit5
 ### ThriftHiveMetaStoreJUnitExtension
 This extension creates an in-memory Hive database and a Thrift Hive Metastore service on top of this. This can then be used to perform Hive Thrift API calls in a test. The extension exposes a Thrift URI that can be injected into the class under test and a Hive Metastore Client which can be used for data setup and assertions.
