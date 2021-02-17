@@ -140,7 +140,8 @@ public class BeejuCore {
       return socket.getLocalPort();
     } catch (IOException e) {
       log.info(
-          "No free port available for the Web UI. Setting the port to " + defaultPort + ", which disables the WebUI.");
+          "No free port available for the Web UI. Setting the port to " + defaultPort + ", which disables the WebUI.",
+          e);
       return defaultPort;
     }
   }
