@@ -1,4 +1,4 @@
-## [5.0.0] - TBD
+## [5.0.0] - 2021-03-01
 ### Changed
 - Hive version updated to `3.1.2` (was `2.3.7`) and Hadoop version updated to `3.1.0` (was `2.7.2`).
 
