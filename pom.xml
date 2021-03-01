@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>beeju</artifactId>
-  <version>4.0.1-SNAPSHOT</version>
+  <version>5.0.0-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/HotelsDotCom/beeju.git</connection>
@@ -19,8 +19,9 @@
   </scm>
 
   <properties>
-    <hadoop.version>2.7.2</hadoop.version>
-    <hive.version>2.3.8</hive.version>
+    <hadoop.version>3.1.0</hadoop.version>
+    <hive.version>3.1.2</hive.version>
+    <tez.version>0.9.1</tez.version>
     <jdk.version>1.8</jdk.version>
     <junit.jupiter.version>5.7.0</junit.jupiter.version>
     <junit.platform.version>1.3.2</junit.platform.version>
@@ -102,6 +103,16 @@
       <version>${hive.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.tez</groupId>
+      <artifactId>tez-common</artifactId>
+      <version>${tez.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tez</groupId>
+      <artifactId>tez-dag</artifactId>
+      <version>${tez.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
       <version>2.2</version>
@@ -181,6 +192,16 @@
             <version>${junit.jupiter.version}</version>
           </dependency>
         </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- If this class is not excluded, Jacoco throws a MethodTooLargeException when instrumenting it -->
+            <exclude>org/apache/hadoop/hive/ql/parse/HiveParser</exclude>
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

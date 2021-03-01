@@ -20,6 +20,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
@@ -28,6 +29,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.derby.jdbc.EmbeddedDriver;
@@ -37,6 +39,7 @@ import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
 import org.apache.hadoop.hive.metastore.api.Database;
 import org.apache.hadoop.hive.metastore.api.MetaException;
+import org.apache.hadoop.hive.metastore.conf.MetastoreConf;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,22 +94,56 @@ public class BeejuCore {
     configure(preConfiguration);
 
     configureFolders();
-    
+
     configureMetastore();
-    
+
     configureMisc();
 
     configure(postConfiguration);
   }
 
   private void configureMisc() {
+    int webUIPort = getWebUIPort();
+
     // override default port as some of our test environments claim it is in use.
-    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, 0);
-    
+    conf.setIntVar(HiveConf.ConfVars.HIVE_SERVER2_WEBUI_PORT, webUIPort);
+
     conf.setBoolVar(HiveConf.ConfVars.HIVESTATSAUTOGATHER, false);
-    
+
     // Disable to get rid of clean up exception when stopping the Session.
     conf.setBoolVar(HiveConf.ConfVars.HIVE_SERVER2_LOGGING_OPERATION_ENABLED, false);
+
+    // Used to prevent "Not authorized to make the get_current_notificationEventId call" errors
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.EVENT_DB_NOTIFICATION_API_AUTH, "false");
+
+    // Used to prevent "Error polling for notification events" error
+    conf.setTimeVar(HiveConf.ConfVars.HIVE_NOTFICATION_EVENT_POLL_INTERVAL, 0, TimeUnit.MILLISECONDS);
+
+    // Has to be added to exclude failures related to the HiveMaterializedViewsRegistry
+    conf.set(HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+    System.setProperty(HiveConf.ConfVars.HIVE_SERVER2_MATERIALIZED_VIEWS_REGISTRY_IMPL.varname, "DUMMY");
+  }
+
+  private void setMetastoreAndSystemProperty(MetastoreConf.ConfVars key, String value) {
+    conf.set(key.getVarname(), value);
+    conf.set(key.getHiveName(), value);
+
+    System.setProperty(key.getVarname(), value);
+    System.setProperty(key.getHiveName(), value);
+  }
+
+  private int getWebUIPort() {
+    // Try to find a free port, if impossible return the default port 0 which disables the WebUI altogether
+    int defaultPort = 0;
+
+    try (ServerSocket socket = new ServerSocket(0)) {
+      return socket.getLocalPort();
+    } catch (IOException e) {
+      log.info(
+          "No free port available for the Web UI. Setting the port to " + defaultPort + ", which disables the WebUI.",
+          e);
+      return defaultPort;
+    }
   }
 
   private void configureFolders() {
@@ -115,28 +152,30 @@ public class BeejuCore {
       createAndSetFolderProperty(HiveConf.ConfVars.SCRATCHDIR, "scratchdir");
       createAndSetFolderProperty(HiveConf.ConfVars.LOCALSCRATCHDIR, "localscratchdir");
       createAndSetFolderProperty(HiveConf.ConfVars.HIVEHISTORYFILELOC, "hive-history");
-      
+
       createDerbyPaths();
       createWarehousePath();
     } catch (IOException e) {
       throw new UncheckedIOException("Error creating temporary folders", e);
     }
   }
-  
+
   private void configureMetastore() {
     driverClassName = EmbeddedDriver.class.getName();
     conf.setBoolean("hcatalog.hive.client.cache.disabled", true);
     connectionURL = "jdbc:derby:memory:" + UUID.randomUUID() + ";create=true";
-    conf.setVar(HiveConf.ConfVars.METASTORECONNECTURLKEY, connectionURL);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_DRIVER, driverClassName);
-    conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_USER_NAME, METASTORE_DB_USER);
-    conf.setVar(HiveConf.ConfVars.METASTOREPWD, METASTORE_DB_PASSWORD);
+
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.CONNECT_URL_KEY, connectionURL);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.CONNECTION_DRIVER, driverClassName);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.CONNECTION_USER_NAME, METASTORE_DB_USER);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.PWD, METASTORE_DB_PASSWORD);
+
     conf.setVar(HiveConf.ConfVars.METASTORE_CONNECTION_POOLING_TYPE, "NONE");
     conf.setBoolVar(HiveConf.ConfVars.HMSHANDLERFORCERELOADCONF, true);
 
     // Hive 2.x compatibility
-    conf.setBoolean("datanucleus.schema.autoCreateAll", true);
-    conf.setBoolean("hive.metastore.schema.verification", false);
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.AUTO_CREATE_ALL, "true");
+    setMetastoreAndSystemProperty(MetastoreConf.ConfVars.SCHEMA_VERIFICATION, "false");
   }
 
   private void createAndSetFolderProperty(HiveConf.ConfVars var, String childFolderName) throws IOException {
@@ -215,7 +254,7 @@ public class BeejuCore {
 
   /**
    * @return a copy of the {@link HiveConf} used to create the Hive Metastore database. This {@link HiveConf} should be
-   *         used by tests wishing to connect to the database.
+   * used by tests wishing to connect to the database.
    */
   public HiveConf conf() {
     return new HiveConf(conf);
@@ -265,5 +304,4 @@ public class BeejuCore {
       throw new RuntimeException("Unable to create HiveMetaStoreClient", e);
     }
   }
-
 }

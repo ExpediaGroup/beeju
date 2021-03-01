@@ -15,6 +15,8 @@
  */
 package com.hotels.beeju.extensions;
 
+import static org.apache.hadoop.hive.metastore.conf.MetastoreConf.ConfVars.CONNECT_URL_KEY;
+
 import java.util.Map;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -60,7 +62,8 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
   }
 
   @Override
-  public void beforeEach(ExtensionContext context) throws Exception{
+  public void beforeEach(ExtensionContext context) throws Exception {
+    System.clearProperty(CONNECT_URL_KEY.getVarname());
     thriftHiveMetaStoreCore.initialise();
     super.beforeEach(context);
   }

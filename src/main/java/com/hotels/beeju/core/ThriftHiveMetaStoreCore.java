@@ -27,8 +27,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.metastore.HiveMetaStore;
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
-import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge;
-import org.apache.hadoop.hive.thrift.HadoopThriftAuthBridge23;
+import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge;
+import org.apache.hadoop.hive.metastore.security.HadoopThriftAuthBridge23;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,15 +57,12 @@ public class ThriftHiveMetaStoreCore {
     }
     beejuCore.setHiveVar(HiveConf.ConfVars.METASTOREURIS, getThriftConnectionUri());
     final HiveConf hiveConf = new HiveConf(beejuCore.conf(), HiveMetaStoreClient.class);
-    thriftServer.execute(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          HadoopThriftAuthBridge bridge = new HadoopThriftAuthBridge23();
-          HiveMetaStore.startMetaStore(thriftPort, bridge, hiveConf, startLock, startCondition, startedServing);
-        } catch (Throwable e) {
-          LOG.error("Unable to start a Thrift server for Hive Metastore", e);
-        }
+    thriftServer.execute(() -> {
+      try {
+        HadoopThriftAuthBridge bridge = HadoopThriftAuthBridge23.getBridge();
+        HiveMetaStore.startMetaStore(thriftPort, bridge, hiveConf, startLock, startCondition, startedServing);
+      } catch (Throwable e) {
+        LOG.error("Unable to start a Thrift server for Hive Metastore", e);
       }
     });
     int i = 0;

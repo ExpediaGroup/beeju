@@ -1,3 +1,7 @@
+## [5.0.0] - 2021-03-01
+### Changed
+- Hive version updated to `3.1.2` (was `2.3.7`) and Hadoop version updated to `3.1.0` (was `2.7.2`).
+
 ## [4.0.0] - 2021-02-09
 ### Fixed
 - Intermediate temporary folders now cleaned up as part of test lifecycle.
