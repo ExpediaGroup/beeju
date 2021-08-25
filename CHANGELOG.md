@@ -27,7 +27,7 @@
 ### Changed
 - Allow passing in of "pre" and "post" configuration values so that BeeJU's defaults can be overridden.
 - JUnit version updated to `5.7.0` (was `5.5.2`).
-- `hotels-oss-parent` version updated to `5.0.0` (was `4.2.0`). 
+- `hotels-oss-parent` version updated to `5.0.0` (was `4.2.0`).
 
 ## [3.2.0] - 2020-10-14
 ### Added
@@ -35,7 +35,7 @@
 - A `ThriftHiveMetaStoreApp` which can be used to run the the Thrift Hive Metastore service locally.
 
 ### Changed
-- Changed visibility of `createDatabase()` method in `BeejuJUnitRule` from default to public (for external usage). 
+- Changed visibility of `createDatabase()` method in `BeejuJUnitRule` from default to public (for external usage).
 
 ## [3.1.0] - 2020-05-13
 ### Changed
@@ -49,14 +49,14 @@
 
 ## [3.0.1] - 2019-09-27
 ### Changed
-- `HiveMetaStoreJUnitExtension` and `HiveServer2JUnitExtension` constructors made public to allow access to classes outside of the extensions package. 
+- `HiveMetaStoreJUnitExtension` and `HiveServer2JUnitExtension` constructors made public to allow access to classes outside of the extensions package.
 
 ## [3.0.0] - 2019-09-06
 ### Changed
 - JDK version upgrade to 1.8 (was 1.7).
 
 ### Added
-- JUnit5 extension class equivalents for all BeeJU Rules. 
+- JUnit5 extension class equivalents for all BeeJU Rules.
 
 ## [2.0.0] - 2019-09-02
 ### Added
@@ -64,7 +64,7 @@
 
 ### Changed
 - Excluded `org.pentaho.pentaho-aggdesigner-algorithm` dependency as it's not available in Maven Central.
-- `hotels-oss-parent` version updated to 4.1.0 (was 4.0.1). 
+- `hotels-oss-parent` version updated to 4.1.0 (was 4.0.1).
 
 ## [1.3.2] - 2019-07-10
 ### Changed
@@ -77,9 +77,9 @@
 
 ## [1.3.0] - 2018-12-18
 ### Changed
-- `log4j-slf4j-impl` transitive dependency excluded. See [#17](https://github.com/HotelsDotCom/beeju/issues/17).
-- Hive version upgraded to 2.3.4 (was 2.3.0) and transitive dependencies on HBase which in turn depended on JDK tools 1.7 excluded. See [#19](https://github.com/HotelsDotCom/beeju/issues/19).
-- `hotels-oss` parent pom upgraded to 2.3.3 (was 2.0.6). See [#19](https://github.com/HotelsDotCom/beeju/issues/19).
+- `log4j-slf4j-impl` transitive dependency excluded. See [#17](https://github.com/ExpediaGroup/beeju/issues/17).
+- Hive version upgraded to 2.3.4 (was 2.3.0) and transitive dependencies on HBase which in turn depended on JDK tools 1.7 excluded. See [#19](https://github.com/ExpediaGroup/beeju/issues/19).
+- `hotels-oss` parent pom upgraded to 2.3.3 (was 2.0.6). See [#19](https://github.com/ExpediaGroup/beeju/issues/19).
 
 ## [1.2.1] - 2017-11-09
 ### Changed
