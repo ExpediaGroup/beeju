@@ -22,7 +22,7 @@
   </scm>
 
   <properties>
-    <hadoop.version>3.1.0</hadoop.version>
+    <hadoop.version>3.2.3</hadoop.version>
     <hive.version>3.1.2</hive.version>
     <tez.version>0.9.1</tez.version>
     <jdk.version>1.8</jdk.version>
