@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2021 Expedia, Inc.
+ * Copyright (C) 2015-2024 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.hotels.beeju.extensions;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.hadoop.hive.metastore.HiveMetaStoreClient;
@@ -45,7 +46,7 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
    * @param databaseName Database name.
    */
   public HiveMetaStoreJUnitExtension(String databaseName) {
-    this(databaseName, null);
+    this(databaseName, Collections.emptyMap(), Collections.emptyMap());
   }
 
   /**
@@ -55,7 +56,20 @@ public class HiveMetaStoreJUnitExtension extends BeejuJUnitExtension {
    * @param configuration Hive configuration properties.
    */
   public HiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
-    super(databaseName, configuration);
+    this(databaseName, configuration, Collections.emptyMap());
+  }
+
+ /**
+  * @param databaseName Database name.
+  * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+  *          with its defaults.
+  * @param postConfiguration Hive configuration properties that will be set to override BeeJU's defaults.
+  */
+  public HiveMetaStoreJUnitExtension(
+      String databaseName,
+      Map<String, String> preConfiguration,
+      Map<String, String> postConfiguration) {
+    super(databaseName, preConfiguration, postConfiguration);  
     hiveMetaStoreCore = new HiveMetaStoreCore(core);
   }
 
