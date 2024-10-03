@@ -1,3 +1,7 @@
+## [4.0.1] - 2024-10-03
+### Changed
+- Added constructors to override HiveConf in extensions.
+
 ## [4.0.0] - 2021-02-09
 ### Fixed
 - Intermediate temporary folders now cleaned up as part of test lifecycle.
