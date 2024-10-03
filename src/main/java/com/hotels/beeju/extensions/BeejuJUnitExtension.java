@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2021 Expedia, Inc.
+ * Copyright (C) 2015-2024 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.hotels.beeju.extensions;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Map;
 
 import org.apache.hadoop.hive.conf.HiveConf;
@@ -35,7 +36,14 @@ public abstract class BeejuJUnitExtension implements BeforeEachCallback, AfterEa
   protected BeejuCore core;
 
   public BeejuJUnitExtension(String databaseName, Map<String, String> configuration) {
-    core = new BeejuCore(databaseName, configuration);
+    this(databaseName, configuration, Collections.emptyMap());
+  }
+
+  public BeejuJUnitExtension(
+      String databaseName,
+      Map<String, String> preConfiguration,
+      Map<String, String> postConfiguration) {
+    core = new BeejuCore(databaseName, preConfiguration, postConfiguration);
   }
 
   @Override

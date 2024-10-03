@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2015-2021 Expedia, Inc.
+ * Copyright (C) 2015-2024 Expedia, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package com.hotels.beeju.extensions;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -36,7 +37,7 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
    * Create a Thrift Hive Metastore service with a pre-created database "test_database".
    */
   public ThriftHiveMetaStoreJUnitExtension() {
-    this("test_database");
+    this("test_database", Collections.emptyMap(), Collections.emptyMap());
   }
 
   /**
@@ -45,7 +46,7 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
    * @param databaseName Database name.
    */
   public ThriftHiveMetaStoreJUnitExtension(String databaseName) {
-    this(databaseName, null);
+    this(databaseName, Collections.emptyMap(), Collections.emptyMap());
   }
 
   /**
@@ -55,7 +56,20 @@ public class ThriftHiveMetaStoreJUnitExtension extends HiveMetaStoreJUnitExtensi
    * @param configuration Hive configuration properties.
    */
   public ThriftHiveMetaStoreJUnitExtension(String databaseName, Map<String, String> configuration) {
-    super(databaseName, configuration);
+    this(databaseName, configuration, Collections.emptyMap());
+  }
+
+  
+ /**
+  * Create a Thrift Hive Metastore service with a pre-created database using the provided name and configuration.
+  *
+  * @param databaseName Database name.
+  * @param preConfiguration Hive configuration properties that will be set prior to BeeJU potentially overriding these
+  *          with its defaults.
+  * @param postConfiguration Hive configuration properties that will be set to override BeeJU's defaults.
+  */
+  public ThriftHiveMetaStoreJUnitExtension(String databaseName, Map<String, String> preConfiguration, Map<String, String> postConfiguration) {
+    super(databaseName, preConfiguration, postConfiguration);
     thriftHiveMetaStoreCore = new ThriftHiveMetaStoreCore(core);
   }
 
