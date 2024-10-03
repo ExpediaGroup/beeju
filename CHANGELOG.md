@@ -1,3 +1,7 @@
+## [5.0.1] - 2024-10-03
+### Changed
+- Nothing changed, please ignore.
+
 ## [5.0.0] - 2021-03-01
 ### Changed
 - Hive version updated to `3.1.2` (was `2.3.7`) and Hadoop version updated to `3.1.0` (was `2.7.2`).
