@@ -9,7 +9,7 @@
   </parent>
 
   <artifactId>beeju</artifactId>
-  <version>4.0.2-SNAPSHOT</version>
+  <version>4.0.1-SNAPSHOT</version>
 
   <scm>
     <connection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/HotelsDotCom/beeju.git</connection>
