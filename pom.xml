@@ -10,14 +10,14 @@
 
   <groupId>com.hotels</groupId>
   <artifactId>beeju</artifactId>
-  <version>4.0.1-SNAPSHOT</version>
+  <version>4.0.1</version>
   <inceptionYear>2015</inceptionYear>
 
   <scm>
     <connection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/HotelsDotCom/beeju.git</connection>
     <developerConnection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/HotelsDotCom/beeju.git</developerConnection>
     <url>https://github.com/HotelsDotCom/beeju</url>
-    <tag>HEAD</tag>
+    <tag>beeju-4.0.1</tag>
   </scm>
 
   <properties>
