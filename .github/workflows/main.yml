@@ -5,16 +5,16 @@ on: [push, pull_request]
 jobs:
   test:
     name: Package and run all tests
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 0
     - name: Set up JDK
-    uses: actions/setup-java@v2
-    with:
-      distribution: 'adopt'
-      java-version: '8'
-      java-package: jdk
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '8'
+        java-package: jdk
     - name: Run Maven Targets
       run: mvn package jacoco:report --batch-mode --show-version --activate-profiles -DrepoToken=${{ secrets.COVERALLS_REPO_TOKEN }}
