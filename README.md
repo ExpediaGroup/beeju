@@ -4,7 +4,7 @@
 # Start using
 You can obtain BeeJU from Maven Central:
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.hotels/beeju/badge.svg?subject=com.hotels:beeju)](https://maven-badges.herokuapp.com/maven-central/com.hotels/beeju) ![build](https://github.com/ExpediaGroup/beeju/workflows/build/badge.svg?event=push) [![Coverage Status](https://coveralls.io/repos/github/ExpediaGroup/beeju/badge.svg?branch=main)](https://coveralls.io/github/ExpediaGroup/beeju) ![GitHub license](https://img.shields.io/github/license/ExpediaGroup/beeju.svg)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.expediagroup/beeju/badge.svg?subject=com.ls:beeju)](https://maven-badges.herokuapp.com/maven-central/com.expediagroup/beeju) ![build](https://github.com/ExpediaGroup/beeju/workflows/build/badge.svg?event=push) [![Coverage Status](https://coveralls.io/repos/github/ExpediaGroup/beeju/badge.svg?branch=main)](https://coveralls.io/github/ExpediaGroup/beeju) ![GitHub license](https://img.shields.io/github/license/ExpediaGroup/beeju.svg)
 
 # Overview
 BeeJU provides [JUnit5 Extensions](https://junit.org/junit5/docs/current/user-guide/#extensions) that can be used to write test code that tests [Hive](https://hive.apache.org/). The JUnit lifecycle extension points are a means to provide resources in a test and automatically tear them down when the life cycle of a test ends.
@@ -19,7 +19,7 @@ Depend on BeeJU using:
 
 ```xml
     <dependency>
-        <groupId>com.hotels</groupId>
+        <groupId>com.expediagroup</groupId>
         <artifactId>beeju</artifactId>
         <version>....</version>
         <scope>test</scope>

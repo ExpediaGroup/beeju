@@ -1,3 +1,8 @@
+
+## [5.0.3] - 2025-07-21
+### Changed 
+- Switched to groupId `com.expediagroup`
+
 ## [5.0.1] - 2024-10-03
 ### Changed
 - Nothing changed, please ignore.
