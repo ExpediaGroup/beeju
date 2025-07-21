@@ -10,14 +10,14 @@
 
   <groupId>com.expediagroup</groupId>
   <artifactId>beeju</artifactId>
-  <version>5.0.3-SNAPSHOT</version>
+  <version>5.0.3</version>
   <inceptionYear>2015</inceptionYear>
 
   <scm>
     <connection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/ExpediaGroup/beeju.git</connection>
     <developerConnection>scm:git:https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/ExpediaGroup/beeju.git</developerConnection>
     <url>https://github.com/ExpediaGroup/beeju</url>
-    <tag>HEAD</tag>
+    <tag>beeju-5.0.3</tag>
   </scm>
 
   <properties>
