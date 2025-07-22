@@ -10,6 +10,7 @@
 
   <groupId>com.expediagroup</groupId>
   <artifactId>beeju</artifactId>
+  <name>beeju</name>
   <version>5.0.3-SNAPSHOT</version>
   <inceptionYear>2015</inceptionYear>
 
