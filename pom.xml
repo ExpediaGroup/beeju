@@ -12,7 +12,7 @@
   <artifactId>beeju</artifactId>
   <name>beeju</name>
   <packaging>jar</packaging>
-  <version>5.0.3-SNAPSHOT</version>
+  <version>5.0.4-SNAPSHOT</version>
   <inceptionYear>2015</inceptionYear>
 
   <scm>
